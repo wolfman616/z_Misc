@@ -6,7 +6,7 @@ SetWorkingDir %A_ScriptDir%
 coordmode tooltip, screen
 global Matched_String:="",global p,global name2,global Link_Match:=
 WAV_Index:= 0, p := 1, yyy :=1,
-NeedleWav:="i)(https:\/\/[a-z\d-]+[\\\/\w \.-]*\/?[\d_]*\.wav)"
+NeedleWav:="i)(https:\/\/[a-z\d-]+[\\\/\w \.-]*\/?[a-z\s\w\d_'-]*\.wav)"
 sURL=% clipboard
 surlA=%sURL%
 SplitPath, sURLa, namex, dirx, extx, name_no_extx, drivex
