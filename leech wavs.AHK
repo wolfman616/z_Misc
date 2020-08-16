@@ -34,6 +34,6 @@ if ErrorLevel
 		urlDownloadtoFile,%Link_Match%,%File_Name%
 	sleep 50
 	}
-TrayTip, %Domain%, % "Wav Leech Operation Success`nFiles:" WAV_Index "`nDownloaded to`n" Folder_Name,4000,4000 
+TrayTip, %Domain%, % "Wav Leech Operation Success`nFiles:" WAV_Index "`nDownloaded to`n" Folder_Name
 Exit  
 }		
