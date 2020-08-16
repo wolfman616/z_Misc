@@ -6,7 +6,7 @@ SetWorkingDir %A_ScriptDir%
 coordmode tooltip, screen
 global Matched_String:="",global p,global name2,global Link_Match:=
 WAV_Index:= 0, p := 1, yyy :=1,
-NeedleWav:="i)(https:\/\/[a-z\d-]+[\\\/\w \.-]*\/?[a-z\s\w\d_'-]*\.wav)"
+NeedleWav:="i)(https:\/\/[a-z\d-]+[\\\/\w \.-]*\/?[\(\)a-z\s\w\d_'-]*\.wav)"
 sURL=% clipboard
 surlA=%sURL%
 SplitPath, sURLa, namex, dirx, extx, name_no_extx, drivex
@@ -32,9 +32,10 @@ if errorlevel
 	FoundWav:=1,	WAV_Index := WAV_Index + 1, p := p + StrLen(Matched_String), Link_Match := StrReplace(Matched_String, "\" , "")		
 	SplitPath, Link_Match, name2, dir2, ext2, name_no_ext2, drive2
 	name2:=StrReplace(name2, "/","")		;name2:=regexreplace(name2, "\/","")
-	File_Name=%Link_Match%
-	urldownloadtoFile,%Link_Match%,%Folder_Name%\%name2%
-	sleep 300
+	File_Name=%Folder_Name%\%name2%
+	if !fileexist File_Name
+		urldownloadtoFile,%Link_Match%,%File_Name%
+	sleep 50
 	}
 tooltip,% "Wav Leech Operation Success`nFiles:" WAV_Index "`nDownloaded to" Folder_Name,4000,4000 
 SetTimer Tooloff, -5000
