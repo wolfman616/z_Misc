@@ -1,36 +1,35 @@
 ﻿#NoEnv
 #persistent
-#singleinstance force
+#SingleInstance force
 SendMode Input
 SetWorkingDir %A_ScriptDir%
-#SingleInstance force
-STAR=%clipboardall%
+
+Clip_Data=%ClipboardAll%
 Gui, Add, Text, x12 y10 w310 h30, Please enter note.
 Gui, Add, Button, x230 y40 w60 h20, OK ;  OK button
 Gui, Add, Edit, x12 y40 w200 h20 vDATA_ENTRY, ; edit box to input a note
 Gui, Show, w320 h80, NoteAdd 
 GuiControl, Focus, DATA_ENTRY
-retrieved:=0
+Retrieved:=0
 Return
 
-#IF !retrieved
+#IF !Retrieved
 ~Enter:: ; Define ENTER as hotkey conditionally with pass through
 ~NumpadEnter:: 
-	Gui, Submit ; saves entry
-	if !DATA_ENTRY
-		tooltip, your cock doesnt seem to have appeared, ((a_screenwidth/2)-40), ((a_screenheight/2)-10)
-	else
-		{
-		output=%A_ScriptDir%\a%DATA_ENTRY%.txt
-		FileAppend, %STAR%, %output%
-		InvokeVerb(output, "Cut")
-		GuiClose: ; Close the GUI
-		ToolTIP= Clipboard data in %A_ScriptDir%\%DATA_ENTRY%.txt`n File copied to clipboard
-		tooltip, %ToolTIP%,center,center
-		settimer tooloff, -1500
-		retrieved:=1
-		Exitapp
-		}
+Gui, Submit ; saves entry
+if !DATA_ENTRY
+	TrayTip, Clipboard,  Write a note, ((a_screenwidth/2)-40), ((a_screenheight/2)-10)
+else
+	{
+	CoordMode ToolTip, Screen
+	Output=%A_ScriptDir%\a%DATA_ENTRY%.txt
+	FileAppend, %Clip_Data%, %output%
+	InvokeVerb(output, "Cut")
+	GuiClose: ; Close the GUI
+	TrayTip, Clipboard, Clipboard data saved to %DATA_ENTRY%.txt
+	Retrieved:=1
+	Exitapp
+	}
 
 InvokeVerb(path, menu, validate=True) {
 	;by A_Samurai
@@ -59,52 +58,3 @@ InvokeVerb(path, menu, validate=True) {
     } else
         objFolderItem.InvokeVerbEx(Menu)
 }
-
-tooloff:
-tooltip,
-return
-
-
-
-
-
-
-
-
-
-/* 
-
-
-
-Gui, Add, Edit, vMyEdit w135, Add Notes and press Enter`n
-
-gui, show
-
-
-
-
-
-
-
-
-
-
-
-
-while GetKeyState, returned , enter , p
-{
-if returned 
-break
-}
-GuiControlGet, MyEdit
-gui, hide
-ToolTIP:= "Clipboard data in %A_ScriptDir%\SHITCUNT.txt`n File copied to clipboard"
-tooltip, %tooltip%, (a_screenwidth/2)-40, (a_screenheight/2)-10
-
-settimer tooloff, 1000
-return
-
-tooloff:
-tooltip,
-return
- */
