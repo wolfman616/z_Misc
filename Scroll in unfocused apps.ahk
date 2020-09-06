@@ -5,60 +5,73 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 ;SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 global Mouse_ClassNN
 
+
 +PgDn::    ;Wheel Right = page down without interfering with selection
-	MouseGetPos,,, Mouse_hWnd, Mouse_ClassNN
 	WinGetClass, Active_WinClass , A
+	MouseGetPos, , , Mouse_hWnd, Mouse_ClassNN
 	WinGetClass, Mouse_WinClass , ahk_id %Mouse_hWnd%
-	WinGetTitle Mouse_WinTitle, ahk_id %Mouse_hWnd%
-	ControlGet, Mouse_ControLhWnd, Hwnd ,, %Mouse_ClassNN%, ahk_id %Mouse_hWnd%
-	if Active_WinClass != Mouse_WinClass
-		background_page_scrolling:=1
-	if Mouse_WinClass in MozillaWindowClass
+	;WinGetTitle Mouse_WinTitle, ahk_id %Mouse_hWnd%	;ControlGet, Mouse_ControLhWnd, Hwnd ,, %Mouse_ClassNN%, ahk_id %Mouse_hWnd%
+	if Active_WinClass != % Mouse_WinClass
+		{
+	if Mouse_WinClass in MozillaWindowClass,Chrome_WidgetWin_1
 		{
 		controlsend, %Mouse_ClassNN%, { PgDn }, ahk_id %Mouse_hWnd%
-		tooltip cunt %Mouse_ClassNN%
-		}
-	else if Mouse_WinClass in CabinetWClass,Notepad++
+		} else if Mouse_WinClass in CabinetWClass,Notepad++
 		{
 		if Mouse_ClassNN=DirectUIHWND2
 			SendMessage, 0x115, 3, 2, ScrollBar2,  ahk_id %Mouse_hWnd%
 		else	
 			SendMessage, 0x115, 3, 2, %Mouse_ClassNN%,  ahk_id %Mouse_hWnd%
-
-	} else {
-		tooltip unknown process`n%Mouse_ClassNN%`n%Mouse_WinTitle%
-		SetTimer, ToolOff, -1200
+		} else 
+		if Mouse_ClassNN=WindowsForms10.Window.8.app.0.34f5582_r6_ad1
+			controlsend, %Mouse_ClassNN%, { Right } , ahk_id %Mouse_hWnd%
+		else 
+			ControlSend, , { PgDn }, ahk_id %Mouse_hWnd%
 		}
+	else
+	if Mouse_WinClass in CabinetWClass,Notepad++
+		{
+		if Mouse_ClassNN=DirectUIHWND2
+			SendMessage, 0x115, 3, 2, ScrollBar2,  ahk_id %Mouse_hWnd%
+		else	
+			SendMessage, 0x115, 3, 2, %Mouse_ClassNN%,  ahk_id %Mouse_hWnd%
+		} else 
+			send, { pgdn }
 	Return    
 
 +PgUp::    ;Wheel Left = page up without interfering with selection
-	MouseGetPos, ax, ay, Mouse_hWnd, Mouse_ClassNN
 	WinGetClass, Active_WinClass , A
+	MouseGetPos, , , Mouse_hWnd, Mouse_ClassNN
 	WinGetClass, Mouse_WinClass , ahk_id %Mouse_hWnd%
-	WinGetTitle Mouse_WinTitle, ahk_id %Mouse_hWnd%
-	ControlGet, Mouse_ControLhWnd, Hwnd ,, %Mouse_ClassNN%, ahk_id %Mouse_hWnd%
-	if Active_WinClass != Mouse_WinClass
-		background_page_scrolling:=1
+	;ControlGet, Mouse_ControLhWnd, Hwnd ,, %Mouse_ClassNN%, ahk_id %Mouse_hWnd%
+	if Active_WinClass != % Mouse_WinClass
+		{
 	if Mouse_WinClass in MozillaWindowClass
 		controlsend, %Mouse_ClassNN%, { PgUp }, ahk_id %Mouse_hWnd%
-	else if Mouse_WinClass in CabinetWClass,Notepad++
-		{
-		if Mouse_ClassNN=DirectUIHWND2
-			SendMessage, 0x115, 2, 2, ScrollBar2,  ahk_id %Mouse_hWnd%
-		else	
-			SendMessage, 0x115, 2, 2, %Mouse_ClassNN%,  ahk_id %Mouse_hWnd%
-
-	} else {
-		ToolTip, unknown process`n%Mouse_ClassNN%`n%Mouse_WinTitle%
-		SetTimer, ToolOff, -1200
-		}
+	else 
+		if Mouse_WinClass in Chrome_WidgetWin_1
+			controlsendraw, %Mouse_ClassNN%, { PgUp }, ahk_id %Mouse_hWnd%
+	else
+		if Mouse_WinClass in CabinetWClass,Notepad++
+			{
+			if Mouse_ClassNN=DirectUIHWND2
+				SendMessage, 0x115, 2, 2, ScrollBar2,  ahk_id %Mouse_hWnd%
+			else	
+				SendMessage, 0x115, 2, 2, %Mouse_ClassNN%,  ahk_id %Mouse_hWnd%
+			} else
+		if Mouse_ClassNN=WindowsForms10.Window.8.app.0.34f5582_r6_ad1
+			controlsend, %Mouse_ClassNN%, { Left } , ahk_id %Mouse_hWnd%
+		else {
+		ControlSend, %Mouse_ClassNN%, { PgUp }, ahk_id %Mouse_hWnd%
+	}	} else
+		if Mouse_WinClass in CabinetWClass,Notepad++
+			{
+			if Mouse_ClassNN=DirectUIHWND2
+				SendMessage, 0x115, 2, 2, ScrollBar2,  ahk_id %Mouse_hWnd%
+			else	
+				SendMessage, 0x115, 2, 2, %Mouse_ClassNN%,  ahk_id %Mouse_hWnd%
+			} else send, { pgup }
 	Return    
-
-ToolOff:
-{
-Tooltip,
-Return
-}
 
 /* 
 SB_LINEUP			:= 0		; Scrolls one line up.
