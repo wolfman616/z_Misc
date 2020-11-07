@@ -3,7 +3,6 @@
 #SingleInstance
 SetWorkingDir %A_ScriptDir% 
 SplitPath, 1 , OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
-Dickhead="%1%"
 Gui, GuiName:new , , Poop
 Gui +HwndMyGuiHwnd
 Gui, Add, Text,, Start Pos Min:
@@ -19,38 +18,35 @@ Gui, Add, Edit, w80 Center R1 Number vEnd_Sec
 GuiControl,, End_Min, 0
 GuiControl,, End_Sec, 0
 Gui, Add, CheckBox, center vRemove, Remove
-Gui, Add, Button, Center w80 gcunt, OK
+Gui, Add, Button, Center w80 gSub, OK
 Gui, Show , Center, Poop
 return
 
-cunt:
+Sub:
+Gui, Submit
+Gui, Destroy ;Start_Min:=Start_Min * 60	;Start_Pos:=Start_Min + Start_Sec	;End_Min:=End_Min * 60	;End_pos:=End_Min + End_Sec
+Time_Start=00:%Start_Min%:%Start_Sec%
+Time_End=00:%End_Min%:%End_Sec%
+if remove
 	{
-	Gui, Submit
-	Gui, Destroy ;Start_Min:=Start_Min * 60	;Start_Pos:=Start_Min + Start_Sec	;End_Min:=End_Min * 60	;End_pos:=End_Min + End_Sec
-	Time_Start=00:%Start_Min%:%Start_Sec%
-	Time_End=00:%End_Min%:%End_Sec%
-	if remove
-		{
-		Process_Type:="Trimmed"
+	Process_Type:="Trimmed"
+} else {
+	Process_Type:="Extracted"
+	DildoFace=%OutDir%\%OutNameNoExt% - %Process_Type%
+	origtry=%DildoFace%
+	Output_Filename_Full=%origtry%.%OutExtension%
+	while FileExist(Output_Filename_Full) { ; Check_Folder
+		Multiple_Num := Multiple_Num + 1
+		Output_Filename_Full=%origtry%-%Multiple_Num%.%OutExtension%
 		}
-	else
-		{
-		Process_Type:="Extracted"
-		DildoFace=%OutDir%\%OutNameNoExt% - %Process_Type%
-		origtry=%DildoFace%
-		out_fFilename=%origtry%.%OutExtension%
-		while FileExist(out_fFilename) { ; Check_Folder
-			MULTIPLE := MULTIPLE + 1
-			out_fFilename=%origtry%-%MULTIPLE%.%OutExtension%
-			}
-		RunWait, %comspec% /c ffmpeg -i %Dickhead% -ss %Time_Start% -t %Time_End% -c:v copy -c:a copy "%DildoFace%"
-		InvokeVerb(out_fFilename, "cut", True)
-		ExitApp
-		}
-	Return
+	RunWait, %comspec% /c ffmpeg -i "%1%" -ss %Time_Start% -t %Time_End% -c:v copy -c:a copy "%Output_Filename_Full%"
+	InvokeVerb(Output_Filename_Full, "cut", True)
+	ExitApp
 	}
+Return
+}
 
-escape::ExitApp
+Escape::ExitApp
 
 InvokeVerb(path, menu, validate=True) {
     objShell := ComObjCreate("Shell.Application")
@@ -61,7 +57,7 @@ InvokeVerb(path, menu, validate=True) {
         SplitPath, path, name, dir
         objFolder := objShell.NameSpace(dir)
         objFolderItem := objFolder.ParseName(name)
-    }
+		}
     if validate {
         colVerbs := objFolderItem.Verbs   
         loop % colVerbs.Count {
