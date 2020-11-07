@@ -20,31 +20,30 @@ GuiControl,, End_Sec, 0
 Gui, Add, CheckBox, center vRemove, Remove
 Gui, Add, Button, Center w80 gSub, OK
 Gui, Show , Center, Poop
-return
+Return
 
 Sub:
 Gui, Submit
 Gui, Destroy ;Start_Min:=Start_Min * 60	;Start_Pos:=Start_Min + Start_Sec	;End_Min:=End_Min * 60	;End_pos:=End_Min + End_Sec
 Time_Start=00:%Start_Min%:%Start_Sec%
 Time_End=00:%End_Min%:%End_Sec%
-if remove
+if Remove
 	{
+	Process_Action:="-to"
 	Process_Type:="Trimmed"
 } else {
 	Process_Type:="Extracted"
-	DildoFace=%OutDir%\%OutNameNoExt% - %Process_Type%
-	origtry=%DildoFace%
-	Output_Filename_Full=%origtry%.%OutExtension%
-	while FileExist(Output_Filename_Full) { ; Check_Folder
-		Multiple_Num := Multiple_Num + 1
-		Output_Filename_Full=%origtry%-%Multiple_Num%.%OutExtension%
-		}
-	RunWait, %comspec% /c ffmpeg -i "%1%" -ss %Time_Start% -t %Time_End% -c:v copy -c:a copy "%Output_Filename_Full%"
-	InvokeVerb(Output_Filename_Full, "cut", True)
-	ExitApp
+	Process_Action:="-t"
 	}
-Return
-}
+Output_Prefix=%OutDir%\%OutNameNoExt% - %Process_Type%
+Output_Filename_Full=%Output_Prefix%.%OutExtension%
+while FileExist(Output_Filename_Full) { ; Check_Folder
+	Multiple_Num := Multiple_Num + 1
+	Output_Filename_Full=%Output_Prefix%-%Multiple_Num%.%OutExtension%
+	}
+RunWait, %comspec% /c ffmpeg -i "%1%" -ss %Time_Start% %Process_Action% %Time_End% -c:v copy -c:a copy "%Output_Filename_Full%"
+InvokeVerb(Output_Filename_Full, "Cut", True)
+ExitApp
 
 Escape::ExitApp
 
