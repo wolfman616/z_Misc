@@ -28,13 +28,9 @@ Gui, Destroy ;Start_Min:=Start_Min * 60	;Start_Pos:=Start_Min + Start_Sec	;End_M
 Time_Start=00:%Start_Min%:%Start_Sec%
 Time_End=00:%End_Min%:%End_Sec%
 if Remove
-	{
-	Process_Action:="-to"
-	Process_Type:="Trimmed"
-} else {
-	Process_Type:="Extracted"
-	Process_Action:="-t"
-	}
+	Process_Action:="-to", Process_Type:="Trimmed"
+else 
+	Process_Type:="Extracted", 	Process_Action:="-t"
 Output_Prefix=%OutDir%\%OutNameNoExt% - %Process_Type%
 Output_Filename_Full=%Output_Prefix%.%OutExtension%
 while FileExist(Output_Filename_Full) { ; Check_Folder
