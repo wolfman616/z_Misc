@@ -1,8 +1,10 @@
 ﻿#NoEnv 
-;#Persistent
-#SingleInstance
+#Persistent
+#SingleInstance FORCE
 SetWorkingDir %A_ScriptDir% 
+fullpath=%1%
 SplitPath, 1 , OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
+concat:="c:\out\temp.txt"
 Gui, GuiName:new , , Poop
 Gui +HwndMyGuiHwnd
 Gui, Add, Text,, Start Pos Min:
@@ -28,9 +30,51 @@ Gui, Destroy ;Start_Min:=Start_Min * 60	;Start_Pos:=Start_Min + Start_Sec	;End_M
 Time_Start=00:%Start_Min%:%Start_Sec%
 Time_End=00:%End_Min%:%End_Sec%
 if Remove
-	Process_Action:="-to", Process_Type:="Trimmed"
+{
+o:=comobjcreate("Shell.Application")
+rape=%1%
+splitpath,rape,Pdfile,Pddirectory
+if errorlevel
+	exit
+twonker:
+od:=o.namespace(Pddirectory)
+of:=od.parsename(Pdfile)
+turd:=% ((append:=od.getdetailsof(of,27))?27 " - " od.getdetailsof("",27) ": " append "":"")
+sleep 75
+Output_Duration := RegExReplace(turd, "^.............")
+if !Output_Duration
+	goto twonker
+else {
+		FirstHalf=%OutDir%\%OutNameNoExt% - Trimmed first half.%OutExtension%
+		SecondHalf=%OutDir%\%OutNameNoExt% - Trimmed 2nd half.%OutExtension%
+		RunWait, %comspec% /c ffmpeg -i "%FullPath%" -ss 0:0:0 -to %Time_Start% -c:v copy -c:a copy "%FirstHalf%"
+		RunWait, %comspec% /c ffmpeg -i "%FullPath%" -ss %Time_End% -to %Output_Duration% -c:v copy -c:a copy "%SecondHalf%"
+		FileAppend , file '%FirstHalf%'`n, %concat%
+		FileAppend , file '%SecondHalf%'`n, %concat%
+		sleep 1500
+		Output_Filename_Full=%OutDir%\%OutNameNoExt% - Trimmed.%OutExtension%
+		RunWait, %comspec% /c ffmpeg -f concat -safe 0 -i "%concat%" -c copy "%Output_Filename_Full%"
+		FileDelete, %FirstHalf%
+		FileDelete, %SecondHalf%
+		FileDelete, %concat%
+		FileGetTime, Old_D8 , %FullPath%, m
+		FileSetTime, Old_D8 , %Output_Filename_Full%, m
+		FileRecycle, %FullPath%
+		Bugga:
+		sleep 500
+		if !fileExist(FullPath)
+		FileMove, Output_Filename_Full, FullPath
+		sleep 100
+		InvokeVerb(Output_Filename_Full, "Cut", True)
+		}
+
+
+
+
+}
 else 
-	Process_Type:="Extracted", 	Process_Action:="-t"
+{
+	Process_Type:="Extracted", 	Process_Action:="-tO"
 Output_Prefix=%OutDir%\%OutNameNoExt% - %Process_Type%
 Output_Filename_Full=%Output_Prefix%.%OutExtension%
 while FileExist(Output_Filename_Full) { ; Check_Folder
@@ -39,8 +83,8 @@ while FileExist(Output_Filename_Full) { ; Check_Folder
 	}
 RunWait, %comspec% /c ffmpeg -i "%1%" -ss %Time_Start% %Process_Action% %Time_End% -c:v copy -c:a copy "%Output_Filename_Full%"
 InvokeVerb(Output_Filename_Full, "Cut", True)
-ExitApp
-
+Exit
+}
 Escape::ExitApp
 
 InvokeVerb(path, menu, validate=True) {
