@@ -9,12 +9,11 @@ loop,286
 	{
 	if (turd%a_index%:=((append:=od.getdetailsof(of,a_index))?a_index " - " od.getdetailsof("",a_index) ": " append "":""))
 		{
-		sleep 70
 		turd:=turd%a_index%
-	if a_index=1
-		spunk=%turd%
-	else
-		spunk=%Spunk%`n%turd%
+		if a_index=1
+			spunk:=turd
+		else
+			Spunk=%Spunk%`n%Turd%
 		}
 	}
 fileappend, % Spunk, %file%.txt
