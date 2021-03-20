@@ -11,16 +11,11 @@ Menu, Tray, Icon, Context32.ico
 
 hWinEventHook := DllCall("SetWinEventHook", "UInt", 0x8000, "UInt", 0x8000, "Ptr", 0, "Ptr", (lpfnWinEventProc := RegisterCallback("OnEvent", "")), "UInt", 0, "UInt", 0, "UInt", WINEVENT_OUTOFCONTEXT := 0x0000 | WINEVENT_SKIPOWNPROCESS := 0x0002)		;  EVENT_OBJECT_CREATE := 0x8000
 
-OnMessage(0x4a, "Receive_WM_COPYDATA")  ; 0x4a WM_COPYDATA
-Return
+WinGet, Timehandle, iD, ahk_class 7 Sidebar								; SIDEBAR CLOCKTRANS
+WinSet, ExStyle, 0x000800A8, HUD Time, ahk_id %Timehandle%
+WinSet, ExStyle, 0x000800A8, Moon Phase II
 
-Receive_WM_COPYDATA(wParam, lParam) {
-    StringAddress := NumGet(lParam + 2*A_PtrSize)  ; Retrieves the CopyDataStruct's lpData member.
-    CopyOfData := StrGet(StringAddress)  ; Copy the string out of the struct
-    ;ToolTip %A_ScriptName%`nReceived the following string:`n%CopyOfData%
-	Run %COMSPEC% /c explorer.exe /select`, "%CopyOfData%" ,, Hide
-    return true  ; Returning 1 (true) is the traditional way to acknowledge this message.
-}
+return
 
 OnEvent(hWinEventHook, event, hWnd, idObject, idChild, dwEventThread, dwmsEventTime) {
 	WinGetClass Class, ahk_id %hWnd%
@@ -28,26 +23,25 @@ OnEvent(hWinEventHook, event, hWnd, idObject, idChild, dwEventThread, dwmsEventT
 	{
 		SetAcrylicGlassEffect(hWnd)
 		Return
-	}	
-	Else if Class in RegEdit_RegEdit,FM
+	} Else if Class in RegEdit_RegEdit,FM
 	{	
 		ControlGet, ctrlhand, Hwnd,, SysListView321, ahk_id %hWnd%
 		SendMessage 0x1036, 0, 0x00000020,, ahk_id %ctrlhand% ; 
-	}
-	Else if Class = 7 Sidebar
-		WinSet, ExStyle, 0x000800A8, HUD Time, ahk_id %hWnd%
-else if(class = "Chrome_WidgetWin_1") {
-	wingettitle, turdy, ahk_id %hwnd%
-	if(clacker := InStr(turdy, "Discord"))
-		    WinGet Style, Style, ahk_id %hWnd%
-    if Style & 0x40000000 ; WS_CHILD
+	} Else if(Class = "7 Sidebar") {
+		WinGet, Timehandle, iD, ahk_class 7 Sidebar
+		WinSet, ExStyle, 0x000800A8, HUD Time, ahk_id %Timehandle%
+		WinSet, ExStyle, 0x000800A8, Moon Phase II
+	} else if(class = "Chrome_WidgetWin_1") {
+		wingettitle, turdy, ahk_id %hwnd%
+		if(clacker := InStr(turdy, "Discord"))
+			WinGet Style, Style, ahk_id %hWnd%
+		if Style & 0x40000000 ; WS_CHILD
 		{
 			msgbox
 			parent := GetParent(hWnd) 
 			WinSet, Style, +0x0004,, ahk_id %parent% ;give thick frame (dropshadow)
 			tooltip % parent " " clacker hwnd
 		}
-			
 	}
 }
     
