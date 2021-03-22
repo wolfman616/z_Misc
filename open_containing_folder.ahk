@@ -7,20 +7,23 @@ Task_Sched:="mmc.exe taskschd.msc /s", Loc:=1, S:=1100 ; S sleep millisecs for h
 NeedL=i)(\"([\w\d]*[\.]*[\w\d]*)([\.]*[a-z]{2,4})) ;o="a
 File=%1% ; Passed argument from context object
 FileGetShortcut, %1% , OutTarget, OutDir, OutArgs, OutDescription, OutIcon, OutIconNum, OutRunState
-if (OutTarget="C:\Windows\System32\schtasks.exe") { 
-	Run %COMSPEC% /c %Task_Sched%,, Hide			
-	While an00s:=regexmatch(OutArgs, NeedL, returning, loc) { ; strip argument from tasksched LNK
-		Loc := 999
-		Sleep %S% ; allow launch tasksched in order to then steal foc 
-		msgbox %returning%" 	; o="a ; ***Hint** k
+if errorlevel
+		Run %COMSPEC% /c explorer.exe /select`, "%1%",, Hide
+else {
+	if (OutTarget="C:\Windows\System32\schtasks.exe") { 
+		Run %COMSPEC% /c %Task_Sched%,, Hide			
+		While an00s:=regexmatch(OutArgs, NeedL, returning, loc) { ; strip argument from tasksched LNK
+			Loc := 999
+			Sleep %S% ; allow launch tasksched in order to then steal foc 
+			msgbox %returning%" 	; o="a ; ***Hint** k
+		}
+	} Else {
+		Run %COMSPEC% /c explorer.exe /select`, "%OutTarget%",, Hide
+		Sleep %S%
+		SendInput {F5}
 	}
-} Else {
-	Run %COMSPEC% /c explorer.exe /select`, "%OutTarget%",, Hide
-	Sleep %S%
-	SendInput {F5}
+	Return
 }
-Return
-
 Open_script_folder:	
 Run %COMSPEC% /c explorer.exe /select`, "%A_ScriptFullPath%",, Hide
 Sleep %S%
