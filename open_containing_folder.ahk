@@ -30,7 +30,7 @@ Sleep %S%
 SendInput {F5}
 Return
 
-/* 
+/* old code
 o:=comobjcreate("Shell.Application")
 splitpath,file,file,directory,ext
 if !errorlevel {
