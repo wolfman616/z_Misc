@@ -9,16 +9,16 @@ Menu, Tray, Icon, C:\Script\AHK\Working\search_32.ico
 Gui +AlwaysOnTop +Owner +Resize +ToolWindow
 CoordMode Mouse, Screen
 IniRead, LastScaleFactor, zoom.ini, LastScaleFactor, LastScaleFactor , 4
-Global Antialiasing := 0, Global Rx := 256, Global Ry := 256, Global Zoom := 8, Paused := 1, FPS := 100
-Global Zoom := LastScaleFactor
-Global RefreshInterval:=(1000/FPS)
-Global WinDPI := A_ScreenDPI
-Global Rux := 256/((WinDPI/96))		; half vertical/horizontal side of ninjMag window
-Global Ruy := 256/((WinDPI/96))
-Global Zx := round(Rx/Zoom) 							
-Global Zy := round(Ry/Zoom)
-
+global Antialiasing := 0, global Rx := 256, global Ry := 256, global Zoom := 8, Paused := 1, FPS := 100
+global Zoom := LastScaleFactor
+global RefreshInterval:=(1000/FPS)
+global WinDPI := A_ScreenDPI
+global Rux := 256/((WinDPI/96))
+global Ruy := 256/((WinDPI/96))
+global Zx := round(Rx/Zoom)
+global Zy := round(Ry/Zoom)
 return
+
 #M::
    if !Paused { 
 		^+Up::	
@@ -35,14 +35,11 @@ return
 			ry:=ry/1.15
 			}	
 		SetTimer, Repaint, Off
-		;SetTimer, BarebackOnTOP, Off
-
 		Gui, 2:Hide 
 		Gui, Hide 
 		Paused := 1
 		return
 	} Else {
-	;SetTimer, BarebackOnTOP, 3000
 	Gosub Init_Gui
 	Paused :=
 	^+Up::^+Up
@@ -55,12 +52,11 @@ return
 		return
 }
 
-
 In(x,a,b)  { 
 	IfLess x,%a%, Return a
 	IfLess b,%x%, Return b
 	Return x
-	}
+}
 
 Repaint:
 	MouseGetPos x, y
@@ -70,19 +66,15 @@ Repaint:
 	DllCall("gdi32.dll\SetStretchBltMode",Uint, HDC_Frame, int, 5)
 	DllCall("gdi32.dll\StretchBlt",UInt,HDC_Frame, Int,0, Int,0, Int,256, Int,256, UInt,HDD_Frame, UInt,x-zx, UInt,y-zy, Int,2*Zx, Int,2*Zy, UInt, SRCCOPY)        
 	; NOTSRCCOPY
-	if nignog 
+	if Invert 
 		SRCCOPY:="0x00330008"
 	Else 
 		SRCCOPY:="0x00CC0020"
 	Return
 
-BarebackOnTOP:
-WinActivate ahk_id %NinjMagID%
-Return
 #b::
-nignog := !nignog
+Invert := !Invert
 Return
-
 
 Init_Gui:
 MouseGetPos x, y
