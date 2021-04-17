@@ -1,83 +1,152 @@
 #cs ----------------------------------------------------------------------------
 	AutoIt Version: 3.3.14.5
 		Author: sPksNinj
-			Script Function:
+			Script function: Windows 10 DWM hook
 				Date: 21.03.2021
 #ce ----------------------------------------------------------------------------
 
-; Script Start
+#NoTrayIcon
+#include <TrayConstants.au3> ; Required for the $TRAY_ICONSTATE_SHOW constant.
 #include <GUIConstants.au3>
 #include <WindowsConstants.au3>
+#include <MsgBoxConstants.au3>
 #include <WinAPI.au3>
 #include <Process.au3>
 #include <Misc.au3>
-Global $hDLL, $hWinEventProc, $hHook
-Global $Struct = DllStructCreate("int cxLeftWidth;int cxRightWidth;int cyTopHeight;int cyBottomHeight;")
-Global $sStruct = DllStructCreate("dword;int;ptr;int")
+TraySetIcon ( "1.ico" )
+TraySetPauseIcon( "2.ico" )
+If _Singleton(@ScriptName, 1) = 0 Then
+    MsgBox($MB_SYSTEMMODAL, "Warning", "An occurrence is already running, close it first")
+    exit
+endIf
+
+global $hDLL, $hWinEventProc, $hHook, $Style, $StyleOld
+global $sStruct = DllStructCreate("dword;int;ptr;int")
+global $BlackClassList = "TaskListThumbnailWnd SysDragImage WMPMessenger Scintilla BasicWindow OleMainThreadWndClass ProgMan WorkerW Listbox SideBar_HTMLHostWindow MozillaWindowClass Shell_TrayWnd "
 
 $hDLL = DllOpen("User32.dll")
 $hWinEventProc = DllCallbackRegister("_WinEventProc", "none", "hwnd;int;hwnd;long;long;int;int")
-If Not @error Then
-    OnAutoItExitRegister("OnAutoItExit")
-Else
+if not @error then
+    OnAutoItexitRegister("OnAutoItexit")
+else
     MsgBox(16 + 262144, "Error", "DllCallbackRegister(_WinEventProc) did not succeed.")
-    Exit
-EndIf
+    exit
+endIf
 
 $hHook = _SetWinEventHook($hDLL)
-If @error Then
-    MsgBox(16 + 262144, "Error", "_SetWinEventHook() did not succeed.")
-    Exit
-EndIf
+if @error then
+    MsgBox(16 + 262144, "Error", "_SetWinEventHook() did not succeed.") 	
+    exit
+endIf
 
-While 1
-    Sleep(10)
-WEnd
+MsgBox($MB_SYSTEMMODAL, "", @ScriptFullPath)
 
-Func _WinEventProc($hHook, $iEvent, $hWnd, $idObject, $idChild, $iEventThread, $iEventTime)
-    Local $PID = WinGetProcess($hWnd), $sEventProcName = _ProcessGetName($PID)
-		if($iEvent = 0x8000) Then 
-				_DwmEnableBlurBehindWindow($hWnd)
-		EndIf
-EndFunc   ;==>_WinEventProc
+while 1
+    Sleep(5)
+;	Example()
+wEnd
 
-Func _DwmEnableBlurBehindWindow($hWnd)
-         Const $DWM_BB_ENABLE = 0x00000001
+func _WinEventProc($hHook, $iEvent, $hWnd, $idObject, $idChild, $iEventThread, $iEventTime)
+    local $PID = WinGetProcess($hWnd), $sEventProcName = _ProcessGetName($PID)
+	if($iEvent = 0x8000) then 
+		switch $sEventProcName
+			case "chrome.exe"
+				return
+			case "opera.exe"
+				return
+			case "firefox.exe"
+				return
+			case "edge.exe"
+				return
+			case "steam.exe"
+				return
+			case "discord.exe"
+				return
+			case "terraria.exe"
+				return
+			case "wmplayer.exe"
+				return
+			case "wallpaper64.exe"
+				return
+			case "wallpaper32.exe"
+				return
+			case "sidebar.exe"
+				return
+			case "MSIAfterburner.exe"
+				return
+		endSwitch
+
+		local $sTitle = winGetTitle($hWnd)
+		switch $sTitle
+			case "ninjmag"
+				return
+			case "Roblox"
+				return
+		endSwitch
+		$Class = _WinAPI_GetClassName($hWnd)
+		if StringInStr ($BlackClassList, $Class) then
+			return
+		else
+			switch $Class
+				case "SysShadow" 
+					$iStyle = _WinAPI_GetWindowLong($hWnd, $GWL_STYLE)
+					$iStyleold = $iStyle
+					_WinAPI_SetWindowLong($hWnd, $GWL_STYLE, BitXOR($iStyle, $WS_VISIBLE, $WS_DISABLED, $WS_EX_TRANSPARENT))
+					WinSetTrans($hWnd, "", 0)
+					$iStyle = _WinAPI_GetWindowLong($hWnd, $GWL_STYLE)
+					if $iStyle <> $iStyleold then
+						$new = $iStyle - $iStyleold
+						;ToolTip($new, 0, 40)
+					endIf
+					return		
+				case "#32768" 
+					_WinAPI_SetLayeredWindowAttributes($hWnd, 0x000000) 	; 	not yet implemented comp
+			endSwitch
+		endif
+		if _DwmEnableBlurBehindWindow($hWnd) then
+			$Injsuxs = "dwm Inject - "
+			$Injsuxs = $Injsuxs & $class
+		endIf
+	endIf
+endFunc   ;==>_WinEventProc
+
+func _DwmEnableBlurBehindWindow($hWnd)
+         const $DWM_BB_ENABLE = 0x00000001
          DllStructSetData($sStruct, 1, $DWM_BB_ENABLE)
          DllStructSetData($sStruct, 2, "1")
          DllStructSetData($sStruct, 4, "1")
-         GUISetBkColor(0x000000); Must be here!
+         _WinAPI_SetLayeredWindowAttributes($hWnd, 0x000000); Must be here!
          $Ret = DllCall(	"dwmapi.dll", "int", "DwmEnableBlurBehindWindow", "hwnd", $hWnd, "ptr", DllStructGetPtr($sStruct))
-         If @error Then
-             Return 0
-         Else
-             Return $Ret
-         EndIf
- EndFunc ;==>_DwmEnableBlurBehindWindow
+         if @error then
+             return 0
+         else
+             return $Ret
+         endIf
+ endFunc ;==>_DwmEnableBlurBehindWindow
 
-Func _SetWinEventHook($hDLLUser32)
-    Local $aRet
-	Local Const $ACUNT = 0x8000
-    Local Const $WINEVENT_OUTOFCONTEXT = 0x0
-    Local Const $WINEVENT_SKIPOWNPROCESS = 0x2
-    If Not $hDLLUser32 Or $hDLLUser32 = -1 Then $hDLLUser32 = "User32.dll"
+func _SetWinEventHook($hDLLUser32)
+    local $aRet
+	local const $EVENT_OBJECT_CREATE = 0x8000
+    local const $WINEVENT_OUTOFCONTEXT = 0x0
+    local const $WINEVENT_SKIPOWNPROCESS = 0x2
+    if not $hDLLUser32 Or $hDLLUser32 = -1 then $hDLLUser32 = "User32.dll"
     $aRet = DllCall($hDLLUser32, "hwnd", "SetWinEventHook", _
-            "uint", $ACUNT , _
-            "uint", $ACUNT , _
+            "uint", $EVENT_OBJECT_CREATE , _
+            "uint", $EVENT_OBJECT_CREATE , _
             "hwnd", 0, _
             "ptr", DllCallbackGetPtr($hWinEventProc), _
             "int", 0, _
             "int", 0, _
             "uint", BitOR($WINEVENT_OUTOFCONTEXT, $WINEVENT_SKIPOWNPROCESS))
-    If @error Then Return SetError(@error, 0, 0)
-    Return $aRet[0]
-EndFunc   ;==>_SetWinEventHook
+    if @error then return SetError(@error, 0, 0)
+    return $aRet[0]
+endFunc   ;==>_SetWinEventHook
 
-Func OnAutoItExit()
-    If $hWinEventProc Then
+func OnAutoItexit()
+    if $hWinEventProc then
         Beep(3000, 5)
         DllCallbackFree($hWinEventProc)
-    EndIf
-    If $hHook Then DllCall("User32.dll", "int", "UnhookWinEvent", "hwnd", $hHook)
-    If $hDLL Then DllClose($hDLL)
-EndFunc   ;==>OnAutoItExit
+    endIf
+    if $hHook then DllCall("User32.dll", "int", "UnhookWinEvent", "hwnd", $hHook)
+    if $hDLL then DllClose($hDLL)
+endFunc   ;==>OnAutoItexit

@@ -1,36 +1,39 @@
-﻿#NoEnv ; #Persistent 
+﻿#NoEnv ; 
+#Persistent 
 #SingleInstance Force
 Menu, Tray, NoStandard
 Menu, Tray, Add, Open script folder, Open_script_folder,
 Menu, Tray, Standard
 Task_Sched:="mmc.exe taskschd.msc /s", Loc:=1, S:=1100 ; S sleep millisecs for handling explorer launch delay
 NeedL=i)(\"([\w\d]*[\.]*[\w\d]*)([\.]*[a-z]{2,4})) ;o="a
-File=%1% ; Passed argument from context object
+File=%1% ; Passed Filename as argument from context menu
 FileGetShortcut, %1% , OutTarget, OutDir, OutArgs, OutDescription, OutIcon, OutIconNum, OutRunState
-if errorlevel
-		Run %COMSPEC% /c explorer.exe /select`, "%1%",, Hide
+if errorlevel 
+	Run %COMSPEC% /C explorer.exe /select`, "%1%",, hide ; if accessed from 'SEARCH RESULTS VIEW' *.* should open real location Invoked as it is not a shortcut.
 else {
 	if (OutTarget="C:\Windows\System32\schtasks.exe") { 
-		Run %COMSPEC% /c %Task_Sched%,, Hide			
-		While an00s:=regexmatch(OutArgs, NeedL, returning, loc) { ; strip argument from tasksched LNK
+		Run %COMSPEC% /C %Task_Sched%,, hide			
+		While an00s:=regexmatch(OutArgs, NeedL, Returning, loc) { ; to obtain commandline argument from scheduled task .lnk
 			Loc := 999
-			Sleep %S% ; allow launch tasksched in order to then steal foc 
-			msgbox %returning%" 	; o="a ; ***Hint** k
+			Sleep %S% ; Allow some ms to load task-sched...
+			msgbox %Returning%" 	; o="a ; Next... show a "Hint"...( task argument  parameter .EXE )  Will index some common culprits into a list to show exe additional to task-sched.
 		}
-	} Else {
-		Run %COMSPEC% /c explorer.exe /select`, "%OutTarget%",, Hide
-		Sleep %S%
-		SendInput {F5}
+	} else {
+		run %COMSPEC% /C explorer.exe /select`, "%OutTarget%",, hide
+		sleep %S%
+		sendinput {F5}
 	}
-	Return
+Exitapp
 }
-Open_script_folder:	
-Run %COMSPEC% /c explorer.exe /select`, "%A_ScriptFullPath%",, Hide
-Sleep %S%
-SendInput {F5}
-Return
 
-/* old code
+
+Open_script_folder:	
+Run %COMSPEC% /c explorer.exe /select`, "%a_scriptFullPath%",, hide
+sleep %S%
+sendInput {F5}
+exitapp
+
+/* old method  :/
 o:=comobjcreate("Shell.Application")
 splitpath,file,file,directory,ext
 if !errorlevel {
@@ -54,5 +57,4 @@ if !errorlevel {
 	}
 }
 */
-
 	
