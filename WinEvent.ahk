@@ -103,6 +103,7 @@ On4ground(Hook_4Gnd, event, hWnd4, idObject, idChild, dwEventThread, dwmsEventTi
 
 				PostMessage, 0x0111, 65306,,, M2Drag.ahk - AutoHotkey
 				PostMessage, 0x0111, 65305,,, M2Drag.ahk - AutoHotkey
+				return
 			}
 			m2dstatus := false
 			return
@@ -174,6 +175,7 @@ OnMsgBox(Hook_MsgBox, event, hWnd, idObject, idChild, dwEventThread, dwmsEventTi
 				settimer tooloff, -3000
 				goto SICK
 			}
+			return
 		}
 		case "Roblox Game Client":
 		{
@@ -528,8 +530,7 @@ OnObjectDestroyed(Hook_ObjDestroyed, event, hWnd, idObject, idChild, dwEventThre
 	return
 }
 
-
-
+; binds <<<---------------------------------------
 
 ~^s::	 
 winGetActiveTitle, Atitle 
@@ -538,8 +539,7 @@ if winactive("ahk_exe notepad++.exe") {
 		if instr(Atitle, "*") {
 			Atitle := StrReplace(Atitle, "*" , " ") 	; * denotes unsaved doc in np+ 
 			SplitPath, Atitle, tName, npDir, npExtension, npNameNoExt, npDrive 
-			TargetScriptName := npNameNoExt . ".ahk"		
-			ser := npNameNoExt . ".ahk - AutoHotkey"
+			TargetScriptName := (npNameNoExt . ".ahk"	), ser := npNameNoExt . ".ahk - AutoHotkey"
 			if (npNameNoExt = "WinEvent") {
 				if WinExist(ser) {
 					MsgBox, 4,%ser% dtect`nReload AHK Script, Reload %TargetScriptName% now?`nTimeout in 6 Secs, 7
@@ -557,23 +557,21 @@ if winactive("ahk_exe notepad++.exe") {
 }
 return
 
-; binds <<<---------------------------------------
 $^z:: 		;	"ctrl Z" - bypass "Undo." in Explorer.exe
 if !winactive("AHK_Class WorkerW") && !winactive("AHK_Class Progman") && !winactive("AHK_Class CabinetWClass") 
 	sendinput ^z
 return
 
-$^y:: 	; 	"ctrl Y" - bypass "Redo". in Explorer .exe
+$^y:: 		; 	"ctrl Y" - bypass "Redo". in Explorer .exe
 if !winactive("AHK_Class WorkerW") && !winactive("AHK_Class Progman") && !winactive("AHK_Class CabinetWClass") 
 	sendinput ^y
 return
 
-!Shift:: 	 ; Windows 10 local language selection bypass (can be bypassed in settings)
+!Shift:: 		; 	Windows 10 local language selection bypass (can be bypassed in settings)
 +Alt::
 if KB_Langswitch
 	send A_ThisHotkey
-;else
-	;tooltip bypassed
+;else	;tooltip bypassed
 return
 
 ~Escape:: ; 
@@ -594,7 +592,9 @@ MessageBoxKill(Target_MSGBOX) {
 	If Target_hwnd := WinExist(Target_MSGBOX) {
 		winactivate
 		sleep 10
-		;send n
+		send n
+		tooltip sent N
+		settimer tooloff, -2000
 		sleep 10
 		if WinExist(ahk_ID %target_hwnd% ) {
 			MsgBox_MsgBox_TargetHandle = ahk_id %hWnd4%
@@ -683,6 +683,7 @@ Display_Msg(Text, Display_Msg_Time, X_X) {
 }
 
 Hooks:
+CRITICAL
 OnMessage(0x4a, "Receive_WM_COPYDATA")
 
 EVENT_4GND := 0x0003, OBJ_FOCUS:=0x8005, OBJ_CREATED := 0x8000, OBJ_DESTROYED := 0x8001, WIN_TARGET_DESC := "Information", MSG_WIN_TARGET := WIN_TARGET_DESC
@@ -746,12 +747,47 @@ Send_WM_COPYDATA(ByRef StringToSend, ByRef TargetScriptTitle) {
 	SetTitleMatchMode %Prev_TitleMatchMode%
 	return ErrorLevel
 }
+return
+
+FileListStrGen(abc) {
+	adelim := abc
+	if !oldlist
+		oldlist := FileListStr
+	else
+		oldlist := FileListStr
+	settimer FileListStrGen2, -500
+	return
+
+	FileListStrGen2:
+	if (oldlist = FileListStr) {
+		Loop, parse, FileListStr, ø,
+		{
+			IF (A_Index = 1)
+				global action := A_LoopField
+			Else
+				FileListStr := A_LoopField
+		}
+		FileListStr_array := (StrSplit(FileListStr, "%adelim%")), FileListStr := "", oldlist := "", FileCount := ""
+		return
+	} 
+	else oldlist := FileListStr
+	return
+}
 
 Receive_WM_COPYDATA(wParam, lParam)
 {
 	StringAddress := NumGet(lParam + 2*A_PtrSize)
 	CopyOfData := StrGet(StringAddress)
-	if CopyOfData = RobloxFalse 
+	if CopyOfData contains Þ ; <-- gonna be this delimiting a list of files (sent from context menu)
+	{ 	; 		now generate a string of all in FileListStr 
+		if !FileListStr {
+			FileListStr := CopyOfData, FileCount := 1
+		} else {
+			FileListStr := (FileListStr . CopyOfData), FileCount := (FileCount + 1) ; FileListStr := FileListStr . "`n" . CopyOfData
+		}
+		FileListStrGen(Delimiter:="Þ") ; this will confirm filelist recieved, parsing into array
+	}
+	else if (CopyOfData = "RobloxFalse")
 	{
 		roblox := false
 		Result := Send_WM_COPYDATA("RobloxClosing", TargetScriptTitle2)
@@ -762,7 +798,7 @@ Receive_WM_COPYDATA(wParam, lParam)
 		m2dstatus := "Suspended"
 	else if CopyOfData = 00
 		m2dstatus := "Running Normally"
-	else if CopyOfData := "StyleMenu"
+	else if (CopyOfData = "StyleMenu")
 		settimer, Stylemenu_init, -1
 	else m2dstatus := "not running or paused"
 	return true
@@ -791,6 +827,7 @@ Spunkmessagebox(handle) {
 		run C:\Apps\Kill.exe robloxplayerbeta.exe,, hide
 	}
 }
+
 RobloxGetHandle: 
 winGet, Roblox_hWnd, id, AHK_Class WINDOWSCLIENT
 if !Roblox_Hwnd {
@@ -1277,7 +1314,8 @@ menu, tray, Icon, Context32.ico
 return
 
 Globals:
-global AF := (Script . af_1), global AF2 := (Script . Bun_), global AutoFireScript := BF, global AutoFireScript2 := BF2 , global TargetScriptTitle := (AutoFireScript . " ahk_class AutoHotkey"), global TargetScriptTitle2 := (AutoFireScript2 . " ahk_class AutoHotkey"), global AHK_Rare := "C:\Script\AHK\- Script\AHK-Rare-master\AHKRareTheGui.ahk", global SidebarPath := "C:\Program Files\Windows Sidebar\sidebar.exe", global AF_Delay := 10, global SysShadowStyle_New := 0x08000000, global SysShadowExStyle_New := 0x08000020, global toolx := "-66", global offsett := 40, global KILLSWITCH := "kill all AHK procs.ahk", global starttime, global text, global X_X, global Last_Title, global autofire, global RhWnd_old, global MouseTextID, global DMT, global roblox, global toggleshift, global Norm_menuStyle, global Norm_menuexStyle, global Title_Last, global Title_last, global dcStyle, global classname, global tool, global tooly, global EventLogBuffer_Old, global Roblox_hwnd, global Time_Elapsed, global KillCount, global SBAR_2berestored_True, global Sidebar, global 4groundtt, global focustt, global creatett, global destroytt, global msgboxtt, global dbg, global TClass, global TTitle, global TProcName, global delim, global delim2, global TitleCount, global ClassCount, global ProcCount, global style2, global exstyle2, delim := "µ", delim2 := "»", global ArrayProc, global ArrayClass, global ArrayTitle, global Array_LProc, global Array_LTitle, global Array_LClass, global Style_ClassnameList2, global Style_procnameList2, global Style_wintitleList2, global popoutyt, global Script_Title, global np, global m2dstatus, global 4skin_crash, global 8skin_crash, global OutputVarWin, global F, global s1, global s2, global s3
+global AF := (Script . af_1), global AF2 := (Script . Bun_), global AutoFireScript := BF, global AutoFireScript2 := BF2 , global TargetScriptTitle := (AutoFireScript . " ahk_class AutoHotkey"), global TargetScriptTitle2 := (AutoFireScript2 . " ahk_class AutoHotkey"), global AHK_Rare := "C:\Script\AHK\- Script\AHK-Rare-master\AHKRareTheGui.ahk", global SidebarPath := "C:\Program Files\Windows Sidebar\sidebar.exe", global AF_Delay := 10, global SysShadowStyle_New := 0x08000000, global SysShadowExStyle_New := 0x08000020, global toolx := "-66", global offsett := 40, global KILLSWITCH := "kill all AHK procs.ahk", global starttime, global text, global X_X, global Last_Title, global autofire, global RhWnd_old, global MouseTextID, global DMT, global roblox, global toggleshift, global Norm_menuStyle, global Norm_menuexStyle, global Title_Last, global Title_last, global dcStyle, global classname, global tool, global tooly, global EventLogBuffer_Old, global Roblox_hwnd, global Time_Elapsed, global KillCount, global SBAR_2berestored_True, global Sidebar, global 4groundtt, global focustt, global creatett, global destroytt, global msgboxtt, global dbg, global TClass, global TTitle, global TProcName, global delim, global delim2, global TitleCount, global ClassCount, global ProcCount, global style2, global exstyle2, delim := "µ", delim2 := "»", global ArrayProc, global ArrayClass, global ArrayTitle, global Array_LProc, global Array_LTitle, global Array_LClass, global Style_ClassnameList2, global Style_procnameList2, global Style_wintitleList2, global popoutyt, global Script_Title, global np, global m2dstatus, global 4skin_crash, global 8skin_crash, global OutputVarWin, global F, global s1, global s2, global s3, global delim := "Þ", global FileListStr, global oldlist, global FileCount, global FileListStr_array := [], GLOBAL ADELIM
+
 return
 
 Locals:
