@@ -423,24 +423,24 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 }
 return
 
-OnFocus(Hook_Focus, event, BLACK_CUN_T, idObject, idChild, dwEventThread, dwmsEventTime) {
-	WinGetClass, Class, ahk_id %BLACK_CUN_T% 		
-	winGet PName, ProcessName, ahk_id %BLACK_CUN_T%
-	wingettitle, Title_last, ahk_id %BLACK_CUN_T%	
+OnFocus(Hook_Focus, event, BK_UN_T, idObject, idChild, dwEventThread, dwmsEventTime) {
+	WinGetClass, Class, ahk_id %BK_UN_T% 		
+	winGet PName, ProcessName, ahk_id %BK_UN_T%
+	wingettitle, Title_last, ahk_id %BK_UN_T%	
 
 	if focustt
-		tooltip FOCUS EVENT:`n%PName%`n%Title_last%`nAHK_Class %Class%`nAHK_ID %BLACK_CUN_T%	
+		tooltip FOCUS EVENT:`n%PName%`n%Title_last%`nAHK_Class %Class%`nAHK_ID %BK_UN_T%	
 		
 	switch Class {
 	case "MozillaDialogClass":
 		{
-			winget, Style, Style, ahk_id %BLACK_CUN_T%
+			winget, Style, Style, ahk_id %BK_UN_T%
 			IF(STYLE = 0x16CE0084) ;&& (EXSTYLE = 0x00000101)   
 			{
-				popoutyt := "ahk_id " . BLACK_CUN_T
-				WinGetPos, X, Y, , EdtH, ahk_id %BLACK_CUN_T%
-				WinMove ahk_id %BLACK_CUN_T%,, , , , (EdtH - 39)
-				winSet, Style, 0x16860084,	ahk_id %BLACK_CUN_T%	
+				popoutyt := "ahk_id " . BK_UN_T
+				WinGetPos, X, Y, , EdtH, ahk_id %BK_UN_T%
+				WinMove ahk_id %BK_UN_T%,, , , , (EdtH - 39)
+				winSet, Style, 0x16860084,	ahk_id %BK_UN_T%	
 				SLEEP 500
 				SEND {SPACE}
 			}
@@ -448,40 +448,19 @@ OnFocus(Hook_Focus, event, BLACK_CUN_T, idObject, idChild, dwEventThread, dwmsEv
 		case "MozillaDialogClass":
 		{
 			ecape_target = ahk_id %popoutyt%
-			winget, Style, Style, ahk_id %BLACK_CUN_T%
-			winget, exStyle, exStyle, ahk_id %BLACK_CUN_T%
+			winget, Style, Style, ahk_id %BK_UN_T%
+			winget, exStyle, exStyle, ahk_id %BK_UN_T%
 			IF((STYLE = 0x16CE0084) && (EXSTYLE = 0x00000101) ) {
-				popoutyt := BLACK_CUN_T
+				popoutyt := BK_UN_T
 	
 				winclose
-				WinGetPos, X, Y, , EdtH, ahk_id %BLACK_CUN_T%
-				WinMove ahk_id %BLACK_CUN_T%,, , , , (EdtH - 39)
-				winSet, Style, 0x16860084, ahk_id %BLACK_CUN_T%	
-				MSGBOX %popoutyt% `n Ahk_id %BLACK_CUN_T%
+				WinGetPos, X, Y, , EdtH, ahk_id %BK_UN_T%
+				WinMove ahk_id %BK_UN_T%,, , , , (EdtH - 39)
+				winSet, Style, 0x16860084, ahk_id %BK_UN_T%	
+				MSGBOX %popoutyt% `n Ahk_id %BK_UN_T%
 			}
 		}
-		case "DirectUIHWND":
-		{
-			fuk := WinExist("A")
-			WinGetTitle, tits, ahk_id %fuk%
-			if (tits = "Folder In Use") {
-				asas := "AHK_Class WindowsForms10.Window.8.app.0.141b42a_r6_ad1"
-				WinGet, hwnd2, ID , %asas%
-				if asas {
-					winclose ahk_id %hwnd2%
-					winactivate, ahk_id %fuk%
-					sleep 20
-					send {left}
-					send {enter}
-					return
-				}
-			}
-			else if (tits = "Confirm Folder Replace") {
-				WinSetTitle, ahk_id %fuk%, , Confirm Folder Merge
-				return
-			}
-			return
-		}
+
 		case "#32770":
 		{		
 			if (Title_last = "Information") {
