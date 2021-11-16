@@ -1,0 +1,18 @@
+{
+	"manifest_version": 2,
+	"name": "scroll-pg",
+	"version": "1.0",
+	"description": "Scroll page up/down with f1/2.",
+	"browser_specific_settings": {
+		"gecko": {
+		"id": "{273a5a3e-fcce-462a-bd15-911e058710bd}"
+		}
+	},
+
+	"content_scripts": [
+		{
+		"matches": ["<all_urls>"],
+		"js": ["scroll.js"]
+		}
+	]
+}
