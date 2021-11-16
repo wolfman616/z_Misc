@@ -13,12 +13,12 @@ winGetClass, Active_WinClass , A
 mouseGetPos, , , Mouse_hWnd
 winGetClass, Mouse_WinClass , ahk_id %Mouse_hWnd%
 if ( Active_WinClass != Mouse_WinClass ) { 	; 	unfocused
-	if (Mouse_WinClass in "MozillaWindowClass,Chrome_WidgetWin_1") {
+	if (Mouse_WinClass in "MozillaWindowClass,MozillaCompositorWindowClass,Chrome_WidgetWin_1") {
 		ControlSend, ahk_parent, {f1}, ahk_class %Mouse_WinClass%
 	} else 
-	ControlSend, ahk_parent, {f1}, ahk_class %Mouse_WinClass%
+	ControlSend, ahk_parent, {f1}, ahk_class %Active_WinClass%
 } else 
-ControlSend, ahk_parent, {f1}, ahk_class %Mouse_WinClass%
+ControlSend, ahk_parent, {f1}, ahk_class %Active_WinClass%
 return
 
 f2::
@@ -26,12 +26,12 @@ winGetClass, Active_WinClass , A
 mouseGetPos, , , Mouse_hWnd
 winGetClass, Mouse_WinClass , ahk_id %Mouse_hWnd%
 if ( Active_WinClass != Mouse_WinClass ) { 	; 	unfocused
-	if (Mouse_WinClass in "MozillaWindowClass,Chrome_WidgetWin_1") {
+	if (Mouse_WinClass in "MozillaWindowClass,MozillaCompositorWindowClass,Chrome_WidgetWin_1") {
 		ControlSend, ahk_parent, {f2}, ahk_class %Mouse_WinClass%
 	} else 
-	ControlSend, ahk_parent, {f2}, ahk_class %Mouse_WinClass%
+	ControlSend, ahk_parent, {f2}, ahk_class %Active_WinClass%
 } else 
-ControlSend, ahk_parent, {f2}, ahk_class %Mouse_WinClass%
+ControlSend, ahk_parent, {f2}, ahk_class %Active_WinClass%
 return
 
 Open_ScriptDir:
