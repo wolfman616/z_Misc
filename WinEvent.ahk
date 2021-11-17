@@ -31,37 +31,36 @@ On4ground(Hook_4Gnd, event, hWnd4, idObject, idChild, dwEventThread, dwmsEventTi
 		{ 
 			wingettitle, Title_last, % 4gnd_hwnd	
 			if (Title_last = "Roblox Crash") {
-				if !4skin_crash
-					4skin_crash = 1
-				else 4skin_crash := 4skin_crash + 1
+				if !crashmb
+					crashmb := 1
+				else crashmb := crashmb + 1
 				WinGet, RobloxCrash_PID, PID , % 4gnd_hwnd
 				Roblox_PID=TASKKILL.exe /PID %RobloxCrash_PID%
 				run %comspec% /C %Roblox_PID%,, hide
 				if winexist("ahk_exe robloxplayerbeta.exe") 
 					run C:\Apps\Kill.exe robloxplayerbeta.exe,, hide	; 	run C:\Apps\Kill.exe Multiple_ROBLOX.exe,, hide
 				if winexist("ahk_pid %Roblox_PID%")
-					msgbox major malc
+					msgbox error %a_lasterror%
 				gosub SBAR_Restore
 			} else
-				if (Title_last = "Information") 
-					send {n}
+			if (Title_last = "Information") 
+				;send {n}
+				ControlSend, ahk_parent, N, ahk_class %Class%
 			return
 		} 		; 		;		 else 	other clases
 		case "ApplicationFrameWindow","Chrome_WidgetWin_1","WINDOWSCLIENT":
 		{
-			ttt := "M2Drag.ahk - AutoHotkey"
-			result := Send_WM_COPYDATA("status",ttt)
+			ttt := "M2Drag.ahk - AutoHotkey", result := Send_WM_COPYDATA("status",ttt)
 			wingettitle, Title_last, ahk_id %hWnd4%	
-			if (Title_last != "Roblox")
-				TOOLTIP
-			ttt := "M2Drag.ahk - AutoHotkey"
-			result := Send_WM_COPYDATA("status", "M2Drag.ahk - AutoHotkey")
+			;if (Title_last != "Roblox")
+			;	TOOLTIP
+			ttt := "M2Drag.ahk - AutoHotkey", result := Send_WM_COPYDATA("status", "M2Drag.ahk - AutoHotkey")
 			settimer tooloff, -2222
 			if roblox {
 				gethandle_roblox() 
-				settimer ballbagger, -4000
+				settimer m2_Status_check, -4000
 				return
-				ballbagger:
+				m2_Status_check:
 				if( m2dstatus != "not running or paused"	) {
 					PostMessage, 0x0111, 65306,,, M2Drag.ahk - AutoHotkey	; 	65306 = Pause
 					PostMessage, 0x0111, 65305,,, M2Drag.ahk - AutoHotkey	; 	65305 = Suspend
@@ -72,19 +71,19 @@ On4ground(Hook_4Gnd, event, hWnd4, idObject, idChild, dwEventThread, dwmsEventTi
 		}
 		Default:
 		{ 	
-			ttt := "M2Drag.ahk - AutoHotkey"
-			result := Send_WM_COPYDATA("status", "M2Drag.ahk - AutoHotkey")
+			ttt := "M2Drag.ahk - AutoHotkey", result := Send_WM_COPYDATA("status", "M2Drag.ahk - AutoHotkey")
 			if (result = "FAIL") {
-				settimer cuntface, -1000
+				settimer m2_Status_Req, -1000
 				return
-				cuntface:
+				
+				m2_Status_Req:
 				result := Send_WM_COPYDATA("status", "M2Drag.ahk - AutoHotkey")
 				return
 			}
 			else if (result = 0) {
-				settimer fuckyou, -1000
+				settimer m2_Status_Req2, -1000
 				return
-				fuckyou:
+				m2_Status_Req2:
 				result := Send_WM_COPYDATA("status", "M2Drag.ahk - AutoHotkey")
 				return
 			}
@@ -92,15 +91,14 @@ On4ground(Hook_4Gnd, event, hWnd4, idObject, idChild, dwEventThread, dwmsEventTi
 
 			if roblox 
 				gethandle_roblox() 
-				settimer fuckme, -2800
+				settimer m2_Status_Req3, -2800
 				return
-				fuckme:
+				m2_Status_Req3:
 			if( m2dstatus = "not running or paused"	) {
-				settimer fuckme2, -2800
+				settimer m2_Status_Req4, -2800
 				return
-				fuckme2:
-						result := Send_WM_COPYDATA("status", "M2Drag.ahk - AutoHotkey")
-
+				m2_Status_Req4:
+				result := Send_WM_COPYDATA("status", "M2Drag.ahk - AutoHotkey")
 				PostMessage, 0x0111, 65306,,, M2Drag.ahk - AutoHotkey
 				PostMessage, 0x0111, 65305,,, M2Drag.ahk - AutoHotkey
 				return
@@ -125,20 +123,20 @@ OnMsgBox(Hook_MsgBox, event, hWnd, idObject, idChild, dwEventThread, dwmsEventTi
 			WIN_TARGET_DESC=%MSG_WIN_TARGET%
 			MessageBoxKill(MSG_WIN_TARGET)
 		}
-	If HANDOFGOD :=WinExist("Roblox Crash") { 
+	If DeadManHandle :=WinExist("Roblox Crash") { 
 		MSG_WIN_TARGET=Roblox Crash
 		WIN_TARGET_DESC=%MSG_WIN_TARGET%
 		;MessageBoxKill(MSG_WIN_TARGET)
-		if !4skin_crash 
-			4skin_crash = 1
-		else 4skin_crash := 4skin_crash + 1
-		Spunkmessagebox(HANDOFGOD)
+		if !crashmb 
+			crashmb = 1
+		else crashmb := crashmb + 1
+		TestMbkill(DeadManHandle)
 	}
 	If WinExist(KILLSWITCH) {
 		tooltip, Shutting Down Scripts, (A_ScreenWidth*0.5), (A_ScreenHeight*0.5)
-		settimer fuckme3, -2800
+		settimer m2_Status_Req33, -2800
 		return
-		fuckme3:
+		m2_Status_Req33:
 		Exitapp
 	}
 	wingettitle, TitleR, ahk_id %hwnd%			;	tooltip % Title_Last " " hwnd " " class
@@ -148,17 +146,17 @@ OnMsgBox(Hook_MsgBox, event, hWnd, idObject, idChild, dwEventThread, dwmsEventTi
 			run C:\Apps\Kill.exe RobloxPlayerBeta.exe,, hide
 			tooltip, Roblox Crash Detected: `nClosing All related scripts, A_ScreenWidth*0.5, A_ScreenHeight*0.5
 			settimer tooloff, -3000
-			if !4skin_crash 
-				4skin_crash = 1
-			else 4skin_crash := 4skin_crash + 1
-				settimer fuckme4, -1000
+			if !crashmb 
+				crashmb = 1
+			else crashmb := crashmb + 1
+				settimer m2_Status_Req34, -1000
 				return
-				fuckme4:
+				m2_Status_Req34:
 			settimer SBAR_Restore, -1
 			SICK:
-				settimer fuckme5, -2800
+				settimer m2_Status_Req35, -2800
 				return
-				fuckme5:
+				m2_Status_Req35:
 			Roblox := False, Result := Send_WM_COPYDATA("RobloxClosing", TargetScriptTitle)
 			if (result = "FAIL")
 				Display_Msg("SendMessage failed.", "1000", "True")
@@ -225,36 +223,9 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 				winSet, Style, 0x94000000, ahk_id %hWnd%
 				return
 			}
-			; case "#32768":	
-			; {
-				; winSet, TransColor, 0x000000 , ahk_id %hWnd%	; tooltip Context Menu
-				; winSet, ExStyle, 0x00000100, ahk_id %hWnd%
-				; winSet, Style, 0x94000000, ahk_id %hWnd%
-				; winget, Norm_menuStyle, Style, ahk_id %hwnd%
-				; winget, Norm_menuexStyle, exStyle, ahk_id %hwnd%
-				; tooltip % Norm_menuStyle "`n" Norm_menuexStyle
-				; clipboard := Norm_menuStyle . Norm_menuexStyle . FFmenuStyle . FFmenuexStyle
-				; return
-			; }
 			case "TaskListThumbnailWnd":	
 			{
 				SetAcrylicGlassEffect(hWnd)
-				return
-			}
-			case "QPopup":	
-			{
-				;winSet,transcolor, 000000 100, ahk_id %hWnd%
-				;winSet, transparent , 200, ahk_id %hwnd%
-				;SetAcrylicGlassEffect(hWnd)
-				;tooltip addadadad
-				return
-			}
-			case "Qwidget":	
-			{
-				;	winSet,transcolor, 000000 100, ahk_id %hWnd%
-				;	winSet, transparent , 200, ahk_id %hwnd%
-				;	SetAcrylicGlassEffect(hWnd)
-				;	tooltip addadadad
 				return
 			}
 			case "RegEdit_RegEdit","FM":
@@ -293,12 +264,12 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 						PostMessage, 0x0111, 65305,,, M2Drag.ahk - AutoHotkey	
 					}
 					if(m2dstatus = false) {
-						settimer fuckme6, -5000
+						settimer m2_Status_Req36, -5000
 						return
-						fuckme6:
+						m2_Status_Req36:
 						if (m2dstatus != "not running or paused"	) && (m2dstatus !=false) {
-							PostMessage, 0x0111, 65306,,, M2Drag.ahk - AutoHotkey		; Use 65306 to Pause, 
-							PostMessage, 0x0111, 65305,,, M2Drag.ahk - AutoHotkey		; 65305 to Suspend.
+							PostMessage, 0x0111, 65306,,, M2Drag.ahk - AutoHotkey		
+							PostMessage, 0x0111, 65305,,, M2Drag.ahk - AutoHotkey		
 						}
 						return
 					}
@@ -315,7 +286,7 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 					txt := "dialog", c_ntrolName := "Static1"
 				if (mainc_nt = WinExist("ahk_exe msiexec.exe",txt)) {
 					ControlGet, c_ntHandle, hWnd ,,%c_ntrolName% , ahk_id %mainc_nt%
-					ShowWindow( c_ntHandle, !IsWindowVisible( c_ntHandle))
+					StyleMenu_Showindow( c_ntHandle, !IsWindowVisible( c_ntHandle))
 					tooltip ProcdEvent: MsiDialogCloseClass`n.%id% yes %mainc_nt% main hwnd`n.%c_ntHandle%
 				}
 				return
@@ -330,7 +301,7 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 			{			
 				; winSet, Style, -0x00400000, ahk_id %hWnd%
 				; winSet, Style, +0x20000, ahk_id %hWnd%
-				ShowWindow(hWnd, !IsWindowVisible(hWnd))
+				StyleMenu_Showindow(hWnd, !IsWindowVisible(hWnd))
 				winSet, Style, 0x80000000, ahk_id %hWnd%
 				;WinMinimize , ahk_id %hWnd%
 			;	sleep 500
@@ -608,8 +579,8 @@ IsWindowVisible(hWnd) {
  return DllCall("IsWindowVisible", "Ptr", hWnd)
 }
 
-ShowWindow(hWnd, nCmdShow := 1) {
- DllCall("ShowWindow", "Ptr", hWnd, "Int", nCmdShow)
+StyleMenu_Showindow(hWnd, nCmdShow := 1) {
+ DllCall("StyleMenu_Showindow", "Ptr", hWnd, "Int", nCmdShow)
 }
 
 IsChild(hWnd) {
@@ -793,7 +764,7 @@ gethandle_roblox() {
 	return
 }
 
-Spunkmessagebox(handle) {
+TestMbkill(handle) {
 	if !8skin_crash 
 		8skin_crash = 1
 	else 
@@ -940,6 +911,7 @@ if !dstt {
 	dstt 			:= false
 }
 return
+
 pconfig:
 e=C:\Windows\system32\schtasks.exe /run /tn "cmd_output_to_msgbox.ahk_407642875"
 run %E%,, hide
@@ -968,18 +940,15 @@ if errorlevel
 	msgbox %errorlevel%
 else {
 	winSet, ExStyle, 0x000800A8, ahk_id %Time_hWnd%		; SIDEBAR-CLOCK CLICK-THRU
-	winSet, ExStyle, 0x000800A8, Moon Phase II
+	;winSet, ExStyle, 0x000800A8, Moon Phase II
 }
 return
 
 StyleDetect(hwnd,Style_xList,XTitle,XtitlesArray) {
-
 	if fpos:=InStr(Style_xList, XTitle)  {
 	;	tooltip % Style_xList " "XTitle 
-
 		;tooltip % value " " index
 		for index, value in XtitlesArray	{
-
 			if fpos:=InStr(value, XTitle) {
 				retpos 	:= RegExMatch(value, "(\µ)\K(.*)" , 		ret_class, p0s := 1) 
 				retpos 	:= RegExMatch(value, "^0.{9}" , 			ret_style, p0s := 1)
@@ -988,7 +957,8 @@ StyleDetect(hwnd,Style_xList,XTitle,XtitlesArray) {
 				WinSet, ExStyle, 	% ret_exstyle, 	% "ahk_id" hwnd
 				;msgbox %XTitle% detected`n%ret_style%`n%ret_exstyle%
 			}
-	}}
+		}	
+	}
 }
 
 toggle_m2drag_bypass:
@@ -1002,13 +972,11 @@ TargetHandle := "", style:=""
 if Dix
 	Menu F, DeleteAll
 Dix:= true
-
 MouseGetPos, OutputVarX, OutputVarY, OutputVarWin, OutputVarControl
 TargetHandle = ahk_id %OutputVarWin%
-
 WinGetTitle, TargetTitle, ahk_id %OutputVarWin%
 if !TargetTitle 
-return
+	return
 winGet PName, ProcessName, ahk_id %OutputVarWin%
 WinGet, Style2, Style, ahk_id %OutputVarWin%
 WinGet, ExStyle2, ExStyle, ahk_id %OutputVarWin%
@@ -1102,10 +1070,10 @@ othermenus: ; below submenus
 Menu F, 	add, m2drag bypass, toggle_m2drag_bypass
 Menu F, 	Icon, m2drag bypass, % mouse24
 Menu F, 	add, %Save% , Savegui
-gosub showw
+gosub StyleMenu_Show
 return
 
-showw:
+StyleMenu_Show:
 tooltip
 Menu F, Show
 return
@@ -1114,75 +1082,75 @@ donothing:
 return
 
 toggle_sysmenu:
-WinSet, Style, ^0x00080000, ahk_id %OutputVarWin%
+WinSet, Style, ^0x00080000, 		ahk_id %OutputVarWin%
 goto ResetMenu
 
 toggle_DLGFRAME:
-WinSet, Style, ^0x00400000, ahk_id %OutputVarWin% 
+WinSet, Style, ^0x00400000, 		ahk_id %OutputVarWin% 
 goto ResetMenu
 
 toggle_thickframe:
-WinSet, Style, ^0x00040000, ahk_id %OutputVarWin% 
+WinSet, Style, ^0x00040000, 		ahk_id %OutputVarWin% 
 goto ResetMenu
 
 toggle_modalframe:
-WinSet, ExStyle, ^0x00000001, ahk_id %OutputVarWin% 
+WinSet, ExStyle, ^0x00000001, 	ahk_id %OutputVarWin% 
 goto ResetMenu
 
 toggle_border:
-WinSet, Style, ^0x00040000, ahk_id %OutputVarWin% 
+WinSet, Style, ^0x00040000, 		ahk_id %OutputVarWin% 
 goto ResetMenu
 
 toggle_raisededge:
-WinSet, ExStyle, ^0x00000100, ahk_id %OutputVarWin%
+WinSet, ExStyle, ^0x00000100, 	ahk_id %OutputVarWin%
 goto ResetMenu
 
 toggle_sunkenedge:
-WinSet, ExStyle, ^0x00000100, ahk_id %OutputVarWin%
+WinSet, ExStyle, ^0x00000100, 	ahk_id %OutputVarWin%
 goto ResetMenu
 
 toggle_staticedge:
-WinSet, ExStyle, ^0x00020000, ahk_id %OutputVarWin%
+WinSet, ExStyle, ^0x00020000, 	ahk_id %OutputVarWin%
 goto ResetMenu
 
 toggle_3dedge:
-WinSet, ExStyle, ^0x00020000, ahk_id %OutputVarWin%
+WinSet, ExStyle, ^0x00020000, 	ahk_id %OutputVarWin%
 goto ResetMenu
 
 toggle_MinBox:
-WinSet, Style, ^0x00020000, ahk_id %OutputVarWin% 
+WinSet, Style, ^0x00020000, 		ahk_id %OutputVarWin% 
 goto ResetMenu
 
 toggle_Maxbox:
-WinSet, Style, ^0x00010000, ahk_id %OutputVarWin% 
+WinSet, Style, ^0x00010000, 		ahk_id %OutputVarWin% 
 goto ResetMenu
 
 toggle_hscroll:
-WinSet, Style, ^0x00100000, ahk_id %OutputVarWin% 
+WinSet, Style, ^0x00100000, 		ahk_id %OutputVarWin% 
 goto ResetMenu
 
 toggle_vscroll:
-WinSet, Style, ^0x00200000, ahk_id %OutputVarWin% 
+WinSet, Style, ^0x00200000, 		ahk_id %OutputVarWin% 
 goto ResetMenu
 
 toggle_LeftScroll:
-WinSet, ExStyle, ^0x00004000, ahk_id %OutputVarWin% 
+WinSet, ExStyle, ^0x00004000, 	ahk_id %OutputVarWin% 
 goto ResetMenu
 
 toggle_Clickthru:
-WinSet, ExStyle, ^0x00000020, ahk_id %OutputVarWin% 
+WinSet, ExStyle, ^0x00000020, 	ahk_id %OutputVarWin% 
 goto ResetMenu
 
 toggle_RightAlign:
-WinSet, ExStyle, ^0x00001000, ahk_id %OutputVarWin% 
+WinSet, ExStyle, ^0x00001000, 	ahk_id %OutputVarWin% 
 goto ResetMenu
 
 toggle_RightoLeft:
-WinSet, ExStyle, ^0x00002000, ahk_id %OutputVarWin% 
+WinSet, ExStyle, ^0x00002000, 	ahk_id %OutputVarWin% 
 goto ResetMenu
 
 toggle_AppWindow:
-WinSet, ExStyle, ^0x00040000, ahk_id %OutputVarWin% 
+WinSet, ExStyle, ^0x00040000, 	ahk_id %OutputVarWin% 
 goto ResetMenu
 
 SAVEGUI:
@@ -1192,7 +1160,7 @@ winGetClass save_new_Class, ahk_id %OutputVarWin%
 WinGet, Style, Style, ahk_id %OutputVarWin%
 WinGet, ExStyle, ExStyle, ahk_id %OutputVarWin%
 if !Style or !ExStyle
-	msgbox error
+	msgbox error %a_lasterror%
 gui, SaveGuI:new , , SAVE WINDOW STYLES
 gui +hwndSaveGuI_hWnd
 gui, SaveGuI:add, checkbox, vTProcName ,Process %save_new_ProcName%
@@ -1265,9 +1233,12 @@ Loop, Reg, % classnamekey
 return
 
 Open_script_folder:
-e = explorer /select,%a_ScriptFullPath%
-tooltip %a_ScriptFullPath%
+e = explorer /select, %a_ScriptFullPath%
+tooltip % a_ScriptFullPath
 run %comspec% /c %e%,,hide,
+settimer tooloff, -1222
+return
+
 tooloff:
 tooltip
 return 
@@ -1293,7 +1264,7 @@ menu, tray, Icon, Context32.ico
 return
 
 Globals:
-global AF := (Script . af_1), global AF2 := (Script . Bun_), global AutoFireScript := BF, global AutoFireScript2 := BF2 , global TargetScriptTitle := (AutoFireScript . " ahk_class AutoHotkey"), global TargetScriptTitle2 := (AutoFireScript2 . " ahk_class AutoHotkey"), global AHK_Rare := "C:\Script\AHK\- Script\AHK-Rare-master\AHKRareTheGui.ahk", global SidebarPath := "C:\Program Files\Windows Sidebar\sidebar.exe", global AF_Delay := 10, global SysShadowStyle_New := 0x08000000, global SysShadowExStyle_New := 0x08000020, global toolx := "-66", global offsett := 40, global KILLSWITCH := "kill all AHK procs.ahk", global starttime, global text, global X_X, global Last_Title, global autofire, global RhWnd_old, global MouseTextID, global DMT, global roblox, global toggleshift, global Norm_menuStyle, global Norm_menuexStyle, global Title_Last, global Title_last, global dcStyle, global classname, global tool, global tooly, global EventLogBuffer_Old, global Roblox_hwnd, global Time_Elapsed, global KillCount, global SBAR_2berestored_True, global Sidebar, global 4groundtt, global focustt, global creatett, global destroytt, global msgboxtt, global dbg, global TClass, global TTitle, global TProcName, global delim, global delim2, global TitleCount, global ClassCount, global ProcCount, global style2, global exstyle2, delim := "µ", delim2 := "»", global ArrayProc, global ArrayClass, global ArrayTitle, global Array_LProc, global Array_LTitle, global Array_LClass, global Style_ClassnameList2, global Style_procnameList2, global Style_wintitleList2, global popoutyt, global Script_Title, global np, global m2dstatus, global 4skin_crash, global 8skin_crash, global OutputVarWin, global F, global s1, global s2, global s3, global delim := "Þ", global FileListStr, global oldlist, global FileCount, global FileListStr_array := [], GLOBAL ADELIM
+global AF := (Script . af_1), global AF2 := (Script . Bun_), global AutoFireScript := BF, global AutoFireScript2 := BF2 , global TargetScriptTitle := (AutoFireScript . " ahk_class AutoHotkey"), global TargetScriptTitle2 := (AutoFireScript2 . " ahk_class AutoHotkey"), global AHK_Rare := "C:\Script\AHK\- Script\AHK-Rare-master\AHKRareTheGui.ahk", global SidebarPath := "C:\Program Files\Windows Sidebar\sidebar.exe", global AF_Delay := 10, global SysShadowStyle_New := 0x08000000, global SysShadowExStyle_New := 0x08000020, global toolx := "-66", global offsett := 40, global KILLSWITCH := "kill all AHK procs.ahk", global starttime, global text, global X_X, global Last_Title, global autofire, global RhWnd_old, global MouseTextID, global DMT, global roblox, global toggleshift, global Norm_menuStyle, global Norm_menuexStyle, global Title_Last, global Title_last, global dcStyle, global classname, global tool, global tooly, global EventLogBuffer_Old, global Roblox_hwnd, global Time_Elapsed, global KillCount, global SBAR_2berestored_True, global Sidebar, global 4groundtt, global focustt, global creatett, global destroytt, global msgboxtt, global dbg, global TClass, global TTitle, global TProcName, global delim, global delim2, global TitleCount, global ClassCount, global ProcCount, global style2, global exstyle2, delim := "µ", delim2 := "»", global ArrayProc, global ArrayClass, global ArrayTitle, global Array_LProc, global Array_LTitle, global Array_LClass, global Style_ClassnameList2, global Style_procnameList2, global Style_wintitleList2, global popoutyt, global Script_Title, global np, global m2dstatus, global crashmb, global 8skin_crash, global OutputVarWin, global F, global s1, global s2, global s3, global delim := "Þ", global FileListStr, global oldlist, global FileCount, global FileListStr_array := [], GLOBAL ADELIM
 
 return
 
