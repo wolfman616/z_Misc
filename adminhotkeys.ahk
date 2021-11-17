@@ -1,24 +1,27 @@
-﻿#noEnv ; #warn;#noTrayIcon
+﻿#noEnv 	;	#warn		;	#noTrayIcon
 #persistent
 #SingleInstance force
 #MaxThreadsPerhotkey 10
 sendMode Input
-setWorkingDir %a_scriptDir%
+setWorkingDir C:\Script\AHK
+
 menu, tray, add, Open Script Folder, Open_Script_Location,
 menu, tray, standard
 
+global email, global Trig
 global M2DRAG 		:= "M2Drag.ahk ahk_class AutoHotkey"
-global WMPMATT 		:= "wmp_Matt.ahk ahk_class AutoHotkey"
-global WinEventScript 	:= "WinEvent.ahk ahk_class AutoHotkey"
+global WMPMATT 	:= "wmp_Matt.ahk ahk_class AutoHotkey"
+global EventScript 	:= "WinEvent.ahk ahk_class AutoHotkey"
 global YTScript 			:= "YT.ahk ahk_class AutoHotkey"
-global TargetScript 		:= "wmp_Matt.ahk ahk_class AutoHotkey"
-global Trigger
+global TargetScript 	:= "wmp_Matt.ahk ahk_class AutoHotkey"
+
+iniRead, email, ad.ini, e, e, test@i.cycles.co
 
 OnMessage(0x4a, "Receive_WM_COPYDATA")
 return
 
 ::btw::by the way
-
+::myemail:: % email
 return
 
 Receive_WM_COPYDATA(wParam, lParam){
@@ -36,40 +39,46 @@ run C:\Apps\Ph\processhacker\x64\ProcessHacker.exe
 return
 
 ~rButton::
-Trigger:=false
+Trig := false
 return
 
-~rButton up::
+~rButton Up::
 if getKeyState("LAlt" , "P") {
-	Trigger:=true
-	goto dickinarse
+	Trig := true
+	setTimer HookMenuInit, -1
 }
 return
 
 <!rbutton:: ; Left Alt and right mouse button (doesnt work properly hence the above)
-dickinarse:
-TargetScript := WinEventScript, STR_ := "StyleMenu", result := Send_WM_COPYDATA(STR_, TargetScript)
+HookMenuInit:
+TargetScript := EventScript, STR_ := "StyleMenu", result := Send_WM_COPYDATA(STR_, TargetScript)
 BlockInput, On
-SLEEP 500
+settimer bi_off, -500
+return
+
+bi_off:
 BlockInput, OFF
 send {lalt up}
 return
 
-~+esc::
 ~esc::
-    if winactive("ahk_exe vlc.exe")
-        WinClose
-Return
+~+esc::
+if (	winactive("ahk_exe 	vlc.exe") || winactive("ahk_exe 	fontview.exe") || winactive("ahk_exe 	WMPlayer.exe") || winactive("ahk_exe 	RzSynapse.exe")) {
+	WinClose
+} else 
+if (	winactive("ahk_exe ApplicationFrameHost.exe")) {
+	WinClose
+	settimer tooloff, -1000
+}
 return
 
-#M::				; 		Win M
+#M::				     ; 		Win M                                    
 +#M::		
-; not working
-; TargetScript := "M2Drag.ahk ahk_class AutoHotkey"
-; STR_ := "magtoggle"
+; TargetScript := "M2Drag.ahk ahk_class AutoHotkey", 	; STR_ := "magtoggle"
 ; result := Send_WM_COPYDATA(STR_, TargetScript)
-run C:\Program Files\AHK\Autohotkey.exe C:\Script\AHK\Working\M2DRAG_MAG.AHK ; WORKING
-return
+; 				;^^ above not working ^ ^
+run C:\Program Files\AHK\Autohotkey.exe C:\Script\AHK\Working\M2DRAG_MAG.AHK
+return		;^^ above working ^ ^
 
 <^>!PgUp::		;		ALTgr + Page UP 	; 	Volume Up	
 +<^>!PgUp::		
@@ -121,13 +130,13 @@ return
 TargetScript := WMPMATT, STR_ := "Add2Playlist", result := Send_WM_COPYDATA(STR_, TargetScript)
 return
 
-<^>!s::			;	ALTgr + S
-+<^>!s::
+<^>!f::			;	ALTgr + f
++<^>!f::
 TargetScript := WMPMATT, STR_ := "SearchExplorer", result := Send_WM_COPYDATA(STR_, TargetScript)
 return
 
-<^>!i::			;	ALTgr + i
-+<^>!i::			;	Search SlSK for alternatives to current
+<^>!s::			;	ALTgr + s
++<^>!s::			;	Search SlSK for alternatives to current
 TargetScript := WMPMATT, STR_ := "CopySearchSlSk", result := Send_WM_COPYDATA(STR_, TargetScript)
 return
 
