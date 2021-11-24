@@ -2,7 +2,7 @@
 	AutoIt Version: 3.3.14.5
 		Author: sPksNinj
 			Script function: Windows 10 DWM hook
-				Date: 21.10.2021
+				Date: 21.11.2021
 #ce ----------------------------------------------------------------------------
 
 #noTrayIcon ;#include <GUIConstants.au3> 
@@ -24,7 +24,7 @@ If _Singleton(@ScriptName, 1) = 0 Then
     exit
 endIf
 
-global $BlackClassList = "TaskListThumbnailWnd SysDragImage WMPMessenger Scintilla BasicWindow OleMainThreadWndClass ProgMan WorkerW Listbox SideBar_HTMLHostWindow MozillaWindowClass Shell_TrayWnd MSTasklistWClass ToolbarWindow32 TaskListOverlayWnd tooltips_class32 WMP Skin Host"
+global $BlackClassList = "TaskListThumbnailWnd,SysDragImage,WMPMessenger,Scintilla,BasicWindow,OleMainThreadWndClass ProgMan,WorkerW,Listbox,SideBar_HTMLHostWindow,MozillaWindowClass,Shell_TrayWnd,MSTasklistWClass,ToolbarWindow32,TaskListOverlayWnd,tooltips_class32,WMP Skin Host,WMPTransition,CWmpControlCntr,Shell_LightDismissOverlay,Shell_Flyout"
 
 global $hDLL, $hWinEventProc, $hHook, $Style, $StyleOld, $Class, $ClassLog
 global $sStruct = DllStructCreate("dword;int;ptr;int")
@@ -147,6 +147,8 @@ func _WinEventProc($hHook, $iEvent, $hWnd, $idObject, $idChild, $iEventThread, $
 			case "GitHubDesktop.exe"
 				return
 			case "Autohotkey2.exe" 
+				return
+			case "GoogleDriveFS.exe" 
 				return
 		endSwitch
 
