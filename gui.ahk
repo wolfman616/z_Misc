@@ -15,10 +15,10 @@ loop 8
 
 knob1 := "C:\Users\ninj\DESKTOP\knobtest.png" ; alpha notch
 global rot_num_in
-global rot_led_in
+global Rot_Led_in
 global rot_num
-global rot_led
-global rotledold 
+global Rot_Led
+global RotLed_Old 
 
 menu, tray, add, Open Script Folder, Open_ScriptDir,
 menu, tray, standard
@@ -124,7 +124,7 @@ Gdip_GraphicsClear(G%Rot_Num%)
 Gdip_ResetWorldTransform(G%Rot_Num%)
 
 Gdip_TranslateWorldTransform(G%Rot_Num%, 40, 40)
-Gdip_RotateWorldTransform(G%Rot_Num%, (rsot:=rot_led * 19.3))
+Gdip_RotateWorldTransform(G%Rot_Num%, (rsot:=Rot_Led * 19.3))
 Gdip_TranslateWorldTransform(G%Rot_Num%, -40, -40)
 
 Gdip_DrawImage(G%Rot_Num%, pBitmap%Rot_Num%, 0, 0, nW, nh)
@@ -135,74 +135,67 @@ return
 
 Receive_WM_COPYDATA(wParam, lParam)
 {
-    StringAddress := NumGet(lParam + 2*A_PtrSize)  ; Retrieves the CopyDataStruct's lpData member.
-    CopyOfData := StrGet(StringAddress)  ; Copy the string out of the structure.
-    ; Show it with ToolTip vs. MsgBox so we can return in a timely fashion:
-    ;ToolTip %A_ScriptName%`nReceived the following string:`n%CopyOfData%
+    StringAddress := NumGet(lParam + 2*A_PtrSize)
+    WmCoppOffData := StrGet(StringAddress) 
 	settimer tooloff, -2000
-	
-	StringLeft, 	rot_num_in, CopyOfData, 3
-	StringRight, 	rot_led_in, CopyOfData, 3
-;	tooltip % rot_led_in "`n" rot_num_in "`n" CopyOfData
-
-	SWITCH rot_num_in {
-		CASE "048":
+	StringLeft, 	rot_num_in, WmCoppOffData, 3
+	StringRight, 	Rot_Led_in, WmCoppOffData, 3
+	switch rot_num_in {
+		case "048":
 			rot_num := 1
-		CASE "049":
+		case "049":
 			rot_num := 2
-		CASE "050":
+		case "050":
 			rot_num := 3
-		CASE "051":
+		case "051":
 			rot_num := 4
-		CASE "052":
+		case "052":
 			rot_num := 5
-		CASE "053":
+		case "053":
 			rot_num := 6
-		CASE "054":
+		case "054":
 			rot_num := 7
-		CASE "055":
+		case "055":
 			rot_num := 8
 	}
 			
-	SWITCH rot_led_in {
-	CASE 0,8:
-		rot_led:=0
-	CASE 9,17:
-		rot_led:=1
-	CASE 18,26:  
-		rot_led:=2
-	CASE 27,35:
-		rot_led:=3
-	CASE 36,44:
-		rot_led:=4
-	CASE 45,53:
-		rot_led:=5
-	CASE 54,62:
-		rot_led:=6
-	CASE 63,71:
-		rot_led:=7
-	CASE 72,80:
-		rot_led:=8
-	CASE 81,89:
-		rot_led:=9
-	CASE 90,98:
-		rot_led:=10
-	CASE 99,107:
-		rot_led:=11
-	CASE 108,116:
-		rot_led:=12
-	CASE 117,125:
-		rot_led:=13
-	CASE 126,127:
-		rot_led:=14
+	switch Rot_Led_in {
+		case 0,8:
+			Rot_Led:=0
+		case 9,17:
+			Rot_Led:=1
+		case 18,26:  
+			Rot_Led:=2
+		case 27,35:
+			Rot_Led:=3
+		case 36,44:
+			Rot_Led:=4
+		case 45,53:
+			Rot_Led:=5
+		case 54,62:
+			Rot_Led:=6
+		case 63,71:
+			Rot_Led:=7
+		case 72,80:
+			Rot_Led:=8
+		case 81,89:
+			Rot_Led:=9
+		case 90,98:
+			Rot_Led:=10
+		case 99,107:
+			Rot_Led:=11
+		case 108,116:
+			Rot_Led:=12
+		case 117,125:
+			Rot_Led:=13
+		case 126,127:
+			Rot_Led:=14
 	}           
-	if rot_led != rotledold
+	if Rot_Led != RotLed_Old
 		gosub turd
-		rotledold := rot_led
-    return true  ; Returning 1 (true) is the traditional way to acknowledge this message.
+		RotLed_Old := Rot_Led
+    return true
 }
-
-
 
 
 Gdi_CreateCompatibleDC(hDC = 0)
