@@ -4,21 +4,12 @@
 sendMode Input
 setWorkingDir %a_scriptDir%
 setbatchlines -1
-
-apcgui 			:= "C:\Users\ninj\DESKTOP\apctest.png"
-apcbuttest 		:= "C:\Users\ninj\DESKTOP\tesbutts.png"
-apcbuttestall 	:= "C:\Users\ninj\DESKTOP\allonlol.png"
-TargetOriface 	:= "z_in_out.ahk ahk_class AutoHotkey"
-Anus 			:= -19.3 ;rotary-led separation offset degrees 
-loop 8
-	maskalpha%A_index% := "C:\Users\ninj\DESKTOP\mask.png" ; replace with indiv
-
-knob1 := "C:\Users\ninj\DESKTOP\knobtest.png" ; alpha notch
-global rot_num_in
-global Rot_Led_in
-global rot_num
-global Rot_Led
-global RotLed_Old 
+global Rot_Num_in, global Rot_Led_in, global Rot_Num, global Rot_Led, global RotLed_Old 
+apcgui 			:= "Images\apctest.png"		;	Main
+knob1 			:= "Images\knobtest.png"	; 	replace with individual images of knobs
+Rot_Mask 		:= "Images\mask.png" 		;	Rotary-LED Alpha-notched-Mask
+Anus 			:= -19.3					;	Rotary-LED separation offset degrees 
+WM_Target 		:= "z_in_out.ahk ahk_class AutoHotkey" 	;	Midi feedback
 
 menu, tray, add, Open Script Folder, Open_ScriptDir,
 menu, tray, standard
@@ -41,36 +32,35 @@ WinSet, TransColor, EEAA99
 gui, 	layer2:Show,x433 y433 w1122 h666, MIDI, 
 gui,	layer2:+LastFound  
 gui, 	layer2:-Caption 
-	
-loop 8  
-{
- 	sFile%A_index% 	:=  maskalpha%A_index%
+	 	sFile%A_index% 	:=  Rot_Mask
+
+loop 8 {
 	CuntHole 		:= ("Dripp" . A_index)
 	GapedJap		:= ("Tr4ny" 	. A_index)
-	ypos2 			:= "y445"
+	Y_pos_2 		:= "y445"
 	switch a_index{
 		case "1":
-			xpos1 := "x0", ypos1 := "y0", xpos2 := "x445"
+			X_pos_1 := "x0", Y_pos_1 := "y0", X_pos_2 := "x445"
 		case "2":
-			xpos1 := "x0", ypos1 := "y0", xpos2 := "x530"
+			X_pos_1 := "x0", Y_pos_1 := "y0", X_pos_2 := "x530"
 		case "3":
-			xpos1 := "x0", ypos1 := "y0", xpos2 := "x610"
+			X_pos_1 := "x0", Y_pos_1 := "y0", X_pos_2 := "x610"
 		case "4":
-			xpos1 := "x0", ypos1 := "y0", xpos2 := "x695"
+			X_pos_1 := "x0", Y_pos_1 := "y0", X_pos_2 := "x695"
 		case "5":
-			xpos1 := "x0", ypos1 := "y0", xpos2 := "x775"
+			X_pos_1 := "x0", Y_pos_1 := "y0", X_pos_2 := "x775"
 		case "6":
-			xpos1 := "x0", ypos1 := "y0", xpos2 := "x860"
+			X_pos_1 := "x0", Y_pos_1 := "y0", X_pos_2 := "x860"
 		case "7":
-			xpos1 := "x0", ypos1 := "y0", xpos2 := "x945"
+			X_pos_1 := "x0", Y_pos_1 := "y0", X_pos_2 := "x945"
 		case "8":
-			xpos1 := "x0", ypos1 := "y0", xpos2 := "x1035"
+			X_pos_1 := "x0", Y_pos_1 := "y0", X_pos_2 := "x1035"
 	}	
 	gui, 	%CuntHole%:New, -DPIScale +AlwaysOnTop +disabled -SysMenu +ToolWindow +Owner , Layerr%A_index%
 	gui, 	%CuntHole%:Color, 000000
-	gui, 	%CuntHole%:Add, Picture,%xpos1% %ypos1% w80 h80 BackgroundTrans , %knob1%	; 
+	gui, 	%CuntHole%:Add, Picture,%X_pos_1% %Y_pos_1% w80 h80 BackgroundTrans , %knob1%	; 
 	gui, 	%CuntHole%:+Hwnd%CuntHole%
-	gui, 	%CuntHole%:Show, %xpos2% %ypos2% w80 h80 NoActivate, MIDOUT, 
+	gui, 	%CuntHole%:Show, %X_pos_2% %Y_pos_2% w80 h80 NoActivate, MIDOUT, 
 	gui, 	%CuntHole%:+LastFound -Caption   ; Make the GUI window the last found window for use by the line below.
 	WinSet, TransColor, 000000
 	gui, 	%CuntHole%:hide,
@@ -79,7 +69,7 @@ loop 8
 	gui, 	%GapedJap%:+LastFound +AlwaysOnTop -Caption +E0x80000
 	hwnd%GapedJap% 	:= WinExist()
 	pToken%A_index% := Gdip_Startup22()
-	pImage%A_index% := Gdip_LoadImageFromFile(sFile%A_index%)
+	pImage%A_index% := Gdip_LoadImageFromFile(Rot_Mask)
 	noW%A_index%	:= Gdip_GetImageWidth2(pImage%A_index%)
 	noH%A_index%	:= Gdip_GetImageHeight2(pImage%A_index%)
 	nh := (noH%A_index%), 	nw := (noW%A_index%)	
@@ -91,11 +81,11 @@ loop 8
 	DllCall("gdi32.dll\SetStretchBltMode",Uint, mDC%A_index%, int, 5)
 	DllCall("gdi32.dll\StretchBlt",UInt,mDC%A_index%, Int,0, Int,0, Int, nH , Int, nH , UInt, %CuntHole%dc, UInt,0, UInt,0, Int,nW, Int,nH, UInt, "0x00440328")        
 	DllCall("UpdateLayeredWindow", "Uint", hwnd%GapedJap%, "Uint", 0, "Uint", 0, "int64P", nW|nH<<32, "Uint", mDC%A_index%, "int64P", 0, "Uint", 0, "intP", 0xFF<<16|1<<24, "Uint", 2)
-	gui, 	%GapedJap%:Show, h80 w80 %xpos2% %ypos2% NoActivate,
+	gui, 	%GapedJap%:Show, h80 w80 %X_pos_2% %Y_pos_2% NoActivate,
 	gui, 	%GapedJap%:+LastFound
 	gui, 	%GapedJap%:-Caption 
 	nH:=80,	nw:=80
- 	pBitmap%A_index% := Gdip_CreateBitmapFromFile(sFile%A_index%)
+ 	pBitmap%A_index% := Gdip_CreateBitmapFromFile(Rot_Mask)
 	;Gdip_GetRotatedDimensions(80, 80, 90, rw1, rh1)
 	;Gdip_GetRotatedDimensions(0, 0, 57.29578 * atan(0/0), rw, rh)
 	G%A_index%:=Gdip_GraphicsFromHDC(mdc%A_index%)
@@ -114,9 +104,9 @@ return
 ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-turd:
+Knob_Upd8:
 nH:=80, nw:=80
-pBitmap%Rot_Num% := Gdip_CreateBitmapFromFile(sFile%Rot_Num%)
+pBitmap%Rot_Num% := Gdip_CreateBitmapFromFile(Rot_Mask)
 ;Gdip_GetRotatedDimensions(80, 80, 90, rw1, rh1)
 ;Gdip_GetRotatedDimensions(0, 0, 57.29578 * atan(0/0), rw, rh)
 G%Rot_Num%:=Gdip_GraphicsFromHDC(mdc%Rot_Num%)
@@ -138,25 +128,25 @@ Receive_WM_COPYDATA(wParam, lParam)
     StringAddress := NumGet(lParam + 2*A_PtrSize)
     WmCoppOffData := StrGet(StringAddress) 
 	settimer tooloff, -2000
-	StringLeft, 	rot_num_in, WmCoppOffData, 3
+	StringLeft, 	Rot_Num_in, WmCoppOffData, 3
 	StringRight, 	Rot_Led_in, WmCoppOffData, 3
-	switch rot_num_in {
+	switch Rot_Num_in {
 		case "048":
-			rot_num := 1
+			Rot_Num := 1
 		case "049":
-			rot_num := 2
+			Rot_Num := 2
 		case "050":
-			rot_num := 3
+			Rot_Num := 3
 		case "051":
-			rot_num := 4
+			Rot_Num := 4
 		case "052":
-			rot_num := 5
+			Rot_Num := 5
 		case "053":
-			rot_num := 6
+			Rot_Num := 6
 		case "054":
-			rot_num := 7
+			Rot_Num := 7
 		case "055":
-			rot_num := 8
+			Rot_Num := 8
 	}
 			
 	switch Rot_Led_in {
@@ -191,9 +181,10 @@ Receive_WM_COPYDATA(wParam, lParam)
 		case 126,127:
 			Rot_Led:=14
 	}           
-	if Rot_Led != RotLed_Old
-		gosub turd
-		RotLed_Old := Rot_Led
+	if (Rot_Led 	!= RotLed_Old) {	
+		gosub Knob_Upd8
+		RotLed_Old 	:= Rot_Led
+	}
     return true
 }
 
@@ -287,7 +278,7 @@ Gdip_DrawImageRectI(pGraphics, pImage, nL, nT, nW, nH)
 }
 
 
-Send_WM_COPYDATA(ByRef StringToSend, ByRef TargetOriface)  ; ByRef saves a little memory in this case.
+Send_WM_COPYDATA(ByRef StringToSend, ByRef WM_Target)  ; ByRef saves a little memory in this case.
 ; This function sends the specified string to the specified window and returns the reply.
 ; The reply is 1 if the target window processed the message, or 0 if it ignored it.
 {
@@ -302,7 +293,7 @@ Send_WM_COPYDATA(ByRef StringToSend, ByRef TargetOriface)  ; ByRef saves a littl
     SetTitleMatchMode 2
     TimeOutTime := 4000  ; Optional. Milliseconds to wait for response from receiver.ahk. Default is 5000
     ; Must use SendMessage not PostMessage.
-    SendMessage, 0x4a, 0, &CopyDataStruct,, %TargetOriface%,,,, %TimeOutTime% ; 0x4a is WM_COPYDATA.
+    SendMessage, 0x4a, 0, &CopyDataStruct,, %WM_Target%,,,, %TimeOutTime% ; 0x4a is WM_COPYDATA.
     DetectHiddenWindows %Prev_DetectHiddenWindows%  ; Restore original setting for the caller.
     SetTitleMatchMode %Prev_TitleMatchMode%         ; Same.
     return ErrorLevel  ; Return SendMessage's reply back to our caller.
