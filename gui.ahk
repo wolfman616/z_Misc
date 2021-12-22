@@ -4,24 +4,22 @@
 sendMode Input
 setWorkingDir %a_scriptDir%
 setbatchlines -1
-Toggler:= True 
-fagToggler := True 
-SRCCOPY := 0x00440328
-apcgui := "C:\Users\ninj\DESKTOP\apctest.png"
-apcbuttest := "C:\Users\ninj\DESKTOP\tesbutts.png"
-apcbuttestall := "C:\Users\ninj\DESKTOP\allonlol.png"
 
+apcgui 			:= "C:\Users\ninj\DESKTOP\apctest.png"
+apcbuttest 		:= "C:\Users\ninj\DESKTOP\tesbutts.png"
+apcbuttestall 	:= "C:\Users\ninj\DESKTOP\allonlol.png"
+TargetOriface 	:= "z_in_out.ahk ahk_class AutoHotkey"
+Anus 			:= -19.3 ;rotary-led separation offset degrees 
 loop 8
-maskalpha%A_index% := "C:\Users\ninj\DESKTOP\mask.png"
+	maskalpha%A_index% := "C:\Users\ninj\DESKTOP\mask.png" ; replace with indiv
 
-knob1 := "C:\Users\ninj\DESKTOP\knobtest.png"
+knob1 := "C:\Users\ninj\DESKTOP\knobtest.png" ; alpha notch
 global rot_num_in
 global rot_led_in
 global rot_num
 global rot_led
 global rotledold 
-anus := -19.3
-TargetScriptTitle := "z_in_out.ahk ahk_class AutoHotkey"
+
 menu, tray, add, Open Script Folder, Open_ScriptDir,
 menu, tray, standard
 OnMessage(0x4a, "Receive_WM_COPYDATA")  ; 0x4a is WM_COPYDATA
@@ -47,8 +45,8 @@ gui, 	layer2:-Caption
 loop 8  
 {
  	sFile%A_index% 	:=  maskalpha%A_index%
-	cunthole 		:= ("gayer" . A_index)
-	GAPEDJAP		:= ("Tranny" . A_index)
+	CuntHole 		:= ("Dripp" . A_index)
+	GapedJap		:= ("Tr4ny" 	. A_index)
 	ypos2 			:= "y445"
 	switch a_index{
 		case "1":
@@ -68,18 +66,18 @@ loop 8
 		case "8":
 			xpos1 := "x0", ypos1 := "y0", xpos2 := "x1035"
 	}	
-	gui, 	%cunthole%:New, -DPIScale +AlwaysOnTop +disabled -SysMenu +ToolWindow +Owner , Layerr%A_index%
-	gui, 	%cunthole%:Color, 000000
-	gui, 	%cunthole%:Add, Picture,%xpos1% %ypos1% w80 h80 BackgroundTrans , %knob1%	; 
-	gui, 	%cunthole%:+Hwnd%cunthole%
-	gui, 	%cunthole%:Show, %xpos2% %ypos2% w80 h80 NoActivate, MIDOUT, 
-	gui, 	%cunthole%:+LastFound -Caption   ; Make the GUI window the last found window for use by the line below.
+	gui, 	%CuntHole%:New, -DPIScale +AlwaysOnTop +disabled -SysMenu +ToolWindow +Owner , Layerr%A_index%
+	gui, 	%CuntHole%:Color, 000000
+	gui, 	%CuntHole%:Add, Picture,%xpos1% %ypos1% w80 h80 BackgroundTrans , %knob1%	; 
+	gui, 	%CuntHole%:+Hwnd%CuntHole%
+	gui, 	%CuntHole%:Show, %xpos2% %ypos2% w80 h80 NoActivate, MIDOUT, 
+	gui, 	%CuntHole%:+LastFound -Caption   ; Make the GUI window the last found window for use by the line below.
 	WinSet, TransColor, 000000
-	gui, 	%cunthole%:hide,
-	%cunthole%dc 	:= DllCall("GetDC", UInt, %cunthole%)
-	gui, 	%GAPEDJAP%:New, -DPIScale +AlwaysOnTop +disabled -SysMenu +ToolWindow +Owner , %GAPEDJAP%
-	gui, 	%GAPEDJAP%:+LastFound +AlwaysOnTop -Caption +E0x80000
-	hwnd%GAPEDJAP% 	:= WinExist()
+	gui, 	%CuntHole%:hide,
+	%CuntHole%dc 	:= DllCall("GetDC", UInt, %CuntHole%)
+	gui, 	%GapedJap%:New, -DPIScale +AlwaysOnTop +disabled -SysMenu +ToolWindow +Owner , %GapedJap%
+	gui, 	%GapedJap%:+LastFound +AlwaysOnTop -Caption +E0x80000
+	hwnd%GapedJap% 	:= WinExist()
 	pToken%A_index% := Gdip_Startup22()
 	pImage%A_index% := Gdip_LoadImageFromFile(sFile%A_index%)
 	noW%A_index%	:= Gdip_GetImageWidth2(pImage%A_index%)
@@ -91,12 +89,12 @@ loop 8
 	oBM%A_index%	:= Gdi_SelectObject(mDC%A_index%, mBM%A_index%)
 	Gdip_DrawImageRectI(pGraphics%A_index%:=Gdip_CreateFromHDC(mDC%A_index%), pImage%A_index%, 0, 0, nW, nH)
 	DllCall("gdi32.dll\SetStretchBltMode",Uint, mDC%A_index%, int, 5)
-	DllCall("gdi32.dll\StretchBlt",UInt,mDC%A_index%, Int,0, Int,0, Int, nH , Int, nH , UInt, %cunthole%dc, UInt,0, UInt,0, Int,nW, Int,nH, UInt, "0x00440328")        
-	DllCall("UpdateLayeredWindow", "Uint", hwnd%GAPEDJAP%, "Uint", 0, "Uint", 0, "int64P", nW|nH<<32, "Uint", mDC%A_index%, "int64P", 0, "Uint", 0, "intP", 0xFF<<16|1<<24, "Uint", 2)
-	gui, 	%GAPEDJAP%:Show, h80 w80 %xpos2% %ypos2% NoActivate,
-	gui, 	%GAPEDJAP%:+LastFound
-	gui, 	%GAPEDJAP%:-Caption 
-	nH:=80,nw:=80
+	DllCall("gdi32.dll\StretchBlt",UInt,mDC%A_index%, Int,0, Int,0, Int, nH , Int, nH , UInt, %CuntHole%dc, UInt,0, UInt,0, Int,nW, Int,nH, UInt, "0x00440328")        
+	DllCall("UpdateLayeredWindow", "Uint", hwnd%GapedJap%, "Uint", 0, "Uint", 0, "int64P", nW|nH<<32, "Uint", mDC%A_index%, "int64P", 0, "Uint", 0, "intP", 0xFF<<16|1<<24, "Uint", 2)
+	gui, 	%GapedJap%:Show, h80 w80 %xpos2% %ypos2% NoActivate,
+	gui, 	%GapedJap%:+LastFound
+	gui, 	%GapedJap%:-Caption 
+	nH:=80,	nw:=80
  	pBitmap%A_index% := Gdip_CreateBitmapFromFile(sFile%A_index%)
 	;Gdip_GetRotatedDimensions(80, 80, 90, rw1, rh1)
 	;Gdip_GetRotatedDimensions(0, 0, 57.29578 * atan(0/0), rw, rh)
@@ -104,13 +102,13 @@ loop 8
 	Gdip_GraphicsClear(G%A_index%)
 	Gdip_ResetWorldTransform(G%A_index%)
 	Gdip_TranslateWorldTransform(G%A_index%, 40, 40)
-	Gdip_RotateWorldTransform(G%A_index%, (aa=anus + 19.3))
+	Gdip_RotateWorldTransform(G%A_index%, (aa=Anus + 19.3))
 	Gdip_TranslateWorldTransform(G%A_index%, -40, -40)
 
 	Gdip_DrawImage(G%A_index%, pBitmap%A_index%, 0, 0, nW, nh)
 	DllCall("gdi32.dll\SetStretchBltMode",Uint, mDC%A_index%, int, 5)
-	DllCall("gdi32.dll\StretchBlt",UInt,mDC%A_index%, Int,0, Int,0, Int, nH , Int, nH , UInt, %cunthole%dc, UInt,0, UInt,0, Int,nW, Int,nH, UInt, "0x00440328")        
-	DllCall("UpdateLayeredWindow", "Uint", hwnd%GAPEDJAP%, "Uint", 0, "Uint", 0, "int64P", nW|nH<<32, "Uint", mDC%A_index%, "int64P", 0, "Uint", 0, "intP", 0xFF<<16|1<<24, "Uint", 2)
+	DllCall("gdi32.dll\StretchBlt",UInt,mDC%A_index%, Int,0, Int,0, Int, nH , Int, nH , UInt, %CuntHole%dc, UInt,0, UInt,0, Int,nW, Int,nH, UInt, "0x00440328")        
+	DllCall("UpdateLayeredWindow", "Uint", hwnd%GapedJap%, "Uint", 0, "Uint", 0, "int64P", nW|nH<<32, "Uint", mDC%A_index%, "int64P", 0, "Uint", 0, "intP", 0xFF<<16|1<<24, "Uint", 2)
 }
 return
 ;-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -131,8 +129,8 @@ Gdip_TranslateWorldTransform(G%Rot_Num%, -40, -40)
 
 Gdip_DrawImage(G%Rot_Num%, pBitmap%Rot_Num%, 0, 0, nW, nh)
 DllCall("gdi32.dll\SetStretchBltMode",Uint, mDC%Rot_Num%, int, 5)
-DllCall("gdi32.dll\StretchBlt",UInt,mDC%Rot_Num%, Int,0, Int,0, Int, nH , Int, nH , UInt, gayer%Rot_Num%dc, UInt,0, UInt,0, Int,nW, Int,nH, UInt, "0x00440328")
-DllCall("UpdateLayeredWindow", "Uint", hwndTranny%Rot_Num%, "Uint", 0, "Uint", 0, "int64P", nW|nH<<32, "Uint", mDC%Rot_Num%, "int64P", 0, "Uint", 0, "intP", 0xFF<<16|1<<24, "Uint", 2)
+DllCall("gdi32.dll\StretchBlt",UInt,mDC%Rot_Num%, Int,0, Int,0, Int, nH , Int, nH , UInt, Dripp%Rot_Num%dc, UInt,0, UInt,0, Int,nW, Int,nH, UInt, "0x00440328")
+DllCall("UpdateLayeredWindow", "Uint", hwndTr4ny%Rot_Num%, "Uint", 0, "Uint", 0, "int64P", nW|nH<<32, "Uint", mDC%Rot_Num%, "int64P", 0, "Uint", 0, "intP", 0xFF<<16|1<<24, "Uint", 2)
 return
 
 Receive_WM_COPYDATA(wParam, lParam)
@@ -296,7 +294,7 @@ Gdip_DrawImageRectI(pGraphics, pImage, nL, nT, nW, nH)
 }
 
 
-Send_WM_COPYDATA(ByRef StringToSend, ByRef TargetScriptTitle)  ; ByRef saves a little memory in this case.
+Send_WM_COPYDATA(ByRef StringToSend, ByRef TargetOriface)  ; ByRef saves a little memory in this case.
 ; This function sends the specified string to the specified window and returns the reply.
 ; The reply is 1 if the target window processed the message, or 0 if it ignored it.
 {
@@ -311,7 +309,7 @@ Send_WM_COPYDATA(ByRef StringToSend, ByRef TargetScriptTitle)  ; ByRef saves a l
     SetTitleMatchMode 2
     TimeOutTime := 4000  ; Optional. Milliseconds to wait for response from receiver.ahk. Default is 5000
     ; Must use SendMessage not PostMessage.
-    SendMessage, 0x4a, 0, &CopyDataStruct,, %TargetScriptTitle%,,,, %TimeOutTime% ; 0x4a is WM_COPYDATA.
+    SendMessage, 0x4a, 0, &CopyDataStruct,, %TargetOriface%,,,, %TimeOutTime% ; 0x4a is WM_COPYDATA.
     DetectHiddenWindows %Prev_DetectHiddenWindows%  ; Restore original setting for the caller.
     SetTitleMatchMode %Prev_TitleMatchMode%         ; Same.
     return ErrorLevel  ; Return SendMessage's reply back to our caller.
