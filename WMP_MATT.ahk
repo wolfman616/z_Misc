@@ -17,7 +17,7 @@ Menu, Tray, color, 080032
 Menu, Tray, Icon, % "HBITMAP:*" Iconz.1
 Menu, Tray, noStandard
 Menu, Tray, MainWindow
-Menu, Tray, Add, 	Open script location, Open_script_folder,
+Menu, Tray, Add, 	Open script location, Open_ScriptDir,
 Menu, Tray, icon, 	Open script location, % icondll , 7
 Menu, Tray, Add, 	Open Extract window, Open_xtractfrommenu,
 Menu, Tray, icon, 	Open Extract window, % icondll , 5
@@ -1399,15 +1399,7 @@ if (A_TimeIdle < (420000 - 1000)) {
 }
 return
 
-Open_script_folder:	
-runwait %COMSPEC% /C explorer.exe /select`, "%a_scriptFullPath%",, hide
-toolTip %a_scriptFullPath%
-sleep %S%
-sendInput {F5}
-sleep 1000
-tooloff:
-tooltip 
-return
+Open_ScriptDir()
 
 ; class ATL:553D4A38
 ; classNN ATL:553D4A381
