@@ -26,7 +26,27 @@ Gui newWnd:Show, %rectCoordStr% NoActivate,  PLEASE CLEAN ME
 OnMessage(0x203, "WM_LBUTTONDBLCLK")	;; window message for the mouse left double-click
 return
 
+turdz:
+Gui newWnd:destroy
+msgbox cleaning KB?
+ifmsgbox OK, {
+	loop {
+		BlockInput, on
+		sleep 660 
+		BlockInput, off
+		sleep 6 
+		GetKeyState, ctl, ctrl, P
+		if (ctl = "D") {
+			GetKeyState, minus, NumpadSub, P
+			if (minus = "D") {
+				msgbox
+				BlockInput, off
+				break
+}	}	}	}
+return
+
 WM_LBUTTONDBLCLK(){
+	gosub turdz
 	exitApp
 }
 
