@@ -1,5 +1,4 @@
-﻿;~~~~~ 
-#noEnv ; #warn
+﻿#noEnv
 #persistent,
 #SingleInstance,	force
 ListLines, 			Off
@@ -25,18 +24,11 @@ if !(t:=fileexist(filePath)) {
 	msgbox,,% "Error",% "Cant find `n" filePath
 	FileSelectFile, filePath , Options, D:\Documents\My Pictures\, Title, Animated GIF (*.gif)
 }
-
-	Active_hwnd := WinExist("A")
-	WinGetClass, class_active, A
-	if (class_active = "CabinetWClass")
-	
-	
+Active_hwnd := WinExist("A")
+WinGetClass, class_active, A
+if (class_active = "CabinetWClass")	
 	gosub, Butt_Go
-	
 return
-
-GuiClose:
-ExitApp
 
 PlayPause:
 isPlaying := gif1.isPlaying
@@ -83,9 +75,9 @@ class Gif {
 		
 		outArray := []
 		Loop, % PropLen//4 {
-		if !n := NumGet(PropVal+0, (A_Index-1)*4, "UInt")
-		n := 10
-		outArray[A_Index-1] := n * 10
+			if !n := NumGet(PropVal+0, (A_Index-1)*4, "UInt")
+				n := 10
+			outArray[A_Index-1] := n * 10
 		}
 		return outArray
 	}
@@ -112,14 +104,12 @@ class Gif {
 		if (mode = "set" && this.frameCurrent < (this.cycle ? 0xFFFFFFFF : this.frameCount - 1)) {
 			fn := this._fn
 			SetTimer, % fn, % -1 * this.frameDelay[this.frameCurrent]
-		}
-	}
+	}	}
 	
 	__Delete() {
 		Gdip_DisposeImage(this.pBitmap)
 		Object.Delete("dimensionIDs")
-	}
-}
+}	}
 return
 
 Butt:
@@ -142,8 +132,7 @@ if (getKeyState("lbutton", "P")) {
 	if !1stclick {
 		1stclick:=true, 	
 		settimer, Butt_Go, -200
-	}
-}
+}	}
 return
 
 move_tt:
@@ -174,49 +163,38 @@ if (title = "") {
 			Parenty := Parenty - 40
 }	}
 gdip:
-pToken := Gdip_Startup()
-pImage   := Gdip_LoadImageFromFile(filepath)
-nW   := Gdip_GetImageWidth(pImage)
-nH   := Gdip_GetImageHeight(pImage)
+pToken 	:=	Gdip_Startup()
+pImage	:=	Gdip_LoadImageFromFile(filepath)
+nW		:=	Gdip_GetImageWidth(pImage)
+nH		:=	Gdip_GetImageHeight(pImage)
 if !ParentX {
-ParentX:= ((wi - 75) - nW)
-ParentY:= ((hi - 75) - nH)
-Parent_Hwnd := Active_hwnd
+	ParentX		:=	((wi - 75) - nW)
+	ParentY		:=	((hi - 75) - nH)
+	Parent_Hwnd	:=	Active_hwnd
 }
 exStyles := (ws_ex_noactivate:= 0x08000000) | (ws_ex_trans:= 0x20) ;| (WS_EX_COMPOSITED := 0x02000000) | (WS_EX_LAYERED := 0x80000)
 Gui, gif1: New, +E%exStyles% +hwndwindy -Caption -DPIScale
-xx:= ("X" . ParentX), yy:= ("Y" . ParentY)
-
+xx	:= 	("X" . ParentX), 	yy	:= 	("Y" . ParentY)
 Gui, gif1:Add, Picture , backgroundtrans %xx% %yy% hwndhwndGif1, % filePath
 gif1 := new Gif(filePath, hwndGif1)
 Gui, gif1:+LastFound -Caption +E%exStyles%
- DllCall("SetParent", "uint", windy, "uint", Parent_Hwnd)
- DllCall("SetParent", "uint", hwndGif1, "uint", Parent_Hwnd)
+DllCall("SetParent", "uint", windy, "uint", Parent_Hwnd)
+DllCall("SetParent", "uint", hwndGif1, "uint", Parent_Hwnd)
 Gui, gif1:+LastFound -Caption +E%exStyles%
-
 settimer, move_tt, Off
 settimer, ToolOff, 	-1
 Control, ExStyle, %exStyles% , , ahk_id %hwndGif1%
 Control, Style, +0x08000000, , ahk_id %hwndGif1%
 1stclick := False
 RestoreCursor()
- gif1.Play()
- sleep 1000
+gif1.Play()
 return
 
+GuiClose:
+~shift::
 ~control::
 Space::
 ~escape::
 ~lbutton::
 ~rbutton::
 exitapp
-
-Open_ScriptDir:
-toolTip %a_scriptFullPath%
-z=explorer.exe /select,%a_scriptFullPath%
-run %comspec% /C %z%,, hide
-sleep 1250
-
-ToolOff:
-toolTip,
-return

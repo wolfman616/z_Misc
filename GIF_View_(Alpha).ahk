@@ -18,6 +18,8 @@ if 		0 != 1 	; Not run with parameter
 	filePath := "D:\Documents\My Pictures\6pkB.gif" ; specify the file path to gif
 else if 0 = 1	; run with parameter from menus
 	filePath 	= %1%
+	
+	
 if !(fileexist(filePath)) {
 	msgbox,,% "Error",% "Cant find `n" filePath
 	FileSelectFile, filePath , Options, D:\Documents\My Pictures\, Title,% "Portable Network Graphics PNG (*.png)"
