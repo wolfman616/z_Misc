@@ -3,21 +3,20 @@
 #persistent,
 #SingleInstance,	force
 ListLines, 			Off
-setBatchLines, 	-1
+setBatchLines,		-1
 setWinDelay,		-1
-sendMode, 		Input
+sendMode,   		Input
 setWorkingDir %a_scriptDir%
-
-Butt_Txt			:= "Child Butt!"
-Butt_Font		:=	"Armada LightCondensed"
-Butt_FontSz	:=	"s11"
-AttatchMsg		:=	"click desired location 2 attatch!" ,
-CurAniFile		:=	"S:\Documents\Icons\- CuRS0R\Fire Cursor.ani"
-
-global 1stclick, global TipHandle, global Title, global Wi, global Hi, global Xi, global Yi, global ParentXs, global ParentYs, global ParentX, global ParentY
-
 menu, tray, add, Open Script Folder, Open_ScriptDir,
 menu, tray, standard
+
+Butt_Txt		:= 	"Child Butt!"
+Butt_Font		:=	"Armada LightCondensed"
+Butt_FontSz		:=	"s11"
+AttatchMsg		:=	"click desired location 2 attatch!" ,
+;CurAniFile		:=	"S:\Documents\Icons\- CuRS0R\_ ani\Fire Cursor.ani"
+
+global 1stclick, global TipHandle, global Title, global Wi, global Hi, global Xi, global Yi, global ParentXs, global ParentYs, global ParentX, global ParentY
 return
 
 Butt:
@@ -27,7 +26,7 @@ return
 #z::
 tooltip, % AttatchMsg, -10, -100
 TipHandle:=winexist("ahk_class tooltips_class32")
-SetSystemCursor(CurAniFile)
+;SetSystemCursor(CurAniFile)
 mousegetpos, ParentXs, ParentYs,
 settimer, Coord_get, 2
 settimer, move_tt, 2
@@ -45,28 +44,28 @@ if (getKeyState("lbutton", "P")) {
 return
 
 move_tt:
-CoordMode,  		Mouse, Screen
-mousegetpos, 	Xc, Yc,
-CoordMode,  		Mouse, Window
+CoordMode,  	Mouse, Screen
+mousegetpos, 	Xc,	   Yc,
+CoordMode,  	Mouse, Window
 win_move(TipHandle, Xc-125, Yc-125,"","") 
 return
 
 Butt_Go:	
 settimer, Coord_get, Off
 WinGetActiveStats, Title, Wi, Hi, Xi, Yi
-if (title = "") {
-	ParentX := ParentX -20
-	if Parenty > 100
-		Parenty := Parenty +5
+if (title 		 = 	"") {
+	ParentX 	:= 	ParentX -20
+	if  Parenty	>	100
+		Parenty :=	Parenty +5
 } else {
-	if (title = "Mouse Properties") {
-		ParentX := ParentX - 24 
-		if Parenty > 25
-			Parenty := Parenty - 37
+	if (title 	 	 =	"Mouse Properties") {
+		ParentX 	:=	ParentX - 24 
+		if  Parenty	 >	25
+			Parenty :=	Parenty - 37
 	} else {
-		ParentX := ParentX - 30
-		if Parenty > 25
-			Parenty := Parenty - 40
+		ParentX 	:=	ParentX - 30
+		if  Parenty	 >	25
+			Parenty :=	Parenty - 40
 }	}
 xx:= ("X" . ParentX), yy:= ("Y" . ParentY)
 Gui, +LastFound +ToolWindow +AlwaysOnTop -Caption -Border HWNDGui_Hwnd +E0x00080000
@@ -78,7 +77,7 @@ Gui, Show, %xx% %yy%, Child_Butt
 settimer, move_tt, Off
 settimer, ToolOff, 	-1
 1stclick := False
-RestoreCursor()
+;RestoreCursor()
 return
 
 Open_ScriptDir:
