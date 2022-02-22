@@ -1,21 +1,23 @@
 ﻿;~~~~~ 
-
 #noEnv ; #warn
 #persistent,
 #SingleInstance,	force
 ListLines, 			Off
-setBatchLines, 	-1
+setBatchLines, 		-1
 setWinDelay,		-1
-sendMode, 		Input
-setWorkingDir %a_scriptDir%
+sendMode, 			Input
+setWorkingDir 		%a_scriptDir%
 #include 			C:\Script\AHK\- LiB\GDI+_All.ahk
 
-menu, tray, add, Open Script Folder, Open_ScriptDir,
-menu, tray, standard
+global 1stclick, global TipHandle, global Title, global Wi, global Hi, global Xi, global Yi, global ParentXs, global ParentYs, global ParentX, global ParentY, global Active_hwnd,global class_active
 
-global 1stclick, global TipHandle, global Title, global Wi, global Hi, global Xi, global Yi, global ParentXs, global ParentYs, global ParentX, global ParentY
+OnExit, Exit
 
-filePath 		:= 	"D:\Documents\My Pictures\animated wiz.gif"
+if 		0 != 1 	; Not run with parameter
+	filePath 		:= 	"D:\Documents\My Pictures\animated wiz.gif"
+else if 0 = 1	; run with parameter from menus
+	filePath 	= %1%
+	
 AttatchMsg		:=	"click desired location 2 attatch!" ,
 CurAniFile		:=	"S:\Documents\Icons\- CuRS0R\Fire Cursor.ani"
 
@@ -23,6 +25,14 @@ if !(t:=fileexist(filePath)) {
 	msgbox,,% "Error",% "Cant find `n" filePath
 	FileSelectFile, filePath , Options, D:\Documents\My Pictures\, Title, Animated GIF (*.gif)
 }
+
+	Active_hwnd := WinExist("A")
+	WinGetClass, class_active, A
+	if (class_active = "CabinetWClass")
+	
+	
+	gosub, Butt_Go
+	
 return
 
 GuiClose:
@@ -146,6 +156,9 @@ return
 Butt_Go:	
 settimer, Coord_get, Off
 WinGetActiveStats, Title, Wi, Hi, Xi, Yi
+if !ParentX {
+	goto gdip
+}
 if (title = "") {
 	ParentX := ParentX -20
 	if Parenty > 100
@@ -160,12 +173,19 @@ if (title = "") {
 		if Parenty > 25
 			Parenty := Parenty - 40
 }	}
-xx:= ("X" . ParentX), yy:= ("Y" . ParentY)
+gdip:
 pToken := Gdip_Startup()
-OnExit, Exit
-
+pImage   := Gdip_LoadImageFromFile(filepath)
+nW   := Gdip_GetImageWidth(pImage)
+nH   := Gdip_GetImageHeight(pImage)
+if !ParentX {
+ParentX:= ((wi - 75) - nW)
+ParentY:= ((hi - 75) - nH)
+Parent_Hwnd := Active_hwnd
+}
 exStyles := (ws_ex_noactivate:= 0x08000000) | (ws_ex_trans:= 0x20) ;| (WS_EX_COMPOSITED := 0x02000000) | (WS_EX_LAYERED := 0x80000)
 Gui, gif1: New, +E%exStyles% +hwndwindy -Caption -DPIScale
+xx:= ("X" . ParentX), yy:= ("Y" . ParentY)
 
 Gui, gif1:Add, Picture , backgroundtrans %xx% %yy% hwndhwndGif1, % filePath
 gif1 := new Gif(filePath, hwndGif1)
@@ -183,8 +203,15 @@ RestoreCursor()
  gif1.Play()
  sleep 1000
 return
-Open_ScriptDir:
 
+~control::
+Space::
+~escape::
+~lbutton::
+~rbutton::
+exitapp
+
+Open_ScriptDir:
 toolTip %a_scriptFullPath%
 z=explorer.exe /select,%a_scriptFullPath%
 run %comspec% /C %z%,, hide
