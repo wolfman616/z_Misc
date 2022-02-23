@@ -1,80 +1,75 @@
 #cs ----------------------------------------------------------------------------
 	AutoIt Version: 3.3.14.5
-		Author: sPksNinj
+		Author: MATTHEW WOLFF
 			Script function: Windows 10 DWM hook
-				Date: 21.11.2021
+				Date: 22.2.2022
 #ce ----------------------------------------------------------------------------
 
 #noTrayIcon ;#include <GUIConstants.au3> 
-#include <TrayConstants.au3> ; Req for $TRAY_ICONSTATE_SHOW const.
 #include <WindowsConstants.au3>
-#include <MsgBoxConstants.au3>
+#include <msgboxConstants.au3>
 #include <WinAPI.au3>
 #include <Process.au3>
 #include <Misc.au3>
-#include <TrayConstants.au3> ; Req354uired for the $TRAY_ICONSTATE_SHOW, $TRAY_ITEM_EXIT and $TRAY_ITEM_PAUSE constants.
+#include <TrayConstants.au3> ; Required for $TRAY_ICONSTATE_SHOW, $TRAY_ITEM_EXIT and $TRAY_ITEM_PAUSE
+
+global 	$BlackClassList = "TaskListThumbnailWnd,SysDragImage,WMPMessenger,Scintilla,BasicWindow,OleMainThreadWndClass ProgMan,WorkerW,Listbox,SideBar_HTMLHostWindow,MozillaWindowClass,Shell_TrayWnd,MSTasklistWClass,ToolbarWindow32,TaskListOverlayWnd,tooltips_class32,WMP Skin Host,WMPTransition,CWmpControlCntr,Shell_LightDismissOverlay,Shell_Flyout,OnScreenPanelWindow,ZafWindow,wacom,nvidia,olechan,kbxLabelClass,WTLAlphaMouse,Tablet,WTouch_,directuihwnd,Net UI Tool Window"
+global 	$hDLL, $hWinEventProc, $hHook, $Style, $StyleOld, $Class, $ClassLog
+global 	$sStruct = DllStructCreate("dword;int;ptr;int")
+local 	$idrestart = TrayCreateItem("restart")
 
 Opt("TrayAutoPause", 0)
 
-TraySetIcon ( "1.ico" ) 	;TraySetPauseIcon( "2.ico" )
-Local $idrestart = TrayCreateItem("restart")
-
+traySetIcon ( "1.ico" ) 	;	TraySetPauseIcon( "2.ico" )
+DllCall("User32.dll", "bool", "SetProcessDPIAware")
 If _Singleton(@ScriptName, 1) = 0 Then
-    MsgBox($MB_SYSTEMMODAL, "Warning", "An occurrence is already running, close it first")
+    msgbox($MB_SYSTEMMODAL, "Error", @ScriptFullPath & ' Already Running ')
     exit
 endIf
-
-global $BlackClassList = "TaskListThumbnailWnd,SysDragImage,WMPMessenger,Scintilla,BasicWindow,OleMainThreadWndClass ProgMan,WorkerW,Listbox,SideBar_HTMLHostWindow,MozillaWindowClass,Shell_TrayWnd,MSTasklistWClass,ToolbarWindow32,TaskListOverlayWnd,tooltips_class32,WMP Skin Host,WMPTransition,CWmpControlCntr,Shell_LightDismissOverlay,Shell_Flyout"
-
-global $hDLL, $hWinEventProc, $hHook, $Style, $StyleOld, $Class, $ClassLog
-global $sStruct = DllStructCreate("dword;int;ptr;int")
 
 $hDLL = DllOpen("User32.dll")
 $hWinEventProc = DllCallbackRegister("_WinEventProc", "none", "hwnd;int;hwnd;long;long;int;int")
 if not @error then
     OnAutoItexitRegister("OnAutoItexit")
 else
-    MsgBox(16 + 262144, "Error", "DllCallbackRegister(_WinEventProc) did not succeed.")
+    msgbox(16 + 262144, "Error", "DllCallbackRegister(_WinEventProc) did not succeed.")
     exit
 endIf
 
 $hHook = _SetWinEventHook($hDLL)
 if @error then
-    MsgBox(16 + 262144, "Error", "_SetWinEventHook() did not succeed.") 	
+    msgbox(16 + 262144, "Error", "_SetWinEventHook() did not succeed.") 	
     exit
+;else
+	;msgbox($MB_SYSTEMMODAL, "", @ScriptFullPath)
 endIf
-
-; 	MsgBox($MB_SYSTEMMODAL, "", @ScriptFullPath)
-
 
 while 1
     Sleep(1)
 	Traywatch()
 wEnd	
 
-
 Func Traywatch()
-    TrayCreateItem("Radio 1", -1, -1, $TRAY_ITEM_RADIO)
-    TrayItemSetState(-1, $TRAY_CHECKED)
-    TrayCreateItem("Radio 2", -1, -1, $TRAY_ITEM_RADIO)
-    TrayCreateItem("Radio 3", -1, -1, $TRAY_ITEM_RADIO)
+    ;TrayCreateItem("Radio 1", -1, -1, $TRAY_ITEM_RADIO)
+  ;  TrayItemSetState(-1, $TRAY_CHECKED)
+   ; TrayCreateItem("Radio 2", -1, -1, $TRAY_ITEM_RADIO)
+  ;  TrayCreateItem("Radio 3", -1, -1, $TRAY_ITEM_RADIO)
+  ;  TrayCreateItem("") ; Create a separator line.
 
-    TrayCreateItem("") ; Create a separator line.
-
-    Local $idAbout = TrayCreateItem("About")
-    TrayCreateItem("") ; Create a separator line.
+    local $idAbout = TrayCreateItem("About")
+  ;  TrayCreateItem("") ; Create a separator line.
 
     TraySetState($TRAY_ICONSTATE_SHOW) ; Show the tray menu.
 
 	while 1
-			Switch TrayGetMsg()
-				Case $idAbout ; Display a message box about the AutoIt version and installation path of the AutoIt executable.
-					MsgBox($MB_SYSTEMMODAL, "", "AutoIt tray menu example." & @CRLF & @CRLF & _
-						"Version: " & @AutoItVersion & @CRLF & _
-						"Install Path: " & StringLeft(@AutoItExe, StringInStr(@AutoItExe, "\", $STR_NOCASESENSEBASIC, -1) - 1)) ; Find the folder of a full path.
-				Case $idrestart ; Exit the loop.
-					ReCreateMyself()
-			EndSwitch
+		Switch TrayGetMsg()
+			Case $idAbout ; Display a message box about the AutoIt version and installation path of the AutoIt executable.
+				msgbox($MB_SYSTEMMODAL, "", "AutoIt tray menu example." & @CRLF & @CRLF & _
+					"Version: " & @AutoItVersion & @CRLF & _
+					"Install Path: " & StringLeft(@AutoItExe, StringInStr(@AutoItExe, "\", $STR_NOCASESENSEBASIC, -1) - 1)) ; Find the folder of a full path.
+			Case $idrestart ; Exit the loop.
+				ReCreateMyself()
+		EndSwitch
     WEnd
 EndFunc   ;==>Example
 
@@ -83,10 +78,10 @@ func _WinEventProc($hHook, $iEvent, $hWnd, $idObject, $idChild, $iEventThread, $
 	if($iEvent = 0x8000) then 
 		switch $sEventProcName
 			; case "autoit3_x64.exe"
-				; MsgBox(16 + 262144, "SIDE", "Gay") 	
+				; msgbox(16 + 262144, "SIDE", "Gay") 	
 				; $Class = _WinAPI_GetClassName($hWnd)
 				; if $Class = "#32768" then
-				; MsgBox(16 + 262144, "SIDE", "ssssGay") 	
+				; msgbox(16 + 262144, "SIDE", "ssssGay") 	
 					; return
 				; endif
 
@@ -126,8 +121,8 @@ func _WinEventProc($hHook, $iEvent, $hWnd, $idObject, $idChild, $iEventThread, $
 				return
 			case "ImageGlass.exe"
 				return
-			; case "MSIAfterburner.exe"
-				; return
+			case "sndvol.exe"
+				return
 			case "StartMenuExperienceHost.exe"
 				return
 			case "devenv.exe"
@@ -150,6 +145,20 @@ func _WinEventProc($hHook, $iEvent, $hWnd, $idObject, $idChild, $iEventThread, $
 				return
 			case "GoogleDriveFS.exe" 
 				return
+			case "Wacom_TabletUser.exe" 
+				return
+			case "Wacom_TouchUser.exe" 
+				return
+			case "WacomDesktopCenter.exe" 
+				return
+			case "Wacom_Tablet.exe" 
+				return
+			case "gimp-2.10.exe" 
+				return
+			case "OUTLOOK.EXE" 
+				return
+			case "WINWORD.EXE" 
+				return
 		endSwitch
 
 		local $sTitle = winGetTitle($hWnd)
@@ -158,11 +167,22 @@ func _WinEventProc($hHook, $iEvent, $hWnd, $idObject, $idChild, $iEventThread, $
 				return
 			case "Roblox"
 				return
+			case "MIDI IN / OUT"
+				return
+			case "MIDI"
+				return
+			case "APCGUI"
+				return
+			case "APCBackMain"
+				return
+			case "no_glass"
+				return
 		endSwitch
+		
 		$Class = _WinAPI_GetClassName($hWnd)
 		if StringInStr ($BlackClassList, $Class) then
 			return
-		else ; insert algorythim  splitting the bl4ck list to find parital match HwndWrapper*
+		else
 			switch $Class
 				case "SysShadow" 
 					$iStyle = _WinAPI_GetWindowLong($hWnd, $GWL_STYLE)
@@ -245,8 +265,8 @@ func _WinEventProc($hHook, $iEvent, $hWnd, $idObject, $idChild, $iEventThread, $
 					return
 				case "Windows.UI.Core.CoreWindow" 
 					return
-				case "tooltips_class32" 
-					return
+				;case "tooltips_class32" 
+					;return
 				case "Autohotkey2" 
 					return
 				case else
@@ -297,15 +317,15 @@ func _SetWinEventHook($hDLLUser32)
 endFunc   	; 		SetWinEventHook
 
 Func ReCreateMyself()
-    If @Compiled Then
-        Run(@ScriptFullPath);just run the exe
-    Else
-        ;$AutoIt3Path = RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\AutoIt v3\AutoIt", "betaInstallDir");installDir for beta
-        $AutoIt3Path = RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\AutoIt v3\AutoIt", "InstallDir");installDir for production
-        $ToRun1 = '"' & $AutoIt3Path & '\AutoIt3.exe "' & ' "' & @ScriptFullPath & '"'
-        ; ConsoleWrite($ToRun1 & @CRLF);to test we have got it right
-        Run($ToRun1)
-    EndIf
+   ; If @Compiled Then
+      ;  Run(@ScriptFullPath);just run the exe
+  ;  Else        ;$AutoIt3Path = RegRead("HKEY_local_MACHINE\SOFTWARE\AutoIt v3\AutoIt", "betaInstallDir");installDir for beta
+       $AutoIt3Path = RegRead("HKEY_local_MACHINE\SOFTWARE\AutoIt v3\AutoIt", "InstallDir") ;installDir for production
+	 
+       $ToRun1 = '"' & $AutoIt3Path & '\AutoIt3.exe "' & ' "' & @ScriptFullPath & '"'
+      ConsoleWrite($ToRun1 & @CRLF);to test we have got it right
+      Run($ToRun1)
+  ;  EndIf
     
     Exit
 
