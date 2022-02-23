@@ -4,9 +4,9 @@
 ListLines,	    	Off
 setBatchLines,   	-1
 setWinDelay,		-1
-sendMode, 			Input
+sendMode,    		Input
 setWorkingDir 		%a_scriptDir%
-#include 			C:\Script\AHK\- LiB\GDI+_All.ahk
+#include        	C:\Script\AHK\- LiB\GDI+_All.ahk
 
 global 1stclick, global TipHandle, global Title, global Wi, global Hi, global Xi, global Yi, global ParentXs, global ParentYs, global ParentX, global ParentY, global Active_hwnd,global class_active
 gfloater_Path 	:=	"C:\Program Files\Autohotkey\Autohotkey.exe C:\Script\AHK\GiF_floating_Preview.ahk "
