@@ -8,11 +8,13 @@ detecthiddenwindows on
 detecthiddentext on 
 #singleinstance force
 settitlematchmode 2 
-          
 SetWorkingDir %A_ScriptDir% 
-#include C:\Script\AHK\Z_MIDI_IN_OUT\extractorgui.ahk
+
 init:
-gosub, tits
+; Extract and trim with vocal / instrumental AI  Requires FFMPEG / Anaconda / Python / Spleeter 
+														
+#include C:\Script\AHK\Z_MIDI_IN_OUT\extractorgui.ahk 		
+gosub, varz
 gosub, init_menu
 gosub, main
 return
@@ -1105,7 +1107,7 @@ if togl_numpad {
 return
 
 zz:
-TOOLTIP FAGS
+TOOLTIP FGS
 bt := a_thishotkey
 if (bt contains "$" &&  bt != $)
 	bt := strreplace(	bt, "$") 
@@ -1362,7 +1364,8 @@ return
 scpl:
 runwait %COMSPEC% /C %scpl%,, hide
 return
-tits:
+
+varz:
 global 	DEBUGTT := TRUE
 global 	tt 		:= 500
 global 	togl_numpad := true
