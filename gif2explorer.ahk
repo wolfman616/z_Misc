@@ -10,8 +10,8 @@ setWorkingDir 		%a_scriptDir%
 
 global 1stclick, global TipHandle, global Title, global Wi, global Hi, global Xi, global Yi, global ParentXs, global ParentYs, global ParentX, global ParentY, global Active_hwnd,global class_active
 gfloater_Path 	:=	"C:\Program Files\Autohotkey\Autohotkey.exe C:\Script\AHK\GiF_floating_Preview.ahk "
-AttatchMsg		:=	"click desired location 2 attatch!" ,
-CurAniFile		:=	"S:\Documents\Icons\- CuRS0R\Fire Cursor.ani"
+AttatchMsg  	:=	"click desired location 2 attatch!" ,
+CurAniFile  	:=	"S:\Documents\Icons\- CuRS0R\Fire Cursor.ani"
 
 Main:
 
