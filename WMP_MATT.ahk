@@ -9,11 +9,11 @@ detecthiddentext on
 #singleinstance force
 settitlematchmode 2 
 SetWorkingDir %A_ScriptDir% 
-
-init:
 ; Extract and trim with vocal / instrumental AI  Requires FFMPEG / Anaconda / Python / Spleeter 
 														
-#include C:\Script\AHK\Z_MIDI_IN_OUT\extractorgui.ahk 		
+#include C:\Script\AHK\Z_MIDI_IN_OUT\extractorgui.ahk 	
+init:
+	
 gosub, varz
 gosub, init_menu
 gosub, main
