@@ -1,12 +1,12 @@
-﻿#Singleinstance,		Force
-;ListLines, 				Off 
-coordMode, tooltip,		screen
-DetectHiddenWindows, 	on
-DetectHiddenText, 		On
-SetTitleMatchMode, 		2	;	SetTitleMatchMode Slow
-setWorkingDir, 			%A_ScriptDir%
-SetBatchLines, 			-1
-SetWinDelay, 			-1
+﻿#Singleinstance,      Force
+ListLines,            Off 
+coordMode, tooltip,   screen
+DetectHiddenWindows,  on
+DetectHiddenText, 	  On
+SetTitleMatchMode,    2	;	SetTitleMatchMode Slow
+setWorkingDir,        %A_ScriptDir%
+SetBatchLines,        -1
+SetWinDelay, 		  -1
 #Persistent
 #NoEnv 
 
