@@ -54,9 +54,9 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 	wingettitle, Title_last,% hwand
 	winget PName, ProcessName,% hwand ;logvar := (logvar . "`r`n" . ( PName . "e" . Class . "e" . Title_last ))
 	TT(("OBJ_CREATE EVENT: " PName "`nTitle: " Title_last "`nAHK_Class: " Class "`nAHK_ID: " hWnd4))
-	StyleDetect(hWnd, Style_ClassnameList2,	Class, 		Array_LClass) 
-	StyleDetect(hWnd, Style_wintitleList2,	Title_last, Array_LTitle) 
-	StyleDetect(hWnd, Style_procnameList2,	PName, 		Array_LProc) 
+	StyleDetect(hWnd, Style_ClassnameList2,	Class,      Array_LClass) 
+	StyleDetect(hWnd, Style_wintitleList2,  Title_last, Array_LTitle) 
+	StyleDetect(hWnd, Style_procnameList2,	PName,      Array_LProc) 
 	Manual_Classhook_objCreated:
 	switch Class {
 		case "OperationStatusWindow":
@@ -85,8 +85,8 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 			return,
 
 			1998:
-			ControlGet, cutrlhand, Hwnd,, SysTreeView321,% 1998
-			winset, Style, +0x00000202, ahk_id %cutrlhand%
+			ControlGet, CtrlHandL, Hwnd,, SysTreeView321,% 1998
+			winset, Style, +0x00000202, ahk_id %CtrlHandL%
 			return,
 		case "TaskListThumbnailWnd":	
 			SetAcrylicGlassEffect(hWnd)
@@ -96,11 +96,11 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 			return,
 
 			1999:
-			ControlGet, cutrlhand, Hwnd,, SysTreeView321,% 1999
+			ControlGet, CtrlHandL, Hwnd,, SysTreeView321,% 1999
 			sleep, 1200
-			winset, Style, 		-0x00000004,	ahk_id %cutrlhand%
-			winset, Style, 		-0x00100000, 	ahk_id %cutrlhand%
-			SendMessage, 0x112C,0, 0x00003C75,, 	ahk_id %cutrlhand% 	 ;TVM_SETEXTENDEDSTYLE := 0x112C = tvmX ;; 0x00000020 auto h scroll
+			winset, Style,        -0x00000004,  ahk_id %CtrlHandL%
+			winset, Style,        -0x00100000,  ahk_id %CtrlHandL%
+			SendMessage, 0x112C,0, 0x00003C75,, ahk_id %CtrlHandL% 	 ;TVM_SETEXTENDEDSTYLE := 0x112C = tvmX ;; 0x00000020 auto h scroll
 			return,
 		case "RegEdit_RegEdit","FM":
 			ControlGet, ctrlhand, Hwnd,, SysListView321,% hwand
@@ -162,10 +162,10 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 			StyleMenu_Showindow(hWnd, !IsWindowVisible(hWnd))
 			winset, Style, 0x80000000, ahk_id %hWnd%
 			;WinMinimize , ahk_id %hWnd%
-		;	sleep 500
+		;	sleep, 500
 			return,
 		case "#32770":
-			;wingetTitle, Title_last, ahk_id %hWnd4%	
+			;wingetTitle, Title_last,% 4gnd_hwnd	
 			if (Title_last = "Information") {
 				winactivate, ahk_class #32770
 				send n
@@ -180,14 +180,14 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 			if (PName = "notepad++.exe")       {
 				winget, currentstyle, Style, ahk_id %hWnd%
 				if (currentstyle = 0x94CC004C) {
-					sleep 580
+					sleep, 580
 					winset, Style, -0x00400000, ahk_id %hWnd%
 			}	}
 			 else, if (PName = "explorer.exe") { ; wingetTitle, tits, ahk_id %hWnd%
 				if (tits = "Folder In Use")   {
 					WinGetText, testes, ahk_id %hWnd%
 					traytip,% "bumcuntface",% "6161 Folder in use mbocks 'tected`n" testes	
-					; asas := "AHK_Class WindowsForms10.Window.8.app.0.141b42a_r6_ad1" ; winget, hwnd2, ID , %asas% ; if asas { ;not working and not good ; winclose ahk_id %hwnd2% ; winactivate, ahk_id %fuk% ; sleep 20 ; send {left} ; send {enter} ; return, ;	}
+					; asas := "AHK_Class WindowsForms10.Window.8.app.0.141b42a_r6_ad1" ; winget, hwnd2, ID , %asas% ; if asas { ;not working and not good ; winclose ahk_id %hwnd2% ; winactivate, ahk_id %fuk% ; sleep, 20 ; send {left} ; send {enter} ; return, ;	}
 			}	}				
 			return,
 		case "Notepad++":
@@ -266,20 +266,19 @@ CRITICAL
 		ripyoursoulapart := False
 	}
 	4gnd_hwnd =% "ahk_id " hWnd4
-	wingetClass Class, % 4gnd_hwnd
-	wingettitle, 	Title_last, ahk_id %hWnd4%	
-		winget,			PName, ProcessName, ahk_id %hWnd4%
-		if TT4g {
-		tooltip, 			4Ground EVENT:`n%PName%`n%Title_last%`nAHK_Class %Class%`nAHK_ID %hWnd4%
-	}
+	wingetClass, Class,% 4gnd_hwnd
+	wingettitle, Title_last, 4gnd_hwnd	
+	winget,      PName, ProcessName,% 4gnd_hwnd
+	if TT4g
+		tooltip, 4Ground EVENT:`n%PName%`n%Title_last%`nAHK_Class %Class%`nAHK_ID %hWnd4%
 	switch Class {
 		case "#32770":	; msg box 
-			wingettitle, Title_last, % 4gnd_hwnd	
+			wingettitle, Title_last,% 4gnd_hwnd	
 			if (Title_last = "Roblox Crash")  {
 				if !crashmb
 					crashmb := 1
 				else, crashmb := crashmb + 1
-				winget, RobloxCrash_PID, PID , % 4gnd_hwnd
+				winget, RobloxCrash_PID, PID ,% 4gnd_hwnd
 				Roblox_PID=TASKKILL.exe /PID %RobloxCrash_PID%
 				run %comspec% /C %Roblox_PID%,, hide
 				if winexist("ahk_exe robloxplayerbeta.exe") 
@@ -298,7 +297,7 @@ CRITICAL
 			return,
 		case "ApplicationFrameWindow","Chrome_WidgetWin_1","WINDOWSCLIENT":
 			ttt := "M2Drag.ahk - AutoHotkey", result := Send_WM_COPYDATA("status",ttt)
-			wingettitle, Title_last, ahk_id %hWnd4%	
+			wingettitle, Title_last,% 4gnd_hwnd	
 			;if (Title_last != "Roblox")
 			;	TOOLTIP
 			ttt := "M2Drag.ahk - AutoHotkey", result := Send_WM_COPYDATA("status", "M2Drag.ahk - AutoHotkey")
@@ -490,7 +489,7 @@ CRITICAL
 			Roblox := False, Result := Send_WM_COPYDATA("RobloxClosing", TargetScriptTitle)
 			if (result = "FAIL")
 				Display_Msg("SendMessage failed.", "1000", "True")
-			sleep 500
+			sleep, 500
 			Result := Send_WM_COPYDATA("RobloxClosing", TargetScriptTitle2)
 			if ( result = "FAIL")
 				Display_Msg("SendMessage failed.", "1000", "True")
@@ -534,7 +533,7 @@ CRITICAL
 				Result2 := Send_WM_COPYDATA("resum", "M2Drag.ahk ahk_class AutoHotkey")
 				If ((result1 or result2) = "FAIL") 				;if (result = "FAIL")
 					Display_Msg("SendMessage failed.", "1000", "True")
-				sleep 500
+				sleep, 500
 				Result := Send_WM_COPYDATA("RobloxClosing", TargetScriptTitle2)
 				If ((result1 or result2) = "FAIL")
 					Display_Msg("SendMessage failed.", "1000", "True")
@@ -617,7 +616,7 @@ Send_WM_COPYDATA(ByRef StringToSend, ByRef TargetScriptTitle) {
 	DetectHiddenWindows On
 	SetTitleMatchMode 2
 	TimeOutTime := 2700
-	SendMessage, 0x4a, 0, &CopyDataStruct,, %TargetScriptTitle%,,,, %TimeOutTime%
+	SendMessage, 0x4a, 0, &CopyDataStruct,,% TargetScriptTitle,,,,% TimeOutTime
 	DetectHiddenWindows %Prev_DetectHiddenWindows%
 	SetTitleMatchMode %Prev_TitleMatchMode%
 	return, ErrorLevel
@@ -650,7 +649,7 @@ Receive_WM_COPYDATA(wParam, lParam) {
 	else, if (CopyOfData = "mag_")
 		gosub, mag_	
 	else, if CopyOfData
-		gosub, %CopyOfData%
+		gosub,% CopyOfData
 	else, m2dstatus := "not running or paused"
 	return, True
 }
@@ -691,11 +690,11 @@ MessageBoxKill(Target_MSGBOX) {
 	ControlClick, "Button2", "ahk_class #32770",	;ControlSend, ahk_parent, {N}, ahk_id %anus%
 	settimer, tooloff, -2000
 	if WinExist(ahk_ID %target_hwnd% ) {
-		MsgBox_MsgBox_TargetHandle = ahk_id %hWnd4%
-			winget, TargetPID, PID , % MsgBox_MsgBox_TargetHandle
+		MsgBox_MsgBox_TargetHandle := 4gnd_hwnd
+			winget, TargetPID, PID ,% MsgBox_MsgBox_TargetHandle
 			Target_PID=TASKKILL.exe /PID %TargetPID%
 			run %comspec% /C %Target_PID%,, hide
-		sleep 100
+		sleep, 100
 		if WinExist(MsgBox_MsgBox_TargetHandle ) {
 			msgbox unable to close the target msgbox 
 		} else {
@@ -961,7 +960,7 @@ invert_win(hw)                  { ; not working atm
 				WinHide, ahk_id %hgui%
 				wPrev := 0
 			}
-			sleep 2
+			sleep, 2
 			continue
 		}
 		x 	:= NumGet(WINDOWINFO, 20, "Int")
@@ -1156,11 +1155,11 @@ return,
 
 PushNewSave: 	
 if TProcName
-	regWrite, REG_SZ, HKEY_CURRENT_USER\SOFTWARE\_Mouse2Drag\Styles\procname, 	% Style . "»" . exStyle . "»" . "µ" . savenew_PNm . "µ" . save_new_Title . "µ" . save_new_Class, % savenew_PNm
+	regWrite, REG_SZ, HKEY_CURRENT_USER\SOFTWARE\_Mouse2Drag\Styles\procname, 	% Style . "»" . exStyle . "»" . "µ" . savenew_PNm . "µ" . save_new_Title . "µ" . save_new_Class,% savenew_PNm
 if TTitle
-	regWrite, REG_SZ, HKEY_CURRENT_USER\SOFTWARE\_Mouse2Drag\Styles\wintitle, 	% Style . "»" . exStyle . "»" . "µ" . savenew_PNm . "µ" . save_new_Title . "µ" . save_new_Class, % save_new_Title
+	regWrite, REG_SZ, HKEY_CURRENT_USER\SOFTWARE\_Mouse2Drag\Styles\wintitle, 	% Style . "»" . exStyle . "»" . "µ" . savenew_PNm . "µ" . save_new_Title . "µ" . save_new_Class,% save_new_Title
 if TClass
-	regWrite, REG_SZ, HKEY_CURRENT_USER\SOFTWARE\_Mouse2Drag\Styles\classname, 	% Style . "»" . exStyle . "»" . "µ" . savenew_PNm . "µ" . save_new_Title . "µ" . save_new_Class, % save_new_Class
+	regWrite, REG_SZ, HKEY_CURRENT_USER\SOFTWARE\_Mouse2Drag\Styles\classname, 	% Style . "»" . exStyle . "»" . "µ" . savenew_PNm . "µ" . save_new_Title . "µ" . save_new_Class,% save_new_Class
 return,
 
 SaveGUIDestroy:
@@ -1181,7 +1180,7 @@ Loop %list_rzexe% {
 	winGet, Style, Style,% SS
 	winGet, ExStyle, ExStyle,% SS
 	if ((Style = "0x16080000") && (ExStyle = "0x000C0000")) {
-		winactivate, % ss
+		winactivate,% ss
 		send ^{a}
 		send %Log1_RZ%	
 		send {tab}
@@ -1189,7 +1188,7 @@ Loop %list_rzexe% {
 		send %Pa5s_RZ%
 		PixelGetColor, color, 219, 326
 		if color != 0x02DD02
-			msgbox, % "default snot saved"
+			msgbox,% "default snot saved"
 		else, send {enter}
 }	}	
 CoordMode,% coord_old
@@ -1243,7 +1242,7 @@ return,
 
 getwintxt:
 WinGetText, wintxt , ahk_id %OutputVarWin%
-msgbox, % wintxt
+msgbox,% wintxt
 return,
 
 Open_script_folder:
@@ -1255,7 +1254,7 @@ return,
 
 AeroTheme_Set:
 if !(fileexist("c:\windows\resources\themes\test\test.msstyles"))
-	msgbox, % "Test.Msstyles MiA"
+	msgbox,% "Test.Msstyles MiA"
 else, {
 	regwrite, REG_SZ,% (HKCUCurVer . "\ThemeManager"),       DllName,       % test_aero_style
 	regwrite, REG_SZ,% (HKCUCurVer . "\Themes\Personalize"), CurrentTheme,	% test_aero_style2 
@@ -1267,7 +1266,7 @@ filechk_msstyles_themefile:
 theme_test_File1      := fileexist("c:\windows\resources\themes\test.theme")
 if !(theme_test_File1 := fileexist("c:\windows\resources\themes\test.theme"))
 or !(theme_test_File2 := fileexist("c:\windows\resources\themes\test\test.msstyles"))
-	msgbox, % "Test.Msstyles MiA"
+	msgbox,% "Test.Msstyles MiA"
 else,
 	traytip,% "File attrib query Sux_cesS . fulLy confirmed ",% "Test.msstyles and Test.theme present & correct! OK" 
 return,
@@ -1426,18 +1425,18 @@ winget, ExStyle2, ExStyle,% 	TargetHandle
 MainMenu:
 menu, F, add, %PName%, donothing,
 menu, F, Disable, %PName%
-menu, F, add, % sysmenu, toggle_sysmenu
+menu, F, add,% sysmenu, toggle_sysmenu
 if (Style2 & 0x00080000)
-	menu, F, check, % doom_array[%SysMenu%]
-else	menu, F, uncheck, % SysMenu
-Menu	  F, 	add, % Clickthru, toggle_Clickthru
+	menu, F, check,% doom_array[%SysMenu%]
+else	menu, F, uncheck,% SysMenu
+Menu	  F, 	add,% Clickthru, toggle_Clickthru
 if (ExStyle2 & 0x00000001)
-	 menu, F, 	check, % Clickthru
-else, menu, F, 	uncheck, % Clickthru
-Menu	  F, 	add, % AppWindow, toggle_AppWindow
+	 menu, F, 	check,% Clickthru
+else, menu, F, 	uncheck,% Clickthru
+Menu	  F, 	add,% AppWindow, toggle_AppWindow
 if (ExStyle2 & 0x00040000)
-	menu,  F, 	check, % AppWindow
-else, menu, F, 	uncheck, % AppWindow
+	menu,  F, 	check,% AppWindow
+else, menu, F, 	uncheck,% AppWindow
 goto, Sumenu_items
 
 Submenus:
@@ -1496,7 +1495,7 @@ return,
 
 othermenus: ; below submenus
 menu, 	F, 	add, m2drag bypass, toggle_m2drag_bypass
-menu, 	F, 	Icon, m2drag bypass, % mouse24
+menu, 	F, 	Icon, m2drag bypass,% mouse24
 menu, 	F, 	add, Get window text , getwintxt
 menu, 	F, 	add, %Save% , Savegui
 gosub, StyleMenu_Show
@@ -1635,7 +1634,7 @@ return,
 init_matt:
 InitLabelOrder := "Varz>Menu_Tray>RegReads>Hooks>quotEI>reload_orload_admhk>Main"
 loop, parse, InitLabelOrder, ">",
-	gosub, %A_loopfield%
+	gosub,% A_loopfield
 return,
 
 donothing:
