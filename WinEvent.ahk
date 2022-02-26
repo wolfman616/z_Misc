@@ -113,7 +113,8 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 			winset, ExStyle, 0x000800A8,%  "Moon Phase II"
 			sidebar := True
 			return,
-		case "ApplicationFrameWindow","Chrome_WidgetWin_1","WINDOWSCLIENT":	;wingettitle, Title_Last, ahk_id %hwnd% ; tooltip % Title_Last " " hwnd " " class
+		case "ApplicationFrameWindow","Chrome_WidgetWin_1","WINDOWSCLIENT":	
+			;wingettitle, Title_Last, ahk_id %hwnd% ; tooltip % Title_Last " " hwnd " " class
 			if (Title_Last="Roblox") {
 				;Result :=Send_WM_COPYDATA("Susp", "M2Drag.ahk ahk_class AutoHotkey")
 				p ="C:\Program Files\AHK\AutoHotkeyU32_UIA.exe" "C:\Script\AHK\Roblox_Rapid.ahk"
@@ -185,7 +186,8 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 			 else, if (PName = "explorer.exe") { ; wingetTitle, tits, ahk_id %hWnd%
 				if (tits = "Folder In Use")   {
 					WinGetText, testes, ahk_id %hWnd%
-					traytip,% "bumcuntface",% "6161 Folder in use mbocks 'tected`n" testes	; asas := "AHK_Class WindowsForms10.Window.8.app.0.141b42a_r6_ad1" ; winget, hwnd2, ID , %asas% ; if asas { ;not working and not good ; winclose ahk_id %hwnd2% ; winactivate, ahk_id %fuk% ; sleep 20 ; send {left} ; send {enter} ; return, ;	}
+					traytip,% "bumcuntface",% "6161 Folder in use mbocks 'tected`n" testes	
+					; asas := "AHK_Class WindowsForms10.Window.8.app.0.141b42a_r6_ad1" ; winget, hwnd2, ID , %asas% ; if asas { ;not working and not good ; winclose ahk_id %hwnd2% ; winactivate, ahk_id %fuk% ; sleep 20 ; send {left} ; send {enter} ; return, ;	}
 			}	}				
 			return,
 		case "Notepad++":
@@ -195,7 +197,7 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 					run "C:\Script\AHK\- Script\Notepad++ Insert AHK Parameters.ahk",,hide
 				np := True
 			}
-	;	case "MozillaDropShadowWindowClass": ;		copied from regular menus and no joy
+	;	case "MozillaDropShadowWindowClass": ; copied from regular menus and no joy
 	;	{ 		
 	;		winset, transparent , 230, ahk_id %hwnd%
 	;		winset, ExStyle, 0x00000181, ahk_id %hWnd%
@@ -221,7 +223,7 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 					offset:= offsett 
 					if !EventLogBuffer_Old {
 						EventLogBuffer_Old=%class%`n
-					} else,                 {
+					} else,                {
 						clist=%EventLogBuffer_Old%%class%`n
 						EventLogBuffer_Old = % CLIST
 					}		;		tooltip, %tool% %clist%, %toolx%, %tooly%
@@ -231,14 +233,15 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 			}	}
 			return,
 		return, 		;	 	end case	
-		}	
-		
-		switch pname {
-			;ase "RzSynapse.exe":
-				;settimer RZ_LOG, -1
-			case "GoogleDriveFS.exe":
-				msgbox,% Title_last
-		}
+	}	
+	
+	switch pname {
+		;ase "RzSynapse.exe":
+			;settimer RZ_LOG, -1
+		case "GoogleDriveFS.exe":
+			msgbox,% Title_last
+	}
+	
 	switch, Title_last {
 		case "Razer Synapse Account Login":
 			settimer RZ_LOG, -1
@@ -272,7 +275,7 @@ CRITICAL
 	switch Class {
 		case "#32770":	; msg box 
 			wingettitle, Title_last, % 4gnd_hwnd	
-			if (Title_last = "Roblox Crash") {
+			if (Title_last = "Roblox Crash")  {
 				if !crashmb
 					crashmb := 1
 				else, crashmb := crashmb + 1
@@ -286,7 +289,7 @@ CRITICAL
 				gosub, SBAR_Restore
 			} else
 			
-			if (Title_last = "Information") {
+			if (Title_last = "Information")   {
 				;MessageBoxKill(hWnd4)
 				WinActivate, ahk_class #32770
 				send n
@@ -467,9 +470,9 @@ CRITICAL
 		m2_Status_Req33:
 		Exitapp
 	}
-	wingettitle, TitleR, ahk_id %hwnd%			;	tooltip % Title_Last " " hwnd " " class
+	wingettitle, TitleR, ahk_id %hwnd% ; tooltip % Title_Last " " hwnd " " class
 	switch TitleR {
-		case "Roblox Crash": 	;	run C:\Apps\Kill.exe Multiple_ROBLOX.exe,, hide
+		case "Roblox Crash": ; run C:\Apps\Kill.exe Multiple_ROBLOX.exe,, hide
 			run C:\Apps\Kill.exe RobloxPlayerBeta.exe,, hide
 			tooltip, Roblox Crash Detected: `nClosing All related scripts, A_ScreenWidth*0.5, A_ScreenHeight*0.5
 			settimer, tooloff, -3000
@@ -517,7 +520,7 @@ CRITICAL
 	if pname contains AutoHotkey 
 	&& IsWindowVisible( hWnd)
 		settimer, quotE, -1
-	switch Class {		; case "Autohotkey":; {	; if % "C:\Script\AHK\adminhotkeys.ahk in " Title_last	; {	; menu, tray, uncheck, Launch AdminHotkeyz,		; tooltip detected admin hotkey disconnecting ; } ; }
+	switch Class { ; case "Autohotkey": { ; if % "C:\Script\AHK\adminhotkeys.ahk in " Title_last ; { ; menu, tray, uncheck, Launch AdminHotkeyz, ; tooltip detected admin hotkey disconnecting ; } ; }
 		case "ApplicationFrameWindow","WINDOWSCLIENT":
 			wingetTitle, Last_Title, ahk_id %hWnd% 
 			if ( Last_Title = "Roblox" ) {	;winClose, ahk_id %hwnd%
@@ -684,7 +687,7 @@ TestMbkill(handle) {
 	else, return, 1
 }	
 MessageBoxKill(Target_MSGBOX) {
-	Target_hwnd := WinExist(Target_MSGBOX)	;winactivate		;send n		;ControlGet, OutputVar, SubCommand , Value, Button2, WinTitle, WinText, ExcludeTitle, ExcludeText	;ControlSendraw, ahk_parent, n, ahk_class #32770
+	Target_hwnd := WinExist(Target_MSGBOX)	;winactivate ;send n ;ControlGet, OutputVar, SubCommand , Value, Button2, WinTitle, WinText, ExcludeTitle, ExcludeText	;ControlSendraw, ahk_parent, n, ahk_class #32770
 	ControlClick, "Button2", "ahk_class #32770",	;ControlSend, ahk_parent, {N}, ahk_id %anus%
 	settimer, tooloff, -2000
 	if WinExist(ahk_ID %target_hwnd% ) {
@@ -1551,16 +1554,16 @@ loop, 22,
 	gosub,  GDIpInvertVars  ;-=-=-;'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'```'`'``''`
 								  ;`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'``''`
 Matrix 	:=(	"-1	|0	|0	|0	|0|"  ;'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'``''`
-.			"0	|-1	|0	|0	|0|"  ;``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'``''`
-.			"0	|0	|-1	|0	|0|"  ;`''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'``''`
-.			"0	|0	|0	|1	|0|"  ;''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'``''`
-.			"1	|1	|1	|0	|1" ) ;'`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'''`
+.           "0	|-1	|0	|0	|0|"  ;``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'``''`
+.           "0	|0	|-1	|0	|0|"  ;`''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'``''`
+.           "0	|0	|0	|1	|0|"  ;''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'``''`
+.           "1	|1	|1	|0	|1" ) ;'`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'''`
 ;"!!! vARi4bl3z !!!!" ...		 ^-=___=-^			>>>>>>>>>>>>
 																;???
-RegRead InstallDir, HKLM\SOFTWARE\AutoHotkey, InstallDir ;  		 ~@~peww~@~	
+RegRead InstallDir, HKLM\SOFTWARE\AutoHotkey, InstallDir        ;  	 ~@~peww~@~	
 AhkPath := ErrorLevel ? "" : InstallDir "\AutoHotkey.exe"
 ;   mattdwmrun:= ((Autoit3path := "C:\Program Files (x86)\AutoIt3\AutoIt3_x64.exe") . " " .  "C:\Script\autoit\_MattDwmBlurBehindWindow.au3") 
-mattdwmrun2	:=	"C:\Script\autoit\_MattDwmBlurBehindWindow.lnk" 		;	^^^	Wrong start dir variable 1nce launched 	^	^	^
+mattdwmrun2	:=	"C:\Script\autoit\_MattDwmBlurBehindWindow.lnk" ;			^^^	Wrong start dir variable 1nce launched 	^	^	^
 test_move	:= 	"C:\Users\ninj\DESKTOP\winmove_test.ahk"
 SidebarPath := 	"C:\Program Files\Windows Sidebar\sidebar.exe"
 Path_PH 	:= 	"C:\Apps\Ph\processhacker\x64\ProcessHacker.exe"
