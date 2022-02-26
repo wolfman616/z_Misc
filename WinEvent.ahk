@@ -1352,17 +1352,17 @@ NewTrayMenuParam( LabelPointer = "", Title = "", Icon = "" ) {
 
 32770Fix:                          ; "Save as" & "Open" Dialogs called from the eventHook.
 winwaitActive,% "ahk_class #32770" ; *takes some time to visually materialise ui hence the previous.
-settimer,  PaintItBlack,  -1400    ; "Active" is not actually ready to be drawn over.
+settimer, PaintItBlack,  -1400    ; "Active" is not actually ready to be drawn over.
 return,
-		   PaintItBlack:
-N_		:= Gdip_Startup()
-dc   	:= GetDC(nnd)
-mDC   	:= Gdi_CreateCompatibleDC(0)
-mBM   	:= Gdi_CreateDIBSection(mDC, 1, 1, 32) 
-oBM   	:= Gdi_SelectObject(mDC, mBM)
+		  PaintItBlack:
+N_  := Gdip_Startup()
+dc  := GetDC(nnd)
+mDC := Gdi_CreateCompatibleDC(0)
+mBM := Gdi_CreateDIBSection(mDC, 1, 1, 32) 
+oBM := Gdi_SelectObject(mDC, mBM)
 DllCall("gdi32.dll\SetStretchBltMode",  "Uint", dc, "Int", 5)
 DllCall("gdi32.dll\StretchBlt",         "Uint", dc, "Int", 0, "Int", 0, "Int", Desk_Wi , "Int", Desk_Hi, "Uint", mdc, "Uint", 0, "Uint", 0, "Int",	1, "Int",	1, "Uint", "0x00CC0020")
-	Gdip_ShutdownI(N_)
+Gdip_ShutdownI(N_)
 return,
 
 LAbel_Ladder:
