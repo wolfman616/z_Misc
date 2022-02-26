@@ -42,11 +42,10 @@ return,
 
 #a::
 gosub, ApplyMSSTYLES ; does nothing atm
-return
+return,
 +#a::
 gosub, AeroTheme_Set ; does nothing atm
-return
-
+return,
 
 OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, dwmsEventTime) {
 	CRITICAL
@@ -183,7 +182,7 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 					sleep 580
 					winset, Style, -0x00400000, ahk_id %hWnd%
 			}	}
-			 else if (PName = "explorer.exe") { ; wingetTitle, tits, ahk_id %hWnd%
+			 else, if (PName = "explorer.exe") { ; wingetTitle, tits, ahk_id %hWnd%
 				if (tits = "Folder In Use")   {
 					WinGetText, testes, ahk_id %hWnd%
 					traytip,% "bumcuntface",% "6161 Folder in use mbocks 'tected`n" testes	; asas := "AHK_Class WindowsForms10.Window.8.app.0.141b42a_r6_ad1" ; winget, hwnd2, ID , %asas% ; if asas { ;not working and not good ; winclose ahk_id %hwnd2% ; winactivate, ahk_id %fuk% ; sleep 20 ; send {left} ; send {enter} ; return, ;	}
@@ -276,7 +275,7 @@ CRITICAL
 			if (Title_last = "Roblox Crash") {
 				if !crashmb
 					crashmb := 1
-				else crashmb := crashmb + 1
+				else, crashmb := crashmb + 1
 				winget, RobloxCrash_PID, PID , % 4gnd_hwnd
 				Roblox_PID=TASKKILL.exe /PID %RobloxCrash_PID%
 				run %comspec% /C %Roblox_PID%,, hide
@@ -323,7 +322,7 @@ CRITICAL
 				result := Send_WM_COPYDATA("status", "M2Drag.ahk - AutoHotkey")
 				return,
 			}
-			else if (result = 0) {
+			else, if (result = 0) {
 				settimer, m2_Status_Req2, -1000
 				return,
 				m2_Status_Req2:
@@ -458,7 +457,7 @@ CRITICAL
 		;MessageBoxKill(MSG_WIN_TARGET)
 		if !crashmb 
 			crashmb = 1
-		else crashmb := crashmb + 1
+		else, crashmb := crashmb + 1
 		TestMbkill(DeadManHandle)
 	}
 	If WinExist(KILLSWITCH) {
@@ -476,7 +475,7 @@ CRITICAL
 			settimer, tooloff, -3000
 			if !crashmb 
 				crashmb = 1
-			else crashmb := crashmb + 1
+			else, crashmb := crashmb + 1
 				settimer, m2_Status_Req34, -1000
 				return,
 				m2_Status_Req34:
@@ -492,11 +491,11 @@ CRITICAL
 			Result := Send_WM_COPYDATA("RobloxClosing", TargetScriptTitle2)
 			if ( result = "FAIL")
 				Display_Msg("SendMessage failed.", "1000", "True")
-			else if (result = 0)
+			else, if (result = 0)
 				Display_Msg("Roblox Exiting: Scripts Closing", "1000", "True")
 			if winexist("ahk_exe sidebar.exe") 
 				SBAR_2berestored_True := False, Sidebar := True
-			else {
+			else, {
 				tooltip, Sidebar Not Loading, (A_ScreenWidth * 0.5), (A_ScreenHeight * 0.5)
 				settimer, tooloff, -3000
 				goto M2STATUS_Start
@@ -560,7 +559,7 @@ if winactive("ahk_exe notepad++.exe") 				{
 						traytip, %TargetScriptName%, reloading, 2, 32
 						TrayTip[, Title, Text, Seconds, Options]
 					}
-					else reload
+					else, reload
 }	}	}	}	}
 return,
 ; ~Escape:: 				; 	see AdminHotkeys as this should be migrated
@@ -627,29 +626,29 @@ Receive_WM_COPYDATA(wParam, lParam) {
 	{ 	
 		if !FileListStr {
 			FileListStr := CopyOfData, FileCount := 1
-		} else {
+		} else, {
 			FileListStr := (FileListStr . CopyOfData), FileCount := (FileCount + 1) ; FileListStr := FileListStr . "`n" . CopyOfData
 		}
 		FileListStrGen(Delimiter:="Þ") 
 	}
-	else if (CopyOfData = "RobloxFalse")
+	else, if (CopyOfData = "RobloxFalse")
 	{
 		roblox := False
 		Result := Send_WM_COPYDATA("RobloxClosing", TargetScriptTitle2)
 		Result1 := Send_WM_COPYDATA("RobloxClosing", TargetScriptTitle),
 		msgbox wank, aaa
 	}
-	else if CopyOfData = 10
+	else, if CopyOfData = 10
 		m2dstatus := "Suspended"
-	else if CopyOfData = 00
+	else, if CopyOfData = 00
 		m2dstatus := "Running Normally"
-	else if (CopyOfData = "StyleMenu")
+	else, if (CopyOfData = "StyleMenu")
 		settimer, Stylemenu_init, -1
-	else if (CopyOfData = "mag_")
+	else, if (CopyOfData = "mag_")
 		gosub, mag_	
-	else if CopyOfData
+	else, if CopyOfData
 		gosub, %CopyOfData%
-	else m2dstatus := "not running or paused"
+	else, m2dstatus := "not running or paused"
 	return, True
 }
 FileListStrGen(abc) {
@@ -666,12 +665,12 @@ gethandle_roblox() {
 		winget, Roblox_hWnd, id, AHK_Class WINDOWSCLIENT
 		if !Roblox_Hwnd 
 			roblox := False
-		else return, Roblox_hWnd
+		else, return, Roblox_hWnd
 }	}
 TestMbkill(handle) {
 	if !8skin_crash 
 		8skin_crash = 1
-	else 
+	else, 
 		8skin_crash := 8skin_crash + 1
 	run C:\Apps\Kill.exe robloxplayerbeta.exe,, hide
 	if winexist("ahk_id %handle%") {
@@ -682,7 +681,7 @@ TestMbkill(handle) {
 	}
 	if winexist("ahk_id %handle%")
 		 return, 0
-	else return, 1
+	else, return, 1
 }	
 MessageBoxKill(Target_MSGBOX) {
 	Target_hwnd := WinExist(Target_MSGBOX)	;winactivate		;send n		;ControlGet, OutputVar, SubCommand , Value, Button2, WinTitle, WinText, ExcludeTitle, ExcludeText	;ControlSendraw, ahk_parent, n, ahk_class #32770
@@ -699,7 +698,7 @@ MessageBoxKill(Target_MSGBOX) {
 		} else {
 			if  !KillCount
 				 KillCount := 1
-			else KillCount := KillCount + 1
+			else, KillCount := KillCount + 1
 			traytip,% KillCount " kills", 4000, 2000
 			settimer, tooloff, -7000
 }	}	}
@@ -766,9 +765,9 @@ OnMessage(0x4a, "Receive_WM_COPYDATA")
 EVENT_4GND := 0x0003, OBJ_FOCUS:=0x8005, OBJ_CREATED := 0x8000, OBJ_DESTROYED := 0x8001, WIN_TARGET_DESC := "Information", MSG_WIN_TARGET := WIN_TARGET_DESC
 SETHOOK:="SetWinEventHook"
 Hook_4Gnd := DllCall(SETH00k, "Uint", EVENT_4GND, "Uint", EVENT_4GND, "Ptr", 0, "Ptr", (Proc4gnd := RegisterCallback("On4ground", "")), "Uint", 0, "Uint", 0, "Uint", WINEVENT_OUTOFCONTEXT := 0x0000 | WINEVENT_SKIPOWNPROCESS := 0x0002)
-Hook_Focus := DllCall(SETH00k, "Uint", OBJ_FOCUS, "Uint", OBJ_FOCUS, "Ptr", 0, "Ptr", (ProcF0cus := RegisterCallback("OnFocus", "")), "Uint", 0, "Uint", 0, "Uint", WINEVENT_OUTOFCONTEXT := 0x0000 | WINEVENT_SKIPOWNPROCESS := 0x0002)
-Hook_MsgBox := DllCall(SETH00k, "Uint", 0x0010, "Uint", 0x0010, "Ptr", 0, "Ptr", 	(ProcMb0x := RegisterCallback("OnMsgBox", "")), "Uint", 0, "Uint", 0, "Uint", WINEVENT_OUTOFCONTEXT := 0x0000 | WINEVENT_SKIPOWNPROCESS := 0x0002)
-Hook_ObjCreate := DllCall(SETH00k, "Uint", OBJ_CREATED, "Uint", OBJ_CREATED, "Ptr", 0, "Ptr", (ProcCreat 	:= RegisterCallback("OnObjectCreated", "")), "Uint", 0, "Uint", 0, "Uint", WINEVENT_OUTOFCONTEXT := 0x0000 | WINEVENT_SKIPOWNPROCESS := 0x0002) 
+Hook_Focus := DllCall(SETH00k, "Uint", OBJ_FOCUS, "Uint", OBJ_FOCUS, "Ptr", 0, "Ptr",  (ProcF0cus := RegisterCallback("OnFocus", "")), "Uint", 0, "Uint", 0, "Uint", WINEVENT_OUTOFCONTEXT := 0x0000 | WINEVENT_SKIPOWNPROCESS := 0x0002)
+Hook_MsgBox := DllCall(SETH00k, "Uint", 0x0010, "Uint", 0x0010, "Ptr", 0, "Ptr",       (ProcMb0x := RegisterCallback("OnMsgBox", "")), "Uint", 0, "Uint", 0, "Uint", WINEVENT_OUTOFCONTEXT := 0x0000 | WINEVENT_SKIPOWNPROCESS := 0x0002)
+Hook_ObjCreate := DllCall(SETH00k, "Uint", OBJ_CREATED, "Uint", OBJ_CREATED, "Ptr", 0, "Ptr",(ProcCreat := RegisterCallback("OnObjectCreated", "")), "Uint", 0, "Uint", 0, "Uint", WINEVENT_OUTOFCONTEXT := 0x0000 | WINEVENT_SKIPOWNPROCESS := 0x0002) 
 Hook_ObjDestroyed := DllCall(SETH00k, "Uint", OBJ_DESTROYED, "Uint", OBJ_DESTROYED, "Ptr", 0, "Ptr", (ProcCreat := RegisterCallback("OnObjectDestroyed", "")), "Uint", 0, "Uint", 0, "Uint", WINEVENT_OUTOFCONTEXT := 0x0000 | WINEVENT_SKIPOWNPROCESS := 0x0002)
 return,
 
@@ -783,7 +782,7 @@ if (oldlist = FileListStr) {
 	}
 	FileListStr_ar := (StrSplit(FileListStr, "%adelim%")), FileListStr := "", oldlist := "", FileCount := ""
 	return,
-} else oldlist := FileListStr
+} else, oldlist := FileListStr
 return,
 
 RobloxGetHandle: 
@@ -829,7 +828,7 @@ Toggle_sbar:
 if !SBAR_DISABLE{
 	SBAR_DISABLE := True
 	Tooltip Sidsebar will be disabled ingame
-} Else {
+} else {
 	SBAR_DISABLE := False
 	Tooltip Sidsebar will be enabled ingame
 }
@@ -913,7 +912,7 @@ else, 						; SIDEBAR-CLOCK CLICK-THRU
 	winset, ExStyle, 0x000800A8,% ("ahk_id " . Time_hWnd)		;winset, ExStyle, 0x000800A8, Moon Phase II
 return,
 
-invert_win(hw) 					{ ; not working atm
+invert_win(hw)                  { ; not working atm
 	hTarget 	:= hw
 	if (hTarget = hTargetPrev)  {
 		hTargetPrev := ""
@@ -934,7 +933,7 @@ invert_win(hw) 					{ ; not working atm
 				gui, %A_Index%: +AlwaysOnTop ; needed for ZBID_UIACCESS
 			gui, %A_Index%: +HWNDhgui%A_Index% -DPIScale +toolwindow -Caption +E0x02000000 +E0x00080000 +E0x20 ; WS_EX_COMPOSITED := E0x02000000 WS_EX_LAYERED := E0x00080000 WS_EX_CLICKTHROUGH := E0x20
 			hChildMagnifier%A_Index% := DllCall("CreateWindowEx", "Uint", 0, "str", "Magnifier", "str", "MagnifierWindow", "Uint", WS_CHILD := 0x40000000, "Int", 0, "Int", 0, "Int", 0, "Int", 0, "ptr", hgui%A_Index%, "Uint", 0, "Ptr", DllCall("GetWindowLong" (A_PtrSize=8 ? "Ptr" : ""), "Ptr", hgui%A_Index%, "Int", GWL_HINSTANCE := -6 , "Ptr"), "Uint", 0, "Ptr")
-				DllCall("magnification.dll\MagSetColorEffect", "Ptr", hChildMagnifier%A_Index%, "Ptr", &MAGCOLOREFFECT)
+			DllCall("magnification.dll\MagSetColorEffect", "Ptr", hChildMagnifier%A_Index%, "Ptr", &MAGCOLOREFFECT)
 	}	}
 	gui, 2: Show, NA ; needed for removing flickering
 	hgui := hgui1
@@ -976,7 +975,7 @@ invert_win(hw) 					{ ; not working atm
 			settimer 2, -20
 			settimer 3, -20
 			hidegui := hgui1
-		} else 
+		} else, 
 		if (hgui = hgui2) and (NumGet(WINDOWINFO, 44, "Uint") != 1) and ((hr := DllCall("GetAncestor", "Ptr", WinExist("A"), "Uint", GA_ROOTOWNER := 3, "ptr")) != hTarget) and hr ; deactivated
 		{
 			hgui := hgui1
@@ -984,13 +983,13 @@ invert_win(hw) 					{ ; not working atm
 			WinMove, ahk_id %hgui%,, x, y, w, h
 			WinMove, ahk_id %hChildMagnifier%,, 0, 0, w, h
 			DllCall("SetWindowPos", "ptr", hgui, "ptr", hTarget, "Int", 0, "Int", 0, "Int", 0, "Int", 0, "Uint", 0x0040|0x0010|0x001|0x002)
-			DllCall("SetWindowPos", "ptr", hTarget, "ptr", 1, "Int", 0, "Int", 0, "Int", 0, "Int", 0, "Uint", 	 0x0040|0x0010|0x001|0x002) ; some windows can not be z-positioned before setting them to bottom
+			DllCall("SetWindowPos", "ptr", hTarget, "ptr", 1, "Int", 0, "Int", 0, "Int", 0, "Int", 0, "Uint",    0x0040|0x0010|0x001|0x002) ; some windows can not be z-positioned before setting them to bottom
 			DllCall("SetWindowPos", "ptr", hTarget, "ptr", hgui, "Int", 0, "Int", 0, "Int", 0, "Int", 0, "Uint", 0x0040|0x0010|0x001|0x002)
 			settimer 1, -20
 			settimer 2, -20
 			settimer 3, -20
 			hidegui := hgui2 
-		} else 
+		} else, 
 		if (x != xPrev) or (y != yPrev) or (w != wPrev) or (h != hPrev) ; location changed
 		{
 			WinMove, ahk_id %hgui%,, x, y, w, h
@@ -1007,7 +1006,7 @@ invert_win(hw) 					{ ; not working atm
 			NumPut(h, RECT, 12, "Int")
 			DllCall("magnification.dll\MagSetWindowSource", "ptr", hChildMagnifier, "ptr", &RECT)
 		} 
-		else 	DllCall("magnification.dll\MagSetWindowSource", "ptr", hChildMagnifier, "Int", x, "Int", y, "Int", w, "Int", h)
+		else, 	DllCall("magnification.dll\MagSetWindowSource", "ptr", hChildMagnifier, "Int", x, "Int", y, "Int", w, "Int", h)
 		xPrev := x, yPrev := y, wPrev := w, hPrev := h
 		if hidegui {
 			WinHide, ahk_id %hidegui%
@@ -1048,7 +1047,7 @@ StyleDetect(hwnd,Style_xList,XTitle,XtitlesArray) {
 
 runlabel(VarString, hide="")	   { 
 	static hidestatic := "Hide"
-	if hide 			; 			"Mag_CleanME_PLZz\/dwmaccentfix\/PConfig\/wmp_matt_run" etc
+	if hide            ;           "Mag_CleanME_PLZz\/dwmaccentfix\/PConfig\/wmp_matt_run" etc
 		hid := hidestatic
 	if (InStr(VarString, "\/"))    {
 		loop, parse, VarString, "\/",
@@ -1058,11 +1057,11 @@ runlabel(VarString, hide="")	   {
 				return, 0
 		}
 				return, 1
-	} else 					       {
+	} else, 					       {
 		run,% VarString,,% hid
 		if !errorlevel
 			 return, 1
-		else return, 0
+		else, return, 0
 }	}
 toggle_m2drag_bypass:
 ttt := "M2Drag.ahk - AutoHotkey", result := Send_WM_COPYDATA("Bypass_Last_Dragged_GUI",ttt)
@@ -1188,7 +1187,7 @@ Loop %list_rzexe% {
 		PixelGetColor, color, 219, 326
 		if color != 0x02DD02
 			msgbox, % "default snot saved"
-		else send {enter}
+		else, send {enter}
 }	}	
 CoordMode,% coord_old
 return,
@@ -1211,7 +1210,7 @@ Loop, Reg,% wintitlekey
         value1 	:= A_LoopRegKey . "\" . A_LoopRegSubKey
         regRead, value2, %value1%, %A_LoopRegName%
 		Style_wintitleList2 := Style_wintitleList2 . value2 . "‡"	
-		retpos 	:= RegExMatch(A_LoopRegName, "^0.{9}" , 		ret_style, p0s := 1)
+		retpos 	:= RegExMatch(A_LoopRegName, "^0.{9}" ,         ret_style,   p0s := 1)
 		retpos 	:= RegExMatch(A_LoopRegName, "(\»)\K(.{10})" , 	ret_exstyle, p0s := 1)
 		Array_wintitleList.push(	ret_style . "»" . ret_exstyle . "»" . "µ" . value2)
 }	}
@@ -1255,7 +1254,7 @@ AeroTheme_Set:
 if !(fileexist("c:\windows\resources\themes\test\test.msstyles"))
 	msgbox, % "Test.Msstyles MiA"
 else, {
-	regwrite, REG_SZ,% (HKCUCurVer . "\ThemeManager"),	     DllName,		% test_aero_style
+	regwrite, REG_SZ,% (HKCUCurVer . "\ThemeManager"),       DllName,       % test_aero_style
 	regwrite, REG_SZ,% (HKCUCurVer . "\Themes\Personalize"), CurrentTheme,	% test_aero_style2 
 	regwrite, REG_SZ,% (HKCUCurVer . "\Themes"),	    	 CurrentTheme,	% test_aero_theme 
 }
@@ -1278,11 +1277,11 @@ cmd=
 return,
 
 quotEI:
-q_dlim 	:= 	42
+q_dlim	:= 	42
 loop, 6
 	sp 	:= 	(" " .  sp . sp)
 kVon    :=  ( "`n" . sp . "Kurt Vonnegut" . q_dlim )
-bujub 	:=  ( "`n" . sp . "Buju Banton" . 	q_dlim )
+bujub 	:=  ( "`n" . sp . "Buju Banton" .   q_dlim )
 loop, parse, qstr,% q_dlim, 
 	quotes[quote_MAX_INDEX] := 	A_loopfield				; quote_MAX_INDEX := A_index working
 return,
@@ -1303,17 +1302,17 @@ return,
 
 ;GDIP FUNCS
 GetDC(hwnd:=0) {
-   return DllCall("GetDC", "UPtr", hwnd)
+   return, DllCall("GetDC", "UPtr", hwnd)
 }
 Gdip_Startup(multipleInstances:=0) {
    pToken := 0
-   If (multipleInstances=0)	       {
+   If (multipleInstances=0)        {
       if !DllCall("GetModuleHandle", "str", "gdiplus", "UPtr")
          DllCall("LoadLibrary", "str", "gdiplus")
-   } Else DllCall("LoadLibrary", "str", "gdiplus")
+   } else, DllCall("LoadLibrary", "str", "gdiplus")
    VarSetCapacity(si, A_PtrSize = 8 ? 24 : 16, 0), si := Chr(1)
    DllCall("gdiplus\GdiplusStartup", "UPtr*", pToken, "UPtr", &si, "UPtr", 0)
-   return pToken
+   return, pToken
 }
 Gdi_CreateCompatibleDC(hDC = 0) {
    return, DllCall("gdi32\CreateCompatibleDC", "Uint", hDC)
@@ -1330,28 +1329,28 @@ Gdi_SelectObject(hDC, hGdiObj) {
 }
 Gdip_ShutdownI(pToken) {
    DllCall("gdiplus\GdiplusShutdown", "Uint", pToken)
-   If   hModule :=   DllCall("GetModuleHandle", "str", "gdiplus")
+   If hModule := DllCall("GetModuleHandle", "str", "gdiplus")
          DllCall("FreeLibrary"    , "Uint", hModule)
-   Return   0
+   return, 0
 }
 
 NewTrayMenuParam( LabelPointer = "", Title = "", Icon = "" ) {
-	if Title												 {
+	if Title                                                 {
 		MenuLablTitlAr["LabelPointer"]:= Title
 		menu,tray,add,% MenuLablTitlAr["LabelPointer"],% LabelPointer
 		if !Icon
 			return, 1
 		else, menu, tray, Icon,% Title ,% Icon
 		return, 2
-	} else if Icon
+	} else, if Icon
 		menu, tray, icon,% Icon
-	else return 0
+	else, return, 0
 	return, 3
 }
 
-32770Fix: 						   ; "Save as" & "Open" Dialogs called from the eventHook.
+32770Fix:                          ; "Save as" & "Open" Dialogs called from the eventHook.
 winwaitActive,% "ahk_class #32770" ; *takes some time to visually materialise ui hence the previous.
-settimer,  PaintItBlack,  -1400      ; "Active" is not actually ready to be drawn over.
+settimer,  PaintItBlack,  -1400    ; "Active" is not actually ready to be drawn over.
 return,
 		   PaintItBlack:
 N_		:= Gdip_Startup()
@@ -1360,7 +1359,7 @@ mDC   	:= Gdi_CreateCompatibleDC(0)
 mBM   	:= Gdi_CreateDIBSection(mDC, 1, 1, 32) 
 oBM   	:= Gdi_SelectObject(mDC, mBM)
 DllCall("gdi32.dll\SetStretchBltMode",  "Uint", dc, "Int", 5)
-DllCall("gdi32.dll\StretchBlt", 		"Uint", dc, "Int", 0, "Int", 0, "Int", Desk_Wi , "Int", Desk_Hi, "Uint", mdc, "Uint", 0, "Uint", 0, "Int",	1, "Int",	1, "Uint", "0x00CC0020")
+DllCall("gdi32.dll\StretchBlt",         "Uint", dc, "Int", 0, "Int", 0, "Int", Desk_Wi , "Int", Desk_Hi, "Uint", mdc, "Uint", 0, "Uint", 0, "Int",	1, "Int",	1, "Uint", "0x00CC0020")
 	Gdip_ShutdownI(N_)
 return,
 
@@ -1431,11 +1430,11 @@ else	menu, F, uncheck, % SysMenu
 Menu	  F, 	add, % Clickthru, toggle_Clickthru
 if (ExStyle2 & 0x00000001)
 	 menu, F, 	check, % Clickthru
-else menu, F, 	uncheck, % Clickthru
+else, menu, F, 	uncheck, % Clickthru
 Menu	  F, 	add, % AppWindow, toggle_AppWindow
 if (ExStyle2 & 0x00040000)
 	menu,  F, 	check, % AppWindow
-else menu, F, 	uncheck, % AppWindow
+else, menu, F, 	uncheck, % AppWindow
 goto, Sumenu_items
 
 Submenus:
@@ -1448,47 +1447,47 @@ Sumenu_items:
 menu, 	S1, 	add, DLG Frame, toggle_DLGFRAME
 if (Style2 & 0x00400000)
 	 menu, 	S1, check, DLG Frame
-else menu, 	S1, uncheck, DLG Frame
+else, menu, 	S1, uncheck, DLG Frame
 menu, S1, add, THICK Frame, toggle_thickframe
 if (Style2 & 0x00040000)
 	 menu, 	S1, 	check, THICK Frame,
-else menu, 	S1, 	uncheck, THICK Frame
+else, menu, 	S1, 	uncheck, THICK Frame
 menu, S1, add, Modal Frame, toggle_Modalframe
 if (ExStyle2 & 0x00000001)
 	 menu, 	S1, 	check, Modal Frame,
-else menu, 	S1, 	uncheck, Modal Frame
+else, menu, 	S1, 	uncheck, Modal Frame
 menu, S1, add, Static edge, toggle_staticedge
 if (ExStyle2 & 0x00020000) 
 	 menu, 	S1, 	check, Static edge,
-else menu, 	S1, 	uncheck, Static edge
+else, menu, 	S1, 	uncheck, Static edge
 menu, S1, add, %Maxbox%, toggle_Maxbox
 if (Style2 & 0x00010000)
 	 menu, 	S1, 	check, %Maxbox%
-else menu, 	S1,	uncheck, %Maxbox%
+else, menu, 	S1,	uncheck, %Maxbox%
 menu, S1, add, %MinBox%, toggle_MinBox
 if (Style2 & 0x00020000)
 	 menu, 	S1, check, 	%MinBox%
-else menu, 	S1, uncheck, 	%MinBox%
+else, menu, 	S1, uncheck, 	%MinBox%
 menu, S2, add, HScroll, toggle_hscroll
 if (Style2 & 0x00100000)
 	 menu, 	S2, check, 	HScroll 
-else menu, 	S2, uncheck, 	HScroll 
+else, menu, 	S2, uncheck, 	HScroll 
 menu, S2, add, VScroll, toggle_hscroll
 if (Style2 & 0x00200000)
 	 menu, 	S2, check, 	VScroll 
-else menu, 	S2, uncheck, 	VScroll 
+else, menu, 	S2, uncheck, 	VScroll 
 menu, S2, add, %LeftScroll%, toggle_LeftScroll
 if (ExStyle2 & 0x00004000)
 	 menu, 	S2, check, 	%LeftScroll%
-else menu, 	S2, uncheck, 	%LeftScroll%
+else, menu, 	S2, uncheck, 	%LeftScroll%
 menu, S3, add, %RightAlign%, toggle_RightAlign
 if (ExStyle2 & 0x00001000)
 	 menu, 	S3, check, 	%RightAlign% 
-else menu, 	S3, uncheck, 	%RightAlign%
+else, menu, 	S3, uncheck, 	%RightAlign%
 menu, S3, add, %RightoLeft%, toggle_RightoLeft
 if (ExStyle2 & 0x00002000)
 	 menu, 	S3, 	check, 		%RightoLeft%
-else menu, 	S3, 	uncheck, 	%RightoLeft%
+else, menu, 	S3, 	uncheck, 	%RightoLeft%
 gosub, Submenus
 return,
 
@@ -1670,7 +1669,7 @@ ID_HELP_WEBSITE := 65412
 ; key=AutoHotkeyScript\Shell\Open\Command
 ; if A_IsAdmin    ; Set for all users.
     ; RegWrite, REG_SZ, HKCR, %key%,, %cmd%
-; else            ; Set for current user only.
+; else,            ; Set for current user only.
     ; RegWrite, REG_SZ, HKCU, Software\Classes\%key%,, %cmd%
 	;----;
 	
@@ -1682,7 +1681,7 @@ ID_HELP_WEBSITE := 65412
     ; ENDSESSION_LOGOFF := 0x80000000
     ; if (lParam & ENDSESSION_LOGOFF)  ; User is logging off.
         ; EventType := "Logoff"
-    ; else  ; System is either shutting down or restarting.
+    ; else,  ; System is either shutting down or restarting.
         ; EventType := "Shutdown"
     ; try { ; Set a prompt for the OS shutdown UI to display.  We do not display        ; our own confirmation prompt because we have only 5 seconds before        ; the OS displays the shutdown UI anyway.  Also, a program without        ; a visible window cannot block shutdown without providing a reason.
         ; BlockShutdown("Example script attempting to prevent " EventType ".")
