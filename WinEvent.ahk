@@ -1,5 +1,5 @@
 ﻿#Singleinstance,      Force
-ListLines,            Off 
+;ListLines,            Off 
 coordMode, tooltip,   Screen
 DetectHiddenWindows,  On
 DetectHiddenText,     On
@@ -23,52 +23,38 @@ wm_allow()
 Time_Idle := A_TimeIdlePhysical	;	total time to screensaver = 420
 if Time_Idle < 440
 	settimer, timer_idletime,% ("-" . (430 - A_TimeIdlePhysical))
-
-		;gui, +HWNDhgui +AlwaysOnTop
-		;DllCall("GetWindowBand", "ptr", hgui, "uint*", band)
-		;gui, Destroy
-		;hgui := ""	
 return,
 
+	;gui, +HWNDhgui +AlwaysOnTop
+	;DllCall("GetWindowBand", "ptr", hgui, "uint*", band)
+	;gui, Destroy
+	;hgui := ""	
+	
 timer_idletime: 		; testing
 tt("timer complete.")
-return,
+return
 
-#M::  					;		ALTgr + Right Arrow
-+#M::	
-Mag_ = "C:\Program Files\Autohotkey\Autohotkey.exe" "C:\Script\AHK\Working\M2DRAG_MAG.AHK"
-run,% Mag_
-return,
-
-#a::
-gosub, ApplyMSSTYLES ; does nothing atm
-return,
-+#a::
-gosub, AeroTheme_Set ; does nothing atm
-return,
-
-OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, dwmsEventTime) {
+OnObjectCreated(HookCr, event, hWnd, idObject, idChild, dwEventThread, dwmsEventTime) {
 	CRITICAL
-	wingetClass Class,% (hwand := "ahk_id " hWnd)
-	gosub, Manual_Classhook_objCreated
+	wingetClass Class,% (hwand := "ahk_id " . Format("{:#x}", hWnd))
 	wingettitle, Title_last,% hwand
 	winget PName, ProcessName,% hwand ;logvar := (logvar . "`r`n" . ( PName . "e" . Class . "e" . Title_last ))
 	TT(("OBJ_CREATE EVENT: " PName "`nTitle: " Title_last "`nAHK_Class: " Class "`nAHK_ID: " hWnd4))
 	StyleDetect(hWnd, Style_ClassnameList2,	Class,      Array_LClass) 
 	StyleDetect(hWnd, Style_wintitleList2,  Title_last, Array_LTitle) 
 	StyleDetect(hWnd, Style_procnameList2,	PName,      Array_LProc) 
-	Manual_Classhook_objCreated:
 	switch Class {
 		case "OperationStatusWindow":
 			;if( tits = "Folder In Use" ) {;;asas := "AHK_Class WindowsForms10.Window.8.app.0.141b42a_r6_ad1";;winget, hwnd2, ID , %asas%;;if 		asas;;winclose ahk_id %hwnd2%;;}
 			ripyoursoulapart := True
 			HandalDRandal := wineXist("A")
-			winset, Style, -0x08000000,% hwand
+			winset, Style, +0x08000000,% hwand
+			win_move(hWnd, 3000, 900, "", "", "")
 			TT("Preparing...")
 			; go_off_n_test_FOCUS(ActiveNow:=HandalDRandal)
 			; go_off_n_test_FOCUS:
 			; go_off_n_test_FOCUS(ActiveNow:=HandalDRandal)
-			wingetTitle, tits , AHK_ID %hWnd% ; WinGetActiveStats, Title, Width, Height, X, Y
+			wingetTitle, tits ,% hwand ; WinGetActiveStats, Title, Width, Height, X, Y
 			settimer, tooloff, -128
 			return,
 		case "MozillaDialogClass":
@@ -83,24 +69,11 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 			1998 := hwand
 			settimer, 1998, -700
 			return,
-
-			1998:
-			ControlGet, CtrlHandL, Hwnd,, SysTreeView321,% 1998
-			winset, Style, +0x00000202, ahk_id %CtrlHandL%
-			return,
 		case "TaskListThumbnailWnd":	
 			SetAcrylicGlassEffect(hWnd)
 		case "CabinetWClass":
 			1999 := hwand
 			settimer, 1999, -700
-			return,
-
-			1999:
-			ControlGet, CtrlHandL, Hwnd,, SysTreeView321,% 1999
-			sleep, 1200
-			winset, Style,        -0x00000004,  ahk_id %CtrlHandL%
-			winset, Style,        -0x00100000,  ahk_id %CtrlHandL%
-			SendMessage, 0x112C,0, 0x00003C75,, ahk_id %CtrlHandL% 	 ;TVM_SETEXTENDEDSTYLE := 0x112C = tvmX ;; 0x00000020 auto h scroll
 			return,
 		case "RegEdit_RegEdit","FM":
 			ControlGet, ctrlhand, Hwnd,, SysListView321,% hwand
@@ -109,7 +82,7 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 			winset, Style, +0x00000200, ahk_id %ctrlhand2%
 		case "7 Sidebar":
 			winget, Time_hWnd, iD, ahk_class 7 Sidebar
-			winset, ExStyle, 0x000800A8,%  "HUD Time", ahk_id %Time_hWnd%
+			winset, ExStyle, 0x000800A8,%  "HUD Time",% "ahk_id " Time_hWnd:=Format("{:#x}",Time_hWnd)
 			winset, ExStyle, 0x000800A8,%  "Moon Phase II"
 			sidebar := True
 			return,
@@ -120,10 +93,10 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 				p ="C:\Program Files\AHK\AutoHotkeyU32_UIA.exe" "C:\Script\AHK\Roblox_Rapid.ahk"
 				result := Send_WM_COPYDATA("status", "M2Drag.ahk - AutoHotkey")
 				settimer, RobloxGetHandle, -2000
-				run %p%		;run "%AF%"			;run "C:\Program Files\AHK\AutoHotkeyU32_UIA.exe" "%AF%"
+				run,% p	;run "%AF%"			;run "C:\Program Files\AHK\AutoHotkeyU32_UIA.exe" "%AF%"
 				if SBAR_DISABLE {
 					if winexist("ahk_exe sidebar.exe") {
-						run C:\Apps\Kill.exe sidebar.exe,, hide
+						run,% "C:\Apps\Kill.exe sidebar.exe",,hide
 						SBAR_2berestored_True := True, Sidebar := False, Roblox := True
 				}	}
 				if (m2dstatus != "not running or paused"	) && (m2dstatus !=False) {
@@ -133,63 +106,51 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 				if(m2dstatus = False) {
 					settimer, m2_Status_Req36, -5000
 					return,
+					
 					m2_Status_Req36:
 					if (m2dstatus != "not running or paused"	) && (m2dstatus !=False) {
 						PostMessage, 0x0111, 65306,,, M2Drag.ahk - AutoHotkey		
 						PostMessage, 0x0111, 65305,,, M2Drag.ahk - AutoHotkey		
-			}	} 	}
-			return,
-		case "ListBox","WMPMessenger":
-			return,
+					}
+					return
+			}	}
 		case "MsiDialogCloseClass":
-			if id := winexist("ahk_class MsiDialogCloseClass")
-				txt := "dialog", c_ntrolName := "Static1"
-			if (mainc_nt = WinExist("ahk_exe msiexec.exe",txt)) {
+			if id := winexist("ahk_class MsiDialogCloseClass") {
+				txt  :=  "dialog",   c_ntrolName  :=  "Static1"
+			}
+			if (mainc_nt = Format("{:#x}", (WinExist("ahk_exe msiexec.exe",txt)))) {
 				ControlGet, c_ntHandle, hWnd ,,%c_ntrolName% , ahk_id %mainc_nt%
 				StyleMenu_Showindow( c_ntHandle, !IsWindowVisible( c_ntHandle))
-				tooltip ProcdEvent: MsiDialogCloseClass`n.%id% yes %mainc_nt% main hwnd`n.%c_ntHandle%
+				tooltip,% ("ProcdEvent: " . MsiDialogCloseClass . "`n" . id " yes..." . mainc_nt . " main " . hwnd . "`n" . c_ntHandle)
 			}
-			return,
-		; case "SysShadow":
-		; {
-			; if !DWMBLUR
-				; winset, transparent , 1, ahk_id %hwnd%
-			; return,
-		; }
+	; 	case "SysShadow": ; { ; if !DWMBLUR ; winset, transparent , 1, ahk_id %hwnd% ; return, ; }
 		case "WindowsForms10.Window.8.app.0.141b42a_r9_ad1": ; Multi game instance (ROBLOX)
-			; winset, Style, -0x00400000, ahk_id %hWnd%
-			; winset, Style, +0x20000, ahk_id %hWnd%
 			StyleMenu_Showindow(hWnd, !IsWindowVisible(hWnd))
-			winset, Style, 0x80000000, ahk_id %hWnd%
-			;WinMinimize , ahk_id %hWnd%
-		;	sleep, 500
-			return,
+			winset, Style, 0x80000000,% hndDS
 		case "#32770":
-			;wingetTitle, Title_last,% 4gnd_hwnd	
 			if (Title_last = "Information") {
 				winactivate, ahk_class #32770
-				send n
+				send, N
 				return,
 			}
-			if (Title_last = "Open" || Title_last = "Save As") {
-				nnd := hwnd
+			if ( (Title_last = "Open") || (Title_last = "Save As") || (Title_last = "Save File As ...") || (Title_last = "Save Image") || (Title_last = "Enter name of file to save to...") ) {
+				nnd := Format("{:#x}", hwnd) ; return proper hex
 				gosub, 32770Fix
 				return,
 			}
-			winget PName, ProcessName, ahk_id %hWnd%
+			winget PName, ProcessName,% hwand
 			if (PName = "notepad++.exe")       {
-				winget, currentstyle, Style, ahk_id %hWnd%
+				winget, currentstyle, Style,% hwand
 				if (currentstyle = 0x94CC004C) {
 					sleep, 580
-					winset, Style, -0x00400000, ahk_id %hWnd%
+					winset, Style, -0x00400000,% hwand
 			}	}
 			 else, if (PName = "explorer.exe") { ; wingetTitle, tits, ahk_id %hWnd%
 				if (tits = "Folder In Use")   {
-					WinGetText, testes, ahk_id %hWnd%
-					traytip,% "bumcuntface",% "6161 Folder in use mbocks 'tected`n" testes	
+					WinGetText, testes,% hwand
+					traytip,% "bctfe",% "6161 Folder in use mB0cks'tected`n" testes	
 					; asas := "AHK_Class WindowsForms10.Window.8.app.0.141b42a_r6_ad1" ; winget, hwnd2, ID , %asas% ; if asas { ;not working and not good ; winclose ahk_id %hwnd2% ; winactivate, ahk_id %fuk% ; sleep, 20 ; send {left} ; send {enter} ; return, ;	}
 			}	}				
-			return,
 		case "Notepad++":
 			if !np {
 				 sem := "Notepad++ Insert AHK Parameters.ahk - AutoHotkey"
@@ -199,9 +160,9 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 			}
 	;	case "MozillaDropShadowWindowClass": ; copied from regular menus and no joy
 	;	{ 		
-	;		winset, transparent , 230, ahk_id %hwnd%
-	;		winset, ExStyle, 0x00000181, ahk_id %hWnd%
-	;		winset, Style, 0x84800000, ahk_id %hWnd%	
+	;		winset, transparent , 230,% hwand
+	;		winset, ExStyle, 0x00000181,% hwand
+	;		winset, Style, 0x84800000,% hwand	
 	;		SetAcrylicGlassEffect(hWnd) 
 	;		return,
 	;	} 
@@ -214,7 +175,7 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 			}
 		default: 
 			if (IsWindow(hWnd))            {
-				winget Style, Style, ahk_id %hWnd%
+				winget Style, Style,% hwand
 				if (Style & 0x10000000)    {
 					if !Tool || if Tool=20
 						Tool := 1
@@ -239,14 +200,14 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 		;ase "RzSynapse.exe":
 			;settimer RZ_LOG, -1
 		case "GoogleDriveFS.exe":
-			msgbox,% Title_last
+			msgbox,% (Title_last . " titlelast!")
 	}
 	
 	switch, Title_last {
 		case "Razer Synapse Account Login":
 			settimer RZ_LOG, -1
 		case "Google Drive Sharing Dialog":
-			msgbox, 
+			msgbox, gfs
 	}
 
 	EventLogBuffer_Push:
@@ -258,7 +219,7 @@ OnObjectCreated(Hook_ObjCreate, event, hWnd, idObject, idChild, dwEventThread, d
 		return,
 }
 
-On4ground(Hook_4Gnd, event, hWnd4, idObject, idChild, dwEventThread, dwmsEventTime) {
+On4ground(hook4g, event, hWnd4, idObject, idChild, dwEventThread, dwmsEventTime) {
 CRITICAL
 	if (ripyoursoulapart && (hWnd4 != HandalDRandal)) {
 		msgbox,% ("focus lost " . HandalDRandal)	;Tt(("focus lost " . HandalDRandal))
@@ -284,7 +245,7 @@ CRITICAL
 				if winexist("ahk_exe robloxplayerbeta.exe") 
 					run C:\Apps\Kill.exe robloxplayerbeta.exe,, hide	; 	run C:\Apps\Kill.exe Multiple_ROBLOX.exe,, hide
 				if winexist("ahk_pid %Roblox_PID%")
-					msgbox error %a_lasterror%
+					msgbox,% "Error",% a_lasterror
 				gosub, SBAR_Restore
 			} else
 			
@@ -355,7 +316,7 @@ CRITICAL
 			settimer RZ_LOG, -1
 		
 		case "GoogleDriveFS.exe":
-		msgbox
+		msgbox,% "gfs",% "detected"
 			invert_win(hWnd4)		
 	}
 	switch, Title_last {
@@ -366,16 +327,17 @@ CRITICAL
 return,	
 }
 
-OnFocus(Hook_Focus, event, BK_UN_T, idObject, idChild, dwEventThread, dwmsEventTime) {
+OnFocus(HookFc, event, BK_UN_T, idObject, idChild, dwEventThread, dwmsEventTime) {
 CRITICAL
 	if (ripyoursoulapart && (hWnd4 != HandalDRandal)) {
 		msgbox,% ("focus lost " . HandalDRandal)	;Tt(("focus lost " . HandalDRandal))
 		HandalDRandal := ""
 		ripyoursoulapart := False
 	}
-	wingetClass, Class, ahk_id %BK_UN_T% 		
-	winget PName, ProcessName, ahk_id %BK_UN_T%
-	wingettitle, Title_last, ahk_id %BK_UN_T%	
+	hnd_ := ("ahk_id " . BK_UN_T)
+	wingetClass, Class,% hnd_
+	winget PName, ProcessName,% hnd_
+	wingettitle, Title_last,% hnd_	
 
 	if TTFoc
 		tooltip FOCUS EVENT:`n%PName%`n%Title_last%`nAHK_Class %Class%`nAHK_ID %BK_UN_T%	
@@ -396,57 +358,52 @@ CRITICAL
 	}	
 	switch Class {
 		case "MozillaDialogClass":
-			winget, Style, Style, ahk_id %BK_UN_T%
+			winget, Style, Style,% hnd_
 			If(STYLE = "0x16CE0084") { ;&& (EXSTYLE = 0x00000101)   
-				Youtube_Popoutwin := "ahk_id " . BK_UN_T
-				wingetPos, X, Y, , EdtH, ahk_id %BK_UN_T%
-				WinMove ahk_id %BK_UN_T%,, , , , (EdtH - 39)
+				Youtube_Popoutwin := hnd_
+				wingetPos, X, Y, , EdtH,% hnd_
+				WinMove,% hnd_,, , , , (EdtH - 39)
 				winset, Style, 0x16860084,	ahk_id %BK_UN_T%	
 				SLEEP, 500
 				SEND, {SPACE}
 			}
 		case "MozillaDialogClass":
 			Escape_TargetWin = ahk_id %Youtube_Popoutwin%
-			winget, Style, Style, ahk_id %BK_UN_T%
-			winget, exStyle, exStyle, ahk_id %BK_UN_T%
+			winget, Style, Style,% hnd_
+			winget, exStyle, exStyle,% hnd_
 			IF((STYLE = 0x16CE0084) && (EXSTYLE = 0x00000101) ) {
 				Youtube_Popoutwin := BK_UN_T
 				winclose,
-				wingetPos, X, Y, , EdtH, ahk_id %BK_UN_T%
-				WinMove ahk_id %BK_UN_T%,, , , , (EdtH - 39)
-				winset, Style, 0x16860084, ahk_id %BK_UN_T%	
-				MSGBOX %Youtube_Popoutwin% `n Ahk_id %BK_UN_T%
+				wingetPos, X, Y, , EdtH,% hnd_
+				WinMove,% hnd_,, , , , (EdtH - 39)
+				winset, Style, 0x16860084,% hnd_	
+				MSGBOX,% (Youtube_Popoutwin . "`nAhk_id: " . BK_UN_T)
 			}
 		case "#32770":		
 			if (Title_last = "Information") {
 				tooltip, c_nt
 					send,% N
 					return,
-}	}		} ; case "CabinetWClass":;{ ;winset, transparent, 130, ahk_id %BK_UN_T%;msgbox;}
+}	}		} ; case "CabinetWClass":;{ ;winset, transparent, 130,% hnd_;msgbox;}
 
-OnMsgBox(Hook_MsgBox, event, hWnd, idObject, idChild, dwEventThread, dwmsEventTime) {
+OnMsgBox(HookMb, event, hWnd, idObject, idChild, dwEventThread, dwmsEventTime) {
 CRITICAL
-	wingetTitle, Title_last, ahk_id %hWnd%	
+	wingetTitle, Title_last,% (h_Wd := ("ahk_id " . Format("{:#x}",hWnd)))	
 	if TTmb {
-		wingetClass Class, ahk_id %hWnd%
-		winget PName, ProcessName, ahk_id %hWnd%
+		wingetClass Class,% h_Wd
+		winget PName, ProcessName,% h_Wd
 		tooltip MSGBOX EVENT:`n%PName%`n%Title_last%`nAHK_Class %Class%`nAHK_ID %hWnd%
 	}
 	If (Title_last = "Information") {
-		punny:
 		MSG_WIN_TARGET := "Information"
 		wingetActiveTitle, Z_Title 
 		if (Z_Title = MSG_WIN_TARGET) {
-			settimer ororo, -600
-			return,
-		} else, settimer, Punny
-		return,
-	
-		ororo:
-			WinActivate, ,% "Information"
+			sleep, 250
+			winactivate
 			sleep, 200
-			send N
-			return,
+			Send, N
+		}
+		return,
 	}
 	If WinExist("Reminder") { 
 		MSG_WIN_TARGET=Reminder
@@ -469,7 +426,7 @@ CRITICAL
 		m2_Status_Req33:
 		Exitapp
 	}
-	wingettitle, TitleR, ahk_id %hwnd% ; tooltip % Title_Last " " hwnd " " class
+	wingettitle, TitleR,% h_Wd ; tooltip % Title_Last " " hwnd " " class
 	switch TitleR {
 		case "Roblox Crash": ; run C:\Apps\Kill.exe Multiple_ROBLOX.exe,, hide
 			run C:\Apps\Kill.exe RobloxPlayerBeta.exe,, hide
@@ -504,25 +461,25 @@ CRITICAL
 			}
 			return,
 		case "Roblox Game Client":
-			winget, RobloxCrashP, PID, ahk_id %hwnd%
+			winget, RobloxCrashP, PID,% h_Wd
 			RobloxCR_PID=TASKKILL.exe /PID %RobloxCrashP%
 			run %comspec% /C %RobloxCR_PID%,, hide
 }	}
 
-OnObjectDestroyed(Hook_ObjDestroyed, event, hWnd, idObject, idChild, dwEventThread, dwmsEventTime) {
+OnObjectDestroyed(HookOD, event, hWnd, idObject, idChild, dwEventThread, dwmsEventTime) {
 CRITICAL
-	wingetClass, Class, ahk_id %hWnd% 	
-	wingettitle, Title_last, ahk_id %hWnd%	
-	winget PName, ProcessName, ahk_id %hWnd%	
+	wingetClass, Class, (hndDS := ("ahk_id " . Format("{:#x}"mhWnd))) 	
+	wingettitle, Title_last,% hndDS	
+	winget PName, ProcessName,% hndDS	
 	if TTds
-		tooltip OBJ_DESTROY EVENT:`n%PName%`n%Title_last%`nAHK_Class %Class%`nAHK_ID %hWnd%
+		tooltip OBJ_DESTROY EVENT:`n%PName%`n%Title_last%`nAHK_Class %Class%`nAHK_ID %hndDS%
 	if pname contains AutoHotkey 
 	&& IsWindowVisible( hWnd)
 		settimer, quotE, -1
 	switch Class { ; case "Autohotkey": { ; if % "C:\Script\AHK\adminhotkeys.ahk in " Title_last ; { ; menu, tray, uncheck, Launch AdminHotkeyz, ; tooltip detected admin hotkey disconnecting ; } ; }
 		case "ApplicationFrameWindow","WINDOWSCLIENT":
-			wingetTitle, Last_Title, ahk_id %hWnd% 
-			if ( Last_Title = "Roblox" ) {	;winClose, ahk_id %hwnd%
+			wingetTitle, Last_Title,% hndDS 
+			if ( Last_Title = "Roblox" ) {	;winClose,% hndDS
 				setTimer, SBAR_Restore, -1
 				if (m2dstatus = "not running or paused") {
 					PostMessage, 0x0111, 65306,,, M2Drag.ahk - AutoHotkey
@@ -564,6 +521,20 @@ if winactive("ahk_exe notepad++.exe") 				{
 					else, reload
 }	}	}	}	}
 return,
+
+#M::  					;		ALTgr + Right Arrow
++#M::	
+Mag_="C:\Program Files\Autohotkey\Autohotkey.exe" "C:\Script\AHK\Working\M2DRAG_MAG.AHK"
+run,% Mag_
+return,
+
+#a::
+gosub, ApplyMSStyles ; does nothing atm
+return,
++#a::
+gosub, AeroTheme_Set ; does nothing atm
+return,
+
 ; ~Escape:: 				; 	see AdminHotkeys as this should be migrated
 ; IF Youtube_Popoutwin { 	;	Youtube_Popoutwin (a bad addin)
 	; Escape_TargetWin = %Youtube_Popoutwin%
@@ -582,26 +553,26 @@ AtExit() {
 		pap := ""
 	fileAppend,% ("`n" . EventLogBuffer . ", " . Script_Title)
 	
-	if (Hook_4Gnd)
-		DllCall("UnhookWinEvent", "Ptr", Hook_4Gnd), Hook_4Gnd := 0
-	if (Proc4gnd)
-		DllCall("GlobalFree", "Ptr", Proc4gnd, "Ptr"), Proc4gnd := 0	
-	if (Hook_MsgBox)
-		DllCall("UnhookWinEvent", "Ptr", Hook_MsgBox), Hook_MsgBox := 0
-	if (ProcMb0x)
-		DllCall("GlobalFree", "Ptr", ProcMb0x, "Ptr"), ProcMb0x := 0	
-	if (Hook_ObjCreate)
-		DllCall("UnhookWinEvent", "Ptr", Hook_ObjCreate), Hook_ObjCreate := 0
-	if (Hook_ObjDestroyed)
-		DllCall("UnhookWinEvent", "Ptr", Hook_ObjDestroyed), Hook_ObjDestroyed := 0
-	if (ProcCreat)
-		DllCall("GlobalFree", "Ptr", ProcCreat, "Ptr"), ProcCreat := 0	
+	if (hook4g)
+		DllCall("UnhookWinEvent", "Ptr", hook4g), hook4g := 0
+	if (Proc4g_)
+		DllCall("GlobalFree", "Ptr", Proc4g_, "Ptr"), Proc4g_ := 0	
+	if (HookMb)
+		DllCall("UnhookWinEvent", "Ptr", HookMb), HookMb := 0
+	if (ProcMb_)
+		DllCall("GlobalFree", "Ptr", ProcMb_, "Ptr"), ProcMb_ := 0	
+	if (HookCr)
+		DllCall("UnhookWinEvent", "Ptr", HookCr), HookCr := 0
+	if (HookOD)
+		DllCall("UnhookWinEvent", "Ptr", HookOD), HookOD := 0
+	if (ProcCr_)
+		DllCall("GlobalFree", "Ptr", ProcCr_, "Ptr"), ProcCr_ := 0	
 	if (ProcDstroyd)
 		DllCall("GlobalFree", "Ptr", ProcDstroyd, "Ptr"), ProcDstroyd := 0	
-	if (Hook_Focus)
-		DllCall("UnhookWinEvent", "Ptr", Hook_Focus), Hook_Focus := 0
-	if (ProcF0cus)
-		DllCall("GlobalFree", "Ptr", ProcF0cus, "Ptr"), ProcF0cus := 0	
+	if (HookFc)
+		DllCall("UnhookWinEvent", "Ptr", HookFc), HookFc := 0
+	if (procFc_)
+		DllCall("GlobalFree", "Ptr", procFc_, "Ptr"), procFc_ := 0	
 	return, 0
 }
 ; 	A string may be sent via wParam or lParam by specifying the address of a variable. The following example uses the address operator (&) to do this:
@@ -638,7 +609,7 @@ Receive_WM_COPYDATA(wParam, lParam) {
 		roblox := False
 		Result := Send_WM_COPYDATA("RobloxClosing", TargetScriptTitle2)
 		Result1 := Send_WM_COPYDATA("RobloxClosing", TargetScriptTitle),
-		msgbox wank, aaa
+		msgbox, aaa, aaa
 	}
 	else, if CopyOfData = 10
 		m2dstatus := "Suspended"
@@ -691,9 +662,9 @@ MessageBoxKill(Target_MSGBOX) {
 	settimer, tooloff, -2000
 	if WinExist(ahk_ID %target_hwnd% ) {
 		MsgBox_MsgBox_TargetHandle := 4gnd_hwnd
-			winget, TargetPID, PID ,% MsgBox_MsgBox_TargetHandle
-			Target_PID=TASKKILL.exe /PID %TargetPID%
-			run %comspec% /C %Target_PID%,, hide
+		winget, TargetPID, PID ,% MsgBox_MsgBox_TargetHandle
+		Target_PID=TASKKILL.exe /PID %TargetPID%
+		run, %comspec% /C %Target_PID%,, hide
 		sleep, 100
 		if WinExist(MsgBox_MsgBox_TargetHandle ) {
 			msgbox unable to close the target msgbox 
@@ -764,13 +735,12 @@ Display_Msg(Text, Display_Msg_Time, X_X) {
 Hooks:
 OnExit("AtExit")
 OnMessage(0x4a, "Receive_WM_COPYDATA")
-EVENT_4GND := 0x0003, OBJ_FOCUS:=0x8005, OBJ_CREATED := 0x8000, OBJ_DESTROYED := 0x8001, WIN_TARGET_DESC := "Information", MSG_WIN_TARGET := WIN_TARGET_DESC
-SETHOOK:="SetWinEventHook"
-Hook_4Gnd := DllCall(SETH00k, "Uint", EVENT_4GND, "Uint", EVENT_4GND, "Ptr", 0, "Ptr", (Proc4gnd := RegisterCallback("On4ground", "")), "Uint", 0, "Uint", 0, "Uint", WINEVENT_OUTOFCONTEXT := 0x0000 | WINEVENT_SKIPOWNPROCESS := 0x0002)
-Hook_Focus := DllCall(SETH00k, "Uint", OBJ_FOCUS, "Uint", OBJ_FOCUS, "Ptr", 0, "Ptr",  (ProcF0cus := RegisterCallback("OnFocus", "")), "Uint", 0, "Uint", 0, "Uint", WINEVENT_OUTOFCONTEXT := 0x0000 | WINEVENT_SKIPOWNPROCESS := 0x0002)
-Hook_MsgBox := DllCall(SETH00k, "Uint", 0x0010, "Uint", 0x0010, "Ptr", 0, "Ptr",       (ProcMb0x := RegisterCallback("OnMsgBox", "")), "Uint", 0, "Uint", 0, "Uint", WINEVENT_OUTOFCONTEXT := 0x0000 | WINEVENT_SKIPOWNPROCESS := 0x0002)
-Hook_ObjCreate := DllCall(SETH00k, "Uint", OBJ_CREATED, "Uint", OBJ_CREATED, "Ptr", 0, "Ptr",(ProcCreat := RegisterCallback("OnObjectCreated", "")), "Uint", 0, "Uint", 0, "Uint", WINEVENT_OUTOFCONTEXT := 0x0000 | WINEVENT_SKIPOWNPROCESS := 0x0002) 
-Hook_ObjDestroyed := DllCall(SETH00k, "Uint", OBJ_DESTROYED, "Uint", OBJ_DESTROYED, "Ptr", 0, "Ptr", (ProcCreat := RegisterCallback("OnObjectDestroyed", "")), "Uint", 0, "Uint", 0, "Uint", WINEVENT_OUTOFCONTEXT := 0x0000 | WINEVENT_SKIPOWNPROCESS := 0x0002)
+
+hook4g := DllCall("SetWinEventHook", "Uint", OBJ4g, "Uint", OBJ4g, "Ptr", 0, "Ptr", (Proc4g_ := RegisterCallback("On4ground", "")),"Uint", 0, "Uint", 0, "Uint", OoC | SkpO)
+HookFc := DllCall("SetWinEventHook", "Uint", OBJFc, "Uint", OBJFc, "Ptr", 0, "Ptr", (procFc_ := RegisterCallback("OnFocus", "")),  "Uint", 0, "Uint", 0, "Uint", OoC | SkpO)
+HookMb := DllCall("SetWinEventHook", "Uint", 0x0010,"Uint", 0x0010,"Ptr", 0, "Ptr", (ProcMb_ := RegisterCallback("OnMsgBox", "")), "Uint", 0, "Uint", 0, "Uint", OoC | SkpO)
+HookCr := DllCall("SetWinEventHook", "Uint", OBJCR, "Uint", OBJCR, "Ptr", 0, "Ptr", (ProcCr_ := RegisterCallback("OnObjectCreated", "")),  "Uint", 0, "Uint", 0, "Uint", OoC| SkpO) 
+HookOD := DllCall("SetWinEventHook", "Uint", OBJDS, "Uint", OBJDS, "Ptr", 0, "Ptr", (ProcCr_ := RegisterCallback("OnObjectDestroyed", "")),"Uint", 0, "Uint", 0, "Uint", OoC| SkpO)
 return,
 
 FileListStrGen2:
@@ -842,7 +812,7 @@ if !dbg {
 	dbg	:=	True
 	listlines on
 	#KeyHistory 900
-	menu, tray, check, Toggle debug,
+	menu, tray, check,   Toggle debug,
 } else {
 	listlines off
 	#KeyHistory 0
@@ -890,7 +860,7 @@ if !TTds {
 	TTds := True
 	menu, tray, check,%   "obj_destroy tip",
 } else {
-	menu, tray, 		uncheck,% "obj_destroy tip",
+	menu, tray, uncheck,% "obj_destroy tip",
 	TTds := False
 }
 return,
@@ -906,12 +876,27 @@ if !TTmb {
 }
 return,
 
-GoGoGadget_Cunt:
+1999:
+ControlGet, CtrlHandL, Hwnd,, SysTreeView321,% 1999
+Chwn_ := ("ahk_id " . CtrlHandL)
+sleep, 1200
+winset, Style,        -0x00000004,% Chwn_ ;TVM_SETEXTENDEDSTYLE := 0x112C = tvmX
+winset, Style,        -0x00100000,% Chwn_ ; 0x00000020 auto h scroll
+SendMessage, 0x112C,0, 0x00003C75,% Chwn_ 
+return,
+
+1998:
+ControlGet, CtrlHandL, Hwnd,, SysTreeView321,% 1998
+Chwn_ := ("ahk_id " . CtrlHandL)
+winset, Style, +0x00000202,% Chwn_
+return,
+
+GoGoGadget_Cl0ck: ; sidebar-clock click-thru
 winget, Time_hWnd, iD,% "HUD Time",
 if errorlevel	
 	msgbox,% errorlevel
-else, 						; SIDEBAR-CLOCK CLICK-THRU	
-	winset, ExStyle, 0x000800A8,% ("ahk_id " . Time_hWnd)		;winset, ExStyle, 0x000800A8, Moon Phase II
+else, ; winset, ExStyle, 0x000800A8, M oon P hase I I
+	winset, ExStyle, 0x000800A8,% ("ahk_id " . Time_hWnd)
 return,
 
 invert_win(hw)                  { ; not working atm
@@ -1041,7 +1026,7 @@ StyleDetect(hwnd,Style_xList,XTitle,XtitlesArray) {
 				retpos 	:= RegExMatch(value, "(\»)\K(.{10})", ret_exstyle, p0s := 1)
 				winset, Style,  % ret_style,  % "ahk_id" hwnd  
 				winset, ExStyle,% ret_exstyle,% "ahk_id" hwnd
-				msgbox, %XTitle% detected`n%ret_style%`n%ret_exstyle%
+				msgbox,% ( XTitle . " detected`n" . ret_style . "`n" . ret_exstyle )
 				return, 1
 	}	}	}
 				return, 0
@@ -1049,7 +1034,7 @@ StyleDetect(hwnd,Style_xList,XTitle,XtitlesArray) {
 
 runlabel(VarString, hide="")	   { 
 	static hidestatic := "Hide"
-	if hide            ;           "Mag_CleanME_PLZz\/dwmaccentfix\/PConfig\/wmp_matt_run" etc
+	if hide            ;           "Mag_CleanME_PLZz\/DWMFixS\/PConfig\/WMPRun" etc
 		hid := hidestatic
 	if (InStr(VarString, "\/"))    {
 		loop, parse, VarString, "\/",
@@ -1069,8 +1054,8 @@ toggle_m2drag_bypass:
 ttt := "M2Drag.ahk - AutoHotkey", result := Send_WM_COPYDATA("Bypass_Last_Dragged_GUI",ttt)
 return,
 
-midiScriptR:
-run % midiScriptR
+MiDiRun:
+run % MiDiRun
 return, 
 ;-~_~_~_~_~_~_~_~_~_~_~_~_~_~_~_~_~_~_~_~_~_~_~_~_~_~_~_~_~_~_~_~_~_
 ;next on the menu to refine
@@ -1137,7 +1122,7 @@ wingetClass save_new_Class,% "ahk_id " OutputVarWin
 winget, Style, Style,% "ahk_id " OutputVarWin
 winget, ExStyle, ExStyle,% "ahk_id " OutputVarWin
 if !Style or !ExStyle
-	msgbox error %a_lasterror%
+	msgbox,% ("error " . a_lasterror)
 gui, SaveGuI:new , , SAVE WINDOW STYLES
 gui +hwndSaveGuI_hWnd
 gui, SaveGuI:add, checkbox, vTProcName ,	Process %savenew_PNm%
@@ -1149,12 +1134,12 @@ gui, show, center, SAVE WINDOW STYLES
 OnMessage(0x200, "Help")
 return,
 
-SaveGUISubmit: 	; keyname will contain unique information as a search key and allow for other combinations such as different classnamed windows for the same target app without duplication
+SaveGUISubmit: 	
 gui, SaveGuI:Submit
 return,
 
 PushNewSave: 	
-if TProcName
+if TProcName  ;  regKey contains unique combo of info picked by user as a search key allowing for combinations of classnamed title and procname. Should be enough
 	regWrite, REG_SZ, HKEY_CURRENT_USER\SOFTWARE\_Mouse2Drag\Styles\procname, 	% Style . "»" . exStyle . "»" . "µ" . savenew_PNm . "µ" . save_new_Title . "µ" . save_new_Class,% savenew_PNm
 if TTitle
 	regWrite, REG_SZ, HKEY_CURRENT_USER\SOFTWARE\_Mouse2Drag\Styles\wintitle, 	% Style . "»" . exStyle . "»" . "µ" . savenew_PNm . "µ" . save_new_Title . "µ" . save_new_Class,% save_new_Title
@@ -1193,10 +1178,12 @@ Loop %list_rzexe% {
 }	}	
 CoordMode,% coord_old
 return,
-
-;~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`
-
+;------------==========================++++++++++++++++++++*+*+*+*
+;~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~
+;------------==========================++++++++++++++++++++*+*+*+*
 RegReads: ; -=-==-=====-= REG READZZZZ =-=-=----==--@~@'''~~--__
+RegRead, AHKdir, HKLM\SOFTWARE\AutoHotkey, AHKdir       
+AhkPath := ErrorLevel ? "" : AHKdir "\AutoHotkey.exe"
 RegRead, Log1RZ, HKEY_CURRENT_USER\Software\_Mouse2Drag\Login , rz
 if Log1RZ {
 	loop, parse, Log1RZ, `,
@@ -1237,21 +1224,26 @@ Loop, Reg,% classnamekey
 		Array_LClass.push(		ret_style . "»" . ret_exstyle . "»" . "µ" . value2)
 }	}
 return,
-
 ;~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`
-
 getwintxt:
 WinGetText, wintxt , ahk_id %OutputVarWin%
-msgbox,% wintxt
+msgbox,% ( wintxt . "`nWintext" )
 return,
-
-Open_script_folder:
-e = explorer /select, %a_ScriptFullPath%
-tooltip % a_ScriptFullPath
-run %comspec% /c %e%,,hide,
-settimer, tooloff, -1222
+;------------==========================++++++++++++++++++++*+*+*+*
+filechk_msstyles_themefile:
+theme_test_File1      :=  fileexist("c:\windows\resources\themes\test.theme"         )
+if !(theme_test_File1 :=  fileexist("c:\windows\resources\themes\test.theme")        )
+or !(theme_test_File2 :=  fileexist("c:\windows\resources\themes\test\test.msstyles"))
+	msgbox,% "Test.Msstyles MiA"
+else,
+	traytip,% "File attrib query Sux_cesS . fulLy confirmed ",% "Test.msstyles and Test.theme present & correct! OK" 
 return,
-
+ApplyMSStyles: 	 ; 	or Basic / Aero
+cmd=
+(LTrim
+   C:\Windows\system32\rundll32.exe C:\Windows\system32\shell32.dll,Control_RunDLL C:\Windows\system32\desk.cpl desk,@Themes /Action:OpenTheme /file "C:\Users\ninj\AppData\Local\Microsoft\Windows\Themes\p00p.theme"
+)
+return,
 AeroTheme_Set:
 if !(fileexist("c:\windows\resources\themes\test\test.msstyles"))
 	msgbox,% "Test.Msstyles MiA"
@@ -1261,33 +1253,16 @@ else, {
 	regwrite, REG_SZ,% (HKCUCurVer . "\Themes"),	    	 CurrentTheme,	% test_aero_theme 
 }
 return,
-
-filechk_msstyles_themefile:
-theme_test_File1      := fileexist("c:\windows\resources\themes\test.theme")
-if !(theme_test_File1 := fileexist("c:\windows\resources\themes\test.theme"))
-or !(theme_test_File2 := fileexist("c:\windows\resources\themes\test\test.msstyles"))
-	msgbox,% "Test.Msstyles MiA"
-else,
-	traytip,% "File attrib query Sux_cesS . fulLy confirmed ",% "Test.msstyles and Test.theme present & correct! OK" 
-return,
-
-ApplyMSSTYLES: 	 ; 	or Basic / Aero
-cmd=
-(LTrim
-   C:\Windows\system32\rundll32.exe C:\Windows\system32\shell32.dll,Control_RunDLL C:\Windows\system32\desk.cpl desk,@Themes /Action:OpenTheme /file "C:\Users\ninj\AppData\Local\Microsoft\Windows\Themes\p00p.theme"
-)
-return,
-
+;------------==========================++++++++++++++++++++*+*+*+*
 quotEI:
 q_dlim	:= 	42
 loop, 6
 	sp 	:= 	(" " .  sp . sp)
-kVon    :=  ( "`n" . sp . "Kurt Vonnegut" . q_dlim )
-bujub 	:=  ( "`n" . sp . "Buju Banton" .   q_dlim )
+KV_    :=  ( "`n" . sp . "Kurt Vonnegut" . q_dlim )
+BJB_ 	:=  ( "`n" . sp . "Buju Banton" .   q_dlim )
 loop, parse, qstr,% q_dlim, 
 	quotes[quote_MAX_INDEX] := 	A_loopfield				; quote_MAX_INDEX := A_index working
 return,
-
 quotE:
 randOm, rNd, 1, quotes[quote_MAX_INDEX] 				; quote_MAX_INDEX working
 if !Quoting {
@@ -1296,12 +1271,11 @@ if !Quoting {
 	settimer, 	Qoff2, -3000
 } else, settimer, Quote, -3000
 return,
-
 Qoff2:
 tooltip,,,,2
 Quoting := False
 return,
-
+;------------==========================++++++++++++++++++++*+*+*+*
 ;GDIP FUNCS
 GetDC(hwnd:=0) {
    return, DllCall("GetDC", "UPtr", hwnd)
@@ -1338,8 +1312,8 @@ Gdip_ShutdownI(pToken) {
 
 NewTrayMenuParam( LabelPointer = "", Title = "", Icon = "" ) {
 	if Title                                                 {
-		MenuLablTitlAr["LabelPointer"]:= Title
-		menu,tray,add,% MenuLablTitlAr["LabelPointer"],% LabelPointer
+		MenuLablTitlAr[%LabelPointer%]:= Title
+		menu,tray,add,% MenuLablTitlAr["LabelPointer"], %LabelPointer%
 		if !Icon
 			return, 1
 		else, menu, tray, Icon,% Title ,% Icon
@@ -1350,65 +1324,74 @@ NewTrayMenuParam( LabelPointer = "", Title = "", Icon = "" ) {
 	return, 3
 }
 
-32770Fix:                          ; "Save as" & "Open" Dialogs called from the eventHook.
-winwaitActive,% "ahk_class #32770" ; *takes some time to visually materialise ui hence the previous.
-settimer, PaintItBlack,  -1400    ; "Active" is not actually ready to be drawn over.
-return,
-		  PaintItBlack:
-N_  := Gdip_Startup()
-dc  := GetDC(nnd)
-mDC := Gdi_CreateCompatibleDC(0)
-mBM := Gdi_CreateDIBSection(mDC, 1, 1, 32) 
-oBM := Gdi_SelectObject(mDC, mBM)
-DllCall("gdi32.dll\SetStretchBltMode",  "Uint", dc, "Int", 5)
-DllCall("gdi32.dll\StretchBlt",         "Uint", dc, "Int", 0, "Int", 0, "Int", Desk_Wi , "Int", Desk_Hi, "Uint", mdc, "Uint", 0, "Uint", 0, "Int",	1, "Int",	1, "Uint", "0x00CC0020")
-Gdip_ShutdownI(N_)
+32770Fix:     
+wingetClass, Cls_A, a
+if Cls_A != "#32770"                   ;    "Save as" & "Open" dlgs called from the eventHook.
+	winwaitActive,% "ahk_class #32770" ; * takesawhile to visually materialise ui, hence prev.
+wingetClass, Cls_A, a
+if (Cls_A = "#32770") {
+	 ;      "Active" is not actually ready to be drawn over.
+	 sleep 2000
+	; msgbox % nnd
+	msgbox % nnd
+	Nnn  := Gdip_Startup()
+	dcC  := GetDC(nnd)
+	mDC := Gdi_CreateCompatibleDC(0)
+	mBM := Gdi_CreateDIBSection(mDC, 1000, 800, 32) 
+	oBM := Gdi_SelectObject(mDC, mBM)
+	DllCall("gdi32.dll\SetStretchBltMode", "Uint", dcC, "Int", 5)
+		;DllCall("gdi32.dll\StretchBlt",UInt,HDC_Frame, Int,0, Int,0, Int, magsize , Int, magsize , UInt, HDD_Frame, UInt,ViewPos_X, UInt,ViewPos_Y, Int,ViewX, Int,ViewY, UInt, SRCCOPY)  
+
+	DllCall("gdi32.dll\StretchBlt", "Uint", dcC, "Int", 0, "Int", 0, "Int", 1000, "Int", 800, "Uint", mdc, "Uint", 0, "Uint", 0, "Int", 1000, "Int", 800, "Uint", "0x00CC0020")
+	msgbox
+	;Gdip_ShutdownI(Nnn)
+}
 return,
 
-LAbel_Ladder:
-mattdwmrun2:
-test_move:
-adminHotkeyzRun: ; menu, tray, check,% "Launch " A_ThisLabel ; swap wih a dictionary for titles
-Mag_:
-zinout: 
-CleanME_PLZz:
-dwmaccentfix:
-PConfig:
-wmp_matt_run:
-m2drag_run:
-YT_DL:
-			
-LABElA((    Your_Label_Sir := A_thislabeL   ))
+LAbeL_Ladder: ; []()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>
+AdHkRun:      ; menu, tray, check,% "Launch " A_ThisLabel ; swap wih a dictionary for titles ;
+mattdwmrun2:  ; []()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>
+test_move:    ; []()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>()
+Mag_:         ; []()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>()
+MiDi_:        ; []()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>()[
+CleanME_PLZz: ; []()<>()[]()<>()[]()<>()[]()<>()[]()<>()[
+DWMFixS:      ; []()<>()[]()<>()[]()<>()[]()<>()[]()
+PConfig:      ; []()<>()[]()<>()[]()<>()[]()<>()  
+WMPRun:       ; []()<>()[]()<>()[]()<>()[]()<
+M2dRun:       ; []()<>()[]()<>()[]()<>()[]
+YT_DL:        ; []()<>()[]()<>()[]()<>()
+											
+LABElA(( Your_Label_Sir := A_thislabeL ))
 return,
 			
 LABElA(Tingz) 	 {
 	switch Tingz {
-		case "adminHotkeyzRun":
+		case "AdHkRun":
 			settimer, reload_orload_admhk, -1
 		default:
 			run,% %Tingz%
 }	}
 			
 check_ADMHOTKEY() {
-	if (wineXist("ahk_class AutoHotkey", ADM_wTtL)) { ;"adminhotkeys.ahk - AutoHotkey"
+	if uiu := wineXist("ahk_class AutoHotkey",ADM_wTtL) ;"adminhotkeys.ahk - AutoHotkey"
 		return, 1
-		}
 	return, 0
 }
 			
 reload_orload_admhk:
-if !(check_ADMHOTKEY()) 
-	run,% adminHotkeyzRun
-else, settimer, admhotkey_reload_, -1
+if !aasa:=check_ADMHOTKEY()
+msgbox no
+	run,% AdHkRun
+;else, settimer, admhotkey_reload_, -1
 return,
 			
 admhotkey_reload_:
 PostMessage, 0x0111, 65303,,,% "adminhotkeys.ahk - AutoHotkey"
 return
-		
-Open_ScriptDir() ; not called here but this is enough to invoke its label(s)
-		
-Stylemenu_init:  ; tooltip % "Analyzing, please wait"
+;------------=========================++++++++++++++++++++*+*+*+*
+Open_ScriptDir() ; not called but, enough to invoke its label(s).
+;------------=========================++++++++++++++++++++*+*+*+*
+Stylemenu_init:  ; tooltip % "Analyzing, please wait" ++++*+*+*+*
 TargetHandle := "", style:=""
 if Dix
 	menu, F, DeleteAll
@@ -1427,7 +1410,7 @@ menu, F, add, %PName%, donothing,
 menu, F, Disable, %PName%
 menu, F, add,% sysmenu, toggle_sysmenu
 if (Style2 & 0x00080000)
-	menu, F, check,% doom_array[%SysMenu%]
+	menu, F, check,% Grants_Son[%SysMenu%]
 else	menu, F, uncheck,% SysMenu
 Menu	  F, 	add,% Clickthru, toggle_Clickthru
 if (ExStyle2 & 0x00000001)
@@ -1500,8 +1483,8 @@ menu, 	F, 	add, Get window text , getwintxt
 menu, 	F, 	add, %Save% , Savegui
 gosub, StyleMenu_Show
 return,
+
 StyleMenu_Show:
-tooltip
 menu, F, Show
 return,  
 
@@ -1521,99 +1504,96 @@ mti := (NewTrayMenuParam("", "Launch PowerConfig", ((icn := "C:\Icon\") . "20\al
 mti := ""
 return, 
 
-;`~					      ~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`
-;`~					      ~`~`~`~`~`~`															  ~`~`
-;`~					      ~`~`~`~`~`~`															  ~`~`
-;`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`															  ~`~``~`~`~`~`~
-;`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`															  ~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~
-;`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`															  ~`~``~`~`~`~`~					`~
-;`~						  ~`~`~`~`~`~`															  ~`~								  []
-;`~						  ~`~`~`~`~`~`															  ~`~
-;`~						  ~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~
-
+;`~				      ~`~`~~`~`~`~`~`~``~`~``~`~`~`~`~`~`~`~`~`~`~`~`~`
+;`~				      ~`~`~~`~`									  ~`~`
+;`~				      ~`~`~~`~`									  ~`~`
+;`~`~`~`~`~`~`~`~`~`~`~`~`~~`~`									  ~`~``~`~`~`~`~
+;`~`~`~`~`~`~`~`~`~`~`~`~`~~`~`									  ~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~
+;`~`~`~`~`~`~`~`~`~`~`~`~`~~`~`									  ~`~``~`~`~`~`~					`~
+;`~					  ~`~`~~`~`									  ~`~								  []
+;`~					  ~`~`~~`~`									  ~`~
+;`~					  ~`~`~~`~`~`~`~`~``~`~``~`~`~`~`~`~`~`~`~`~`~`~`~
 ;~~~~~~~^^; 
- Menu_Tray: ;=---- `~
-;~~~~~~~^^; 		[]
-
+ Menu_Tray_Init: ;=---- `~
+;~~~~~~~^^; 		       []
 menu, 	tray, 	NoStandard	; menu, 	tray, 	icon, 	% TrayIconPath
 menu, 	tray, 	Icon, 	Context32.ico
 menu, 	tray, 	add, 	Open Script Folder, Open_ScriptDir
 menu, 	tray, 	Standard
-
-gosub, 	MenuP 				; add the rest... /;/ add your own ; NewTrayMenuParam("LabelPointer", "Title", "Icon")
+gosub, 	MenuP               ; add the rest... /;/ add your own ; NewTrayMenuParam("LabelPointer", "Title", "Icon")
 gosub, 	test_icons 	
 return,
 
-;	^-=___=-^				^-=___=-^				^--___=-^   ^   ~   ~   _   ¬   ¬   ¬   ¬   ¬   ¬   ¬   ¬   _
-Varz: ; 01010101010 ' ` ' `' `':C\Root\`'`'''`'      `''`0101'`'`'```''`'`'     ``'010101`''`'0xFFEEDD`'`'`'`'``'`'     			`''`''KILL!'`'`' '`''`'``'' `'`''`''` ''`'` '`''` `''` `''` `'` 
-loop, parse,% glob4Lz := ("AF/AF2/AutoFireScript/MyScrpt/dbgtt/AutoFireScript2/TargetScriptTitle/TargetScriptTitle2/AHK_Rare/SidebarPath/AF_Delay/SysShadowStyle_New/SysShadowExStyle_New/toolx/offsett/XCent/YCent/starttime/text/X_X/Last_Title/autofire/RhWnd_old/MouseTextID/DMT/roblox/toggleshift/Norm_menuStyle/Norm_menuexStyle/Title_Last/Title_last/dcStyle/classname/tool/tooly/EventLogBuffer_Old/Roblox_hwnd/Time_Elapsed/KillCount/SBAR_2berestored_True/Sidebar/TT4g/TTFoc/TTcr/TTds/TTmb/dbg/TClass/TTitle/TProcName/delim/delim2/TitleCount/ClassCount/ProcCount/style2/exstyle2/ArrayProc/ArrayClass/ArrayTitle/Array_LProc/Array_LTitle/Array_LClass/Style_ClassnameList2/Style_procnameList2/Style_wintitleList2/Youtube_Popoutwin/Script_Title/np/m2dstatus/crashmb/8skin_crash/OutputVarWin/F/s1/s2/s3/FileListStr/oldlist/FileCount/ADELIM/hTarget/hTargetprev/hgui/xPrev/yPrev/wPrev/hPrev/logvar/ADM_wTtL/triggeredGFS/Matrix/SysMenu/Maxbox/MinBox/LeftScroll/ClickThru/RightAlign/RightoLeft/AppWindow/Save/Reset/midiScriptR/test_move/mattdwmrun/Quoting/titlelist/MenuLablAr/MenuLablTitlAr/labellist/Desk_Wi/Desk_Hi/FileListStr_Ar/hTargetPrev/wPrev/hPrev/xPrev/yPrev/hidegui/q_dlim/quotes/HandalDRandal/Hook_4Gnd/Hook_MsgBox/Hook_ObjCreate/Hook_ObjDestroyed/Hook_Focus/ripyoursoulapart/Hook_4GndProc4gnd/Hook_MsgBox/ProcMb0x/Hook_ObjCreate/ProcCreat/Hook_ObjDestroyed/ProcDstroyd/Hook_Focus/ProcF0cus/nnd"),% "/",
-	global (%A_loopfield%)
-glob4Lz := "" ;	^-=___=-^				^-=___=-^				^-=___=-^				^-=___=-^				^-=___=-^			
-loop, 22, 
-	gosub,  GDIpInvertVars  ;-=-=-;'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'```'`'``''`
-								  ;`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'``''`
-Matrix 	:=(	"-1	|0	|0	|0	|0|"  ;'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'``''`
-.           "0	|-1	|0	|0	|0|"  ;``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'``''`
-.           "0	|0	|-1	|0	|0|"  ;`''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'``''`
-.           "0	|0	|0	|1	|0|"  ;''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'``''`
-.           "1	|1	|1	|0	|1" ) ;'`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'``''`'`'''`
-;"!!! vARi4bl3z !!!!" ...		 ^-=___=-^			>>>>>>>>>>>>
-																;???
-RegRead InstallDir, HKLM\SOFTWARE\AutoHotkey, InstallDir        ;  	 ~@~peww~@~	
-AhkPath := ErrorLevel ? "" : InstallDir "\AutoHotkey.exe"
-;   mattdwmrun:= ((Autoit3path := "C:\Program Files (x86)\AutoIt3\AutoIt3_x64.exe") . " " .  "C:\Script\autoit\_MattDwmBlurBehindWindow.au3") 
-mattdwmrun2	:=	"C:\Script\autoit\_MattDwmBlurBehindWindow.lnk" ;			^^^	Wrong start dir variable 1nce launched 	^	^	^
-test_move	:= 	"C:\Users\ninj\DESKTOP\winmove_test.ahk"
-SidebarPath := 	"C:\Program Files\Windows Sidebar\sidebar.exe"
-Path_PH 	:= 	"C:\Apps\Ph\processhacker\x64\ProcessHacker.exe"
-AHK_Rare 	:= 	((MyScrpt := "C:\Script\AHK") . "\- Script\AHK-Rare-master\AHKRareTheGui.ahk")
-CleanME_PLZz:= 	MyScrpt . "\white_full-screen_gui.ahk"	
-
-qstr := (" ""And I urge you to please notice when you are happy,`nand exclaim or murmur or think at some point,`n 'If this isn't nice, I don't know what is.'"" " . kVon .	" ""Everything was beautiful and nothing hurt."" " . kVon .	" ""Those who believe in telekinesis, raise my hand."" " . kVon . " ""We are what we pretend to be, so we must be careful about what we pretend to be."" " . kVon .	" ""I tell you, we are here on Earth to fart around, and don't let anybody tell you different."" " . kVon . " ""Tiger got to hunt,bird got to fly,`nMan got to sit and wonder 'why, why, why?'"" " . kVon " ""Tiger got to sleep, bird got to land,`nMan got to tell himself he understand."" " . kVon . " ""While elephants play the grass gets trampled."" " . bujub )
-
-adminHotkeyzRun :=  ((sched_tsk	     :=  "C:\Windows\system32\schtasks.exe /run /tn ")         .  "adminhotkeys.ahk_407642875") 	; HideMe
-PConfig 		:= 	(sched_tsk       .   "cmd_output_to_msgbox.ahk_407642875")														; HideMe
-zinout 			:= 	((ahk_exe_u64    :=  InstallDir . "\AutoHotkeyU64.exe ") .  MyScrpt . "\Z_MIDI_IN_OUT\z_in_out.ahk") 	; HideMe
-YT_DL 			:= 	((ahk_exe_u64uia :=  InstallDir . "\AutoHotkeyU64_UIA.exe ") .  ScpW . "YT.ahk")		 	  			  	 	; HideMe
-m2drag_run 		:= 	ahk_exe_u64Uia   . MyScrpt . "\Working\M2Drag.ahk"															; HideMe
-Mag_ 			:= 	(ahk_exe_64	 :=  AhkPath . " " . ScpW . "M2DRAG_MAG.AHK")                                                       ; HideMe
-dwmaccentfix 	:= 	ahk_exe_64   	 . 	MyScrpt . "\__TESTS\dwm_accentcolour.ahk"											    ; HideMe
-wmp_matt_run 	:= 	ahk_exe_u64 	 .	MyScrpt . "\Z_MIDI_IN_OUT\wmp_Matt.ahk"                  								; HideMe
-midiScriptR 	:= 	( InstallDir . "AutoHotkeyU64.exe " . MyScrpt . "\Z_MIDI_IN_OUT\z_in_out.ahk")                         		; HideMe
-ADM_wTtL 		:= 	MyScrpt . "\adminhotkeys.ahk - AutoHotkey v1.1.33.10"
-AF := (MyScrpt . af_1), AF2 := (MyScrpt . Bun_), AutoFireScript := BF, AutoFireScript2 := BF2 , TargetScriptTitle := (AutoFireScript . " ahk_class AutoHotkey"), TargetScriptTitle2 := (AutoFireScript2 . " ahk_class AutoHotkey"), AF_Delay := 10, SysShadowStyle_New := 0x08000000, SysShadowExStyle_New := 0x08000020, toolx := "-66", offsett := 40, delim := "Þ", delim1 := "µ", delim2 := "»",KILLSWITCH := "kill all AHK procs.ahk", mouse24 := "C:\Script\AHK\Working\mouse24.ico", BF := "Roblox_Rapid.ahk", BF2 := "Roblox_Bunny.ahk"
-
-test := (Style2 . "»" . exStyle2 . "»" . "µ" . savenew_PNm . "µ" . save_new_Title . "µ" .  "µ" . save_new_Class) ; konkat the d-lims mw 202
-
-titlelist := "4ground hook tip/focus hook tip/obj_create tip/obj_destroy tip/msgbox hook tip/Toggle debug/Toggle Sidebar off/DWM_Axnt_fix/LoadAeroRegKeyz/Launch PowerConfig/Launch MattDWM/Launch M2Drag/Launch WMP_MATT/Launch midi_in_out/Launch adminHotkeyzRun/Launch YouTube_DL/Launch test_move/Launch screen clean!"
-
-labellist := "TT4g/TTFoc/TTcr/TTds/TTmb/Toggle_dbg/Toggle_sbar/dwmaccentfix/AeroTheme_Set/pconfig/mattdwmrun2/m2drag_run/wmp_matt_run/zinout/adminHotkeyzRun/YT_DL/test_move/CleanME_PLZz"
-
-test_aero_style :=	"C:\Windows\Resources\Themes\Aero\Aero.msstyles"
-test_aero_style2:=	"%SystemRoot%\resources\Themes\Aero\Aero.msstyles"
-test_aero_theme :=	"C:\Windows\Resources\Themes\Aero.theme"
-
-_x := ",,"
-_y := "<<>>"
-
-stringaling:=("SysMenu" . _y . "Title (+ & X Conrols) (SysMenu)" . _x . "Maxbox" . _y . "Maximise Button (□)" . _x . "MinBox" . _y . "Minimise Button (_)" . _x . "LeftScroll" . _y . "Left Scroll Orientation" . _x . "ClickThru" . _y . "Click-through" . _x . "RightAlign" . _y . "Generic Right-alignment" . _x . "RightoLeft" . _y . "Right-to-Left reading" . _x . "AppWindow" . _y . "Taskbar Item (not 100%)" . _x . "Save" . _y . "Save window style preferences" . _x . "Reset" . _y . "Reset window style preferences")
-
-loop, parse, stringaling,% _x, 
+Menu_Style_Init:            ; Style and extended style setter menu Init
+;    -DeLimiters
+_x := ",,", _y := "<<>>" 
+;    -String
+str_aL:=("SysMenu" . _y . "Title (+ & X Conrols) (SysMenu)" . _x . "Maxbox" . _y . "Maximise Button (□)" . _x . "MinBox" . _y . "Minimise Button (_)" . _x . "LeftScroll" . _y . "Left Scroll Orientation" . _x . "ClickThru" . _y . "Click-through" . _x . "RightAlign" . _y . "Generic Right-alignment" . _x . "RightoLeft" . _y . "Right-to-Left reading" . _x . "AppWindow" . _y . "Taskbar Item (not 100%)" . _x . "Save" . _y . "Save window style preferences" . _x . "Reset" . _y . "Reset window style preferences")
+;    -Parse
+loop, parse, str_aL,% _x, 
 	loop, parse, a_loopfield,% _y, 
 		switch index {
 			case 1:
-				my_index := a_loopfield
+				my_i := a_loopfield
 			case 2:
-				doom_array[my_index] := a_loopfield
+				Grants_Son[my_i] := a_loopfield
 		}
-	
-HKCUCurVer	:= 	"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion" 
-stylekey	:= 	"HKEY_CURRENT_USER\SOFTWARE\_Mouse2Drag\Styles"
-wintitlekey	:= 	stylekey . "\wintitle"
-procnamekey	:= 	stylekey . "\procname"
-classnamekey:= 	stylekey . "\classname"
-af_1 		:= 	"\" . BF
-Bun_ 		:= 	"\" . BF2
+return
+;	^-=___=-^				^-=___=-^				^--___=-^   ^   ~   ~   _   ¬   ¬   ¬   ¬   ¬   ¬   ¬   ¬   _
+Varz: ; 01010101010 ' ` ' `' `':C\Root\`'`'''`'      `''`0101'`'`'```''`'`'     ``'010101`''`'0xFFEEDD`'`'`'`'``'`'     			`''`''KILL!'`'`' '`''`'``'' `'`''`''` ''`'` '`''` `''` `''` `'` 
+global AF, AF2, AutoFireScript, Scr_, dbgtt, AutoFireScript2, TargetScriptTitle, TargetScriptTitle2, AHK_Rare, SidebarPath, AF_Delay, SysShadowStyle_New, SysShadowExStyle_New, toolx, offsett, XCent, YCent, starttime, text, X_X, Last_Title, autofire, RhWnd_old, MouseTextID, DMT, roblox, toggleshift, Norm_menuStyle, Norm_menuexStyle, Title_Last, Title_last, dcStyle, classname, tool, tooly, EventLogBuffer_Old, Roblox_hwnd, Time_Elapsed, KillCount, SBAR_2berestored_True, Sidebar, TT4g, TTFoc, TTcr, TTds, TTmb, dbg, TClass, TTitle, TProcName, delim, delim2, TitleCount, ClassCount, ProcCount, style2, exstyle2, ArrayProc, ArrayClass, ArrayTitle, Array_LProc, Array_LTitle, Array_LClass, Style_ClassnameList2, Style_procnameList2, Style_wintitleList2, Youtube_Popoutwin, Script_Title, np, m2dstatus, crashmb, 8skin_crash, OutputVarWin, F, s1, s2, s3, FileListStr, oldlist, FileCount, ADELIM, hTarget, hTargetprev, hgui, xPrev, yPrev, wPrev, hPrev, logvar, ADM_wTtL, triggeredGFS, Matrix, SysMenu, Maxbox, MinBox, LeftScroll, ClickThru, RightAlign, RightoLeft, AppWindow, Save, Reset, MiDiRun, test_move, mattdwmrun, Quoting, titlelist, MenuLablAr, MenuLablTitlAr, labellist, Desk_Wi, Desk_Hi, FileListStr_Ar, hTargetPrev, wPrev, hPrev, xPrev, yPrev, hidegui, q_dlim, quotes, HandalDRandal, hook4g, HookMb, HookCr, HookOD, HookFc, ripyoursoulapart, hook4gProc4g_, AHKdir, AhkPath, HookMb, ProcMb_, HookCr, ProcCr_, HookOD, ProcDstroyd, HookFc, procFc_, nnd, 1998, 1999, SkpO
+ ;	^-=___=-^ 	 ;-=-=;'`'``''`'`'``''`'`'``''`'`'``''`'`'``''
+loop, 22,     
+{               ;-=-=;'`'``''`'`'``''`'`'``''`'`'``''`'`'
+	v1 := ("hChildMagnifier" . a_index) 
+	global (%v1%)
+	v2 := ("hgui" . A_Index) 
+	global  (%v2%)
+	v3 := ("HWNDhgui" . A_Index)  
+	global  (%v3%)   ;-=-=-;'`'``''`'`'``''``''``''`'`
+}		
+						  ;`'``''`'`'``''`'`'``''`'`'`'``
+Matrix 	:=(	"-1	|0	|0	|0	|0|"  ;'``''`'`'``''`'`'``''`'`'````
+.           "0	|-1	|0	|0	|0|"  ;``''`'`'``''`'`'``''`'`'``'``
+.           "0	|0	|-1	|0	|0|"  ;`''`'`'``''`'`'``''`'`'``'''
+.           "0	|0	|0	|1	|0|"  ;''`'`'``''`'`'``''`'`'``''`'
+.           "1	|1	|1	|0	|1 " ) ;'`'`'``''`'`'``''`'`'``''`'
+;"!!! vARi4bl3z !!!!" ...		 ^-=___=-^	>>>>>>>>>>>>;??? ;  	 ~@~peww~@~	
+; DWM_Run:= ((Autoit3path := "C:\Program Files (x86)\AutoIt3\AutoIt3_x64.exe") . " " . "C:\Script\autoit\_MattDwmBlurBehindWindow.au3") 
+mattdwmrun2	:= "C:\Script\autoit\_MattDwmBlurBehindWindow.lnk"    ;   ^^^Wrong start dir envVar 1nce launched?
+test_move	:= "C:\Users\ninj\DESKTOP\winmove_test.ahk"
+SidebarPath := "C:\Program Files\Windows Sidebar\sidebar.exe"
+Path_PH 	:= "C:\Apps\Ph\processhacker\x64\ProcessHacker.exe"
+AHK_Rare 	:= ((Scr_ := "C:\Script\AHK") . "\- Script\AHK-Rare-master\AHKRareTheGui.ahk")
+CleanME_PLZz:= (Scr_ . "\white_full-screen_gui.ahk")
+Schd_T      := "C:\Windows\system32\schtasks.exe"
+HKCUCurVer	:= "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion"
+stylekey    := "HKEY_CURRENT_USER\SOFTWARE\_Mouse2Drag\Styles"
+
+qstr := (" ""And I urge you to please notice when you are happy,`nand exclaim or murmur or think at some point,`n 'If this isn't nice, I don't know what is.'"" " . KV_ .	" ""Everything was beautiful and nothing hurt."" " . KV_ .	" ""Those who believe in telekinesis, Please raise my hand."" " . KV_ . " ""We are what we pretend to be, so we must be careful about what we pretend to be."" " . KV_ .	" ""I tell you, we are here on Earth to fart around, and don't let anybody tell you different."" " . KV_ . " ""Tiger got to hunt,bird got to fly,`nMan got to sit and wonder 'why, why, why?'"" " . KV_ " ""Tiger got to sleep, bird got to land,`nMan got to tell himself he understand."" " . KV_ . " ""While elephants play the grass gets trampled."" " . BJB_ )
+
+AdHkRun := ((sched_tsk := (Schd_T . " /run /tn ") . (adh := "adminhotkeys.ahk") . "_407642875" )) ; HideMe
+PConfig := (sched_tsk .   "cmd_output_to_msgbox.ahk_407642875")                                   ; HideMe
+YT_DL   := ((AHkU64uia := AHKdir . "\AutoHotkeyU64_UIA.exe ") . ScpW . "YT.ahk")                  ; HideMe
+M2dRun  := ( AHkU64Uia .  Scr_ .    "\Working\M2Drag.ahk")                                        ; HideMe
+Mag_    := ( AHk64     := AhkPath . " " . ScpW . "M2DRAG_MAG.AHK")                                ; HideMe
+DWMFixS := ( AHk64     .  Scr_ .   "\__TESTS\dwm_accentcolour.ahk")                               ; HideMe
+WMPRun  := ( AHkU64    .  Scr_ .   "\Z_MIDI_IN_OUT\wmp_Matt.ahk")                                 ; HideMe
+MiDiRun := ( AHKdir    .  "AutoHotkeyU64.exe " . Scr_ . MiDir)                                    ; HideMe
+ADM_wTtL:= ( Scr_      .  "\" , adh . " - AutoHotkey v1.1.33.10")                                 ; HideMe
+MiDi_:=(AHkU64:=(AHKdir . "\AutoHotkeyU64.exe ")) . Scr_ . (MiDir:="\Z_MIDI_IN_OUT\z_in_out.ahk") ; HideMe
+
+AF := (Scr_ . af_1), AF2 := (Scr_ . Bun_), AutoFireScript := BF, AutoFireScript2 := BF2 , TargetScriptTitle := (AutoFireScript . " ahk_class AutoHotkey"), TargetScriptTitle2 := (AutoFireScript2 . " ahk_class AutoHotkey"), AF_Delay := 10, SysShadowStyle_New := 0x08000000, SysShadowExStyle_New := 0x08000020, toolx := "-66", offsett := 40, delim := "Þ", delim1 := "µ", delim2 := "»",KILLSWITCH := "kill all AHK procs.ahk", mouse24 := "C:\Script\AHK\Working\mouse24.ico", BF := "Roblox_Rapid.ahk", BF2 := "Roblox_Bunny.ahk", 
+OBJ4g := 0x0003, OBJFc:=0x8005, OBJCR := 0x8000, OBJDS := 0x8001, WIN_TARGET_DESC := "Information", MSG_WIN_TARGET := WIN_TARGET_DESC, INEVENT_SkpOROCESS := 0x0002, SkpO := WINEVENT_SkpOROCESS, WINEVENT_OUTOFCONTEXT := 0x0000, OoC := WINEVENT_OUTOFCONTEXT, wintitlekey := (stylekey . "\wintitle"), procnamekey := (stylekey . "\procname"), classnamekey := (stylekey . "\classname")
+
+titlelist := "4ground hook tip/focus hook tip/obj_create tip/obj_destroy tip/msgbox hook tip/Toggle debug/Toggle Sidebar off/DWM_Axnt_fix/LoadAeroRegKeyz/Launch PowerConfig/Launch MattDWM/Launch M2Drag/Launch WMP_MATT/Launch midi_in_out/Launch AdHkRun/Launch YouTube_DL/Launch test_move/Launch screen clean!"
+labellist := "TT4g/TTFoc/TTcr/TTds/TTmb/Toggle_dbg/Toggle_sbar/DWMFixS/AeroTheme_Set/pconfig/mattdwmrun2/M2dRun/WMPRun/MiDi_/AdHkRun/YT_DL/test_move/CleanME_PLZz"
+
+Sysget, Desktop_Margin, MonitorWorkArea
+Sysget, Desk_Wi, 78
+Sysget, Desk_Hi, 79
+XCent := (floor(0.5*Desk_Wi)), YCent := (floor(0.5*Desk_Hi))
+af_1 := ("\" . BF),   Bun_ := ("\" . BF2)
 ArrayProc	:= 	[]
 ArrayClass	:= 	[]
 ArrayTitle	:= 	[]
@@ -1624,22 +1604,16 @@ MenuLablAr 	:=	[]
 MenuLablTitlAr:=[] 
 FileListStr_Ar:=[]
 quotes 		:= 	[]
-	
-GDIpInvertVars:
-global  ("hChildMagnifier" . a_index) 
-global  ("hgui" . A_Index)
-global  ("HWNDhgui" . A_Index)
-return,
-
-init_matt:
-InitLabelOrder := "Varz>Menu_Tray>RegReads>Hooks>quotEI>reload_orload_admhk>Main"
-loop, parse, InitLabelOrder, ">",
-	gosub,% A_loopfield
-return,
 
 donothing:
 return,
 
+init_matt:
+InitLabelOrder := "Varz>Menu_Tray_Init>Menu_Style_Init>RegReads>Hooks>quotEI>reload_orload_admhk>Main"
+loop, parse, InitLabelOrder, ">",
+	gosub,% A_loopfield
+return,
+			
 /*  ; Notes for popup: NP++; ahk_id 0x2e1120 PID: 8332; process name AutoHotkey.exe; Title Get Parameters; AHK_Class AutoHotkeyGUI; Style / ExStyle 0x940A0000 - 0x00000088; Control Edit1 C_hWnd: 0x130c78 ; Style / ExStyle 0x50010080 - 0x00000200
 
 ID_TRAY_OPEN := 65300
@@ -1705,6 +1679,13 @@ ID_HELP_WEBSITE := 65412
     ; OnExit(A_ThisFunc, 0)
     ; DllCall("ShutdownBlockReasonDestroy", "ptr", A_ScriptHwnd)
 ; }
+
+; Open_script_folder:
+; e = explorer /select, %a_ScriptFullPath%
+; tooltip % a_ScriptFullPath
+; run %comspec% /c %e%,,hide,
+; settimer, tooloff, -1222
+; return,
 
 ; SysMenu		:= 	"Title (+ & X Conrols) (SysMenu)"
 ; Maxbox 		:= 	"Maximise Button (□)"
