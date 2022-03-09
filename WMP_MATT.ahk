@@ -17,27 +17,25 @@ init:
 gosub, varz
 gosub, init_menu
 gosub, main
-return
+return,
 
 main:
-global 	numpad_blacklist := "ahk_exe wmplayer.exe, ahk_exe firefox.exe"
-;gosub, 	togl_numpad_i ; numpd bypass add shit to string above
+global numpad_blacklist, wmp, WMP8 ;gosub, togl_numpad_i ; numpd bypass add shit to string above
+regWrite, REG_DWORD,% (hkcuWMPprefs := "HKEY_CURRENT_USER\Software\Microsoft\MediaPlayer\Preferences"),% "Volume",% "1"
 hotkey, +<^>!Space,	PauseToggle, on
 hotkey,  <^>!Space,	PauseToggle, on
-
+numpad_blacklist := "ahk_exe wmplayer.exe, ahk_exe firefox.exe"
 wm_allow()
 OnMessage(0x4a, "Receive_WM_COPYDATA") ; 0x4a is WM_COPYDATA
 
 if !(fileexist(c0nda))
 	ANACONDA := False
 
-Start:
 process exist, ahk_exe WMPlayer.exe
 if Errorlevel 
 	run,% "C:\Program Files\Windows Media Player\WMPlayer.exe"
-regWrite, REG_DWORD,% (hkcuWMPprefs := "HKEY_CURRENT_USER\Software\Microsoft\MediaPlayer\Preferences"),% "Volume",% "1"
+run,%	  "WMP_colour_controls_test.ahk"
 
-run,%	"WMP_colour_controls_test.ahk"
 WMP 		:= 	new RemoteWMP
 Media 		:= 	WMP.player.currentMedia
 oldsong 	:= 	Media.sourceURL
@@ -69,12 +67,12 @@ onexit() {
 	WMP 	:= Delete RemoteWMP
 	WMP2 	:= Delete RemoteWMP
 	WMP2del	:= Delete RemoteWMP
-	if (fileexist(extract_data_Concat)) {
-		fileDelete, %extract_data_Concat%
-		msgbox post gasm shame`nfound concat whilst cleaning up
+	if (fileexist(xtractData_Cc)) {
+		fileDelete, %xtractData_Cc%
+		msgbox,% "post gasm shame found`ncleaning up."
 }	}
 
-return
+return,
 
 Cutcurrent:
 Path2File 	:= 	Media.sourceURL
@@ -87,17 +85,17 @@ if (InvokeVerb(Path2File, "Cut")) {
 menu, tray, Icon, % "copy.ico"
 Monster_Clip  :=  clipboard
 settimer, Clip_Commander, -1000
-return
+return,
 
 playy:
 WMP.player.Controls.play()
-return
+return,
 
 PauseToggle:
 if !WMP
 	wmp  :=  new remotewmp
 WMP.togglePause()
-return
+return,
 
 JumpPrev:
 ;cur_ := "AniCur_Pink"
@@ -119,11 +117,11 @@ if (NewSong = oldsong) {
 	sleep, 100
 	gosub, thecall2
 } else {
-	WMP.jump(StartPos_Offset)
+	WMP.jump(Offset_Start)
 	sleep, 200
 	WMP.player.Controls.play()
 }
-return
+return,
 
 /* 
 youtube_next:
@@ -135,45 +133,61 @@ settimer, PlayPstateUpdateInterval, off
 Real_pos := False, genre := "", gnr := "",	NewSong	:= ""
 if !WMP
 	WMP	:= 	new RemoteWMP
-Controls.Stop()
-sleep 20
-Controls.Next()
-sleep 20
-WMP.jump(StartPos_Offset)
-sleep 50
-WMP.player.Controls.play()
-return
-
-Precom_pair:
-;cur_ := "AniCur_bfly"
-;settimer, AniCur_, -200, -2147483648
+stry1:
 try
-	NewSong  :=  WMP.player.currentMedia.sourceURL
-catch 
-{
-	sleep 350
-	gosub Precom_pair
+	Controls.Stop()
+catch {
+	sleep, 200
+	goto,  stry1
 }
-iD3full  :=  iD3_StringGet2(NewSong)
+snext1:
+try
+	Controls.Next()
+catch {
+	sleep, 200
+	goto,  snext1
+}
+jmptry1:
+try
+	WMP.jump(Offset_Start)
+catch {
+	sleep, 200
+	goto,  jmptry1
+}
+plytry1:
+try
+	WMP.player.Controls.play()
+catch {
+	sleep, 200
+	goto,  plytry1
+}
+Precumpair: ;cur_ := "AniCur_bfly" 
+try ;settimer, AniCur_, -200, -2147483648
+	NewSong := WMP.player.currentMedia.sourceURL
+catch {
+	sleep, 350
+	gosub, Precumpair
+}
+iD3full := iD3_StringGet2(NewSong)
 
 thecall1:
 sleep, 50
 if (NewSong == oldsong) {
-	faggottry 	:= 	True
+	f_Htry 	:= 	True
 	if !tries
 		tries 	:= 	1
 	else {
 		tries 	:= 	tries + 1
-		tooltip % "trying " tries
-		settimer, tooloff, -1000
+		tooltip %   "trying " tries
+		settimer,   tooloff, -1000
 	}
-	if (tries < 5) {
-		sleep 300
-		goto Precom_pair
+	if (tries   <   5) {
+		sleep, 300
+		goto,  Precumpair
 	}
-	else return
+	else return,
 } else {
-	faggottry 	:= 	false
+	f_Htry 	:= 	false
 	iD3full 	:= 	iD3_StringGet2(NewSong)
 	NewSong := oldsong
 	real_pos 	:= 	getpos() 
@@ -189,7 +203,7 @@ if (NewSong == oldsong) {
 		goto POST_GASM
 }	}
 
-return
+return,
 
 CopySearchSlSk:
 WMP			:= new RemoteWMP
@@ -210,15 +224,15 @@ else {
 	mouseGetPos, orig_x, orig_y
 	BlockInput, On
 	mouseMove, 145, 90,
-	send {LButton}		
-	send % (Stripped_Name := RegExReplace(2nd, Needle3, " "))
-	send {Enter}
-	mouseMove 1787, 218
-	send {LButton}
+	send, {LButton}		
+	send, % (Stripped_Name := RegExReplace(2nd, Needle3, " "))
+	send, {Enter}
+	mouseMove, 1787, 218
+	send, {LButton}
 	mouseMove, orig_x, orig_y, 
 	BlockInput, Off
 }
-return
+return,
 
 SearchYT:
 SplitPath,  %  (UNC := 	(((New RemoteWMP).Player.CurrentMedia).SourceURL)),,,, Name
@@ -228,7 +242,7 @@ name 				:= 	RegExReplace(name, 	"i)\-" , 	" ")
 Stripped_Name 		:= 	RegExReplace(2nd, 	Needle3, 	" ")
 ytsearchstn 		:= 	""" " . Stripped_Name . " """ 
 Run, % ( "firefox.exe -new-tab " . ( ytsearchstr . ytsearchstn ) )
-return
+return,
 
 SearchExplorer:
 gosub, WMP_Refresh_2
@@ -238,16 +252,15 @@ FullPath=%NewSong%
 SplitPath, FullPath, , , , OutNameNoExt
 1st := regExReplace(OutNameNoExt,Needle4, " ")
 2nd := regExReplace(1st,Needle2, " ")
-run explorer.exe %Search_Root%
-
+run, explorer.exe %Search_Root%
 winWaitActive, ahk_exe explorer.exe, , 5
 sleep, 1000
-sendinput ^f
+send,{ctrl}{f}
 sleep, 1500
-send % Stripped_Name := RegExReplace(2nd, "( . )|(^[a-z][\s])|( )|( )|( )|[.]", " ")
+send,% Stripped_Name := RegExReplace(2nd, "( . )|(^[a-z][\s])|( )|( )|( )|[.]", " ")
 sleep, 500
-sendinput {enter}
-return
+send, {enter}
+return,
 
 Genre_Search:
 p 		:= 	1, Matched_String := "",	genre := ""
@@ -259,46 +272,50 @@ gnr		:= 	od.getdetailsof(of,16) ; genre
 while p := 	RegExMatch(NewSong, Genres, Matched_String, p + StrLen(Matched_String)) {
 	switch Matched_String {
 		case "dnb":
-			StartPos_Offset:=86,   p:=999, Genre:="dnb", 	Search_Root:="S:\- DNB"
+			Offset_Start:=86,   p:=999, Genre:="dnb", 	Search_Root:="S:\- DNB"
+		case "Drum & Bass":
+			Offset_Start:=86,   p:=999, Genre:="dnb", 	Search_Root:="S:\- DNB"
 		case "reggae":
-			StartPos_Offset:=11.5, p:=999, Genre:="reggae", Search_Root:="S:\- REGGAE"
+			Offset_Start:=11.5, p:=999, Genre:="reggae", Search_Root:="S:\- REGGAE"
+		case "rocksteady":
+			Offset_Start:=11.5, p:=999, Genre:="reggae", Search_Root:="S:\- REGGAE"
 		case "riddim":
-			StartPos_Offset:=11.5, p:=999, Genre:="riddim", Search_Root:="S:\- REGGAE"
+			Offset_Start:=11.5, p:=999, Genre:="riddim", Search_Root:="S:\- REGGAE"
 		case "hiphop":
-			StartPos_Offset:=17,   p:=999, Genre:="hiphop", Search_Root:="S:\- HIPHOP"
+			Offset_Start:=17,   p:=999, Genre:="hiphop", Search_Root:="S:\- HIPHOP"
 		case "garage":             
-			StartPos_Offset:=45,   p:=999, Genre:="garage", Search_Root:="S:\- - MP3 -\Garage"
+			Offset_Start:=45,   p:=999, Genre:="garage", Search_Root:="S:\- - MP3 -\Garage"
 		case "rock":               
-			StartPos_Offset:=17,   p:=999, Genre:="rock", 	Search_Root:="S:\- - MP3 -\- Other\Rock"
+			Offset_Start:=17,   p:=999, Genre:="rock", 	Search_Root:="S:\- - MP3 -\- Other\Rock"
 		case "ambient":            
-			StartPos_Offset:=30,   p:=999, Genre:="ambient", Search_Root:="S:\- - MP3 -\Chill"
+			Offset_Start:=30,   p:=999, Genre:="ambient", Search_Root:="S:\- - MP3 -\Chill"
 		case "samples":
-			StartPos_Offset:=0,    p:=999, Genre:="samples", Search_Root:="S:\Samples"
+			Offset_Start:=0,    p:=999, Genre:="samples", Search_Root:="S:\Samples"
 		case "my music":           
-			StartPos_Offset:=0,    p:=999, Genre:="my music", Search_Root:="S:\Documents\My Music"
+			Offset_Start:=0,    p:=999, Genre:="my music", Search_Root:="S:\Documents\My Music"
 		case "audiobooks":         
-			StartPos_Offset:=0,    p:=999, Genre:="audiobooks", Search_Root:="S:\Documents\My Audio"
+			Offset_Start:=0,    p:=999, Genre:="audiobooks", Search_Root:="S:\Documents\My Audio"
 		case "_SLSK_":
-			StartPos_Offset:=45,   p:=999, Genre:="sLSk"
+			Offset_Start:=45,   p:=999, Genre:="sLSk"
 		case "FOAD":
-			StartPos_Offset:=0,    p:=999, Genre:=""
+			Offset_Start:=0,    p:=999, Genre:=""
 	}
 	if (gnr="dnb") || (gnr="drum & bass") || (gnr="drum&bass") || (gnr="drum n bass") 
-		StartPos_Offset:=86, p:=999, Genre:="dnb", Search_Root:="S:\- DNB", 					faggot	:=	1
+		Offset_Start:=86, p:=999, Genre:="dnb", Search_Root:="S:\- DNB",                    f_H	:=	1
 	else if (gnr="Reggae") || (gnr="Dancehall") || (gnr="Ragge") || (gnr="Riddim") 		
-		StartPos_Offset:=11.5, p:=999, Genre:="reggae", Search_Root:="S:\- REGGAE", 			faggot	:=	1
+		Offset_Start:=11.5, p:=999, Genre:="reggae", Search_Root:="S:\- REGGAE",            f_H	:=	1
 	else if (gnr="Hip-Hop") || (gnr="HipHop") || (gnr="Rap") || (gnr="Gangster Rap") 		
-		StartPos_Offset:=17, p:=999, Genre:="hiphop", Search_Root:="S:\- HIPHOP", 				faggot	:=	1
+		Offset_Start:=17, p:=999, Genre:="hiphop", Search_Root:="S:\- HIPHOP",              f_H	:=	1
 	else if (gnr="Garage") || (gnr="2 Step") || (gnr="Bassline")		
-		StartPos_Offset:=45, p:=999, Genre:="garage", Search_Root:="S:\- - MP3 -\Garage", 		faggot	:=	1
+		Offset_Start:=45, p:=999, Genre:="garage", Search_Root:="S:\- - MP3 -\Garage",      f_H	:=	1
 	else if (gnr="Rock") || (gnr="Rock n Roll") || (gnr="Metal")		
-		StartPos_Offset:=17, p:=999, Genre:="rock", Search_Root:="S:\- - MP3 -\- Other\Rock", 	faggot	:=	1
+		Offset_Start:=17, p:=999, Genre:="rock", Search_Root:="S:\- - MP3 -\- Other\Rock",  f_H	:=	1
 	else if (gnr="Ambient") || (gnr="Chill Out")		
-		StartPos_Offset:=30, p:=999, Genre:="ambient", Search_Root:="S:\- - MP3 -\Chill", 		faggot	:=	1
+		Offset_Start:=30, p:=999, Genre:="ambient", Search_Root:="S:\- - MP3 -\Chill",      f_H	:=	1
 	else if (gnr="Spoken Word") || (gnr="Audiobook")		
-		StartPos_Offset:=0, p:=999, Genre:="audiobooks", Search_Root:="S:\Documents\My Audio", 	faggot	:=	1
+		Offset_Start:=0, p:=999, Genre:="audiobooks", Search_Root:="S:\Documents\My Audio", f_H	:=	1
 	}	
-return
+return,
 
 iD3_StringGet(tune="") {
 	SplitPath,tune,file,directory,ext
@@ -310,8 +327,8 @@ iD3_StringGet(tune="") {
 	gnr		:= 	oo.getdetailsof(of,16) ; genre
 	titL 	:=	oo.getdetailsof(of,21)
 	if (!rtist || !titL)
-		return False
-	return % (rtist . " - " . titL)
+		return, False
+	return, % (rtist . " - " . titL)
 }
 iD3_StringGet2(tune="") {
 	SplitPath,tune,file,directory,ext
@@ -323,8 +340,8 @@ iD3_StringGet2(tune="") {
 	gnr		:= 	oo.getdetailsof(of,16) ; genre
 	titL 	:=	oo.getdetailsof(of,21)
 	if (!rtist || !titL)
-		return False
-	return % (titL . " - " . rtist)
+		return, False
+	return, % (titL . " - " . rtist)
 }
 
 iD3_Artist(tune="") {
@@ -335,8 +352,8 @@ iD3_Artist(tune="") {
 	of		:= 	oo.parsename(file)
 	rtist 	:=	oo.getdetailsof(of,13)
 	if !rtist
-		return False
-	return rtist
+		return, False
+	return, rtist
 }
 
 iD3_Track(tune="") {
@@ -347,14 +364,13 @@ iD3_Track(tune="") {
 	of		:= 	oo.parsename(file)
 	titL 	:=	oo.getdetailsof(of,21)
 	if !titL
-		return False
-	return titL
+		return, False
+	return, titL
 }
 
 WMP_Refresh: 
-if !WMP {
+if !WMP
 	WMP 	:= new RemoteWMP
-}
 try
 	Media	:= WMP.player.currentMedia
 catch
@@ -364,12 +380,11 @@ try
 	:= WMP.player.Controls
 catch
 	sleep, 100
-return
+return,
 
 WMP_Refresh_2:
-if !WMP {
+if !WMP
 	WMP 	:= new RemoteWMP
-}
 sleep, 		100
 gosub, 		WMP_refresh
 sleep, 		100
@@ -377,7 +392,7 @@ NewSong 	=% 		WMP.player.currentMedia.sourceURL
 id3Art 		:= 	iD3_Artist(NewSong)
 id3Ttl  	:= 	iD3_Track(NewSong)
 sleep, 		100
-return
+return,
 
 DelCurrent: 
 Cur_ := "AniCur_Munch"
@@ -389,7 +404,7 @@ if Media2del
 
 process, Exist, WMPlayer.exe
 settimer, Del_0, -300
-return
+return,
 
 Del_0:
 Media2del 	:= 	WMP2del.player.currentMedia
@@ -404,7 +419,7 @@ settimer, 	Nowplayinglist_delcurrent, -1
 ;goSub, 	JumpNext
 settimer, 	JumpNext, -200
 setTimer, 	DELETE_, -700	
-return
+return,
 
 DELETE_:
 if FileExist(File2Del) {
@@ -436,7 +451,7 @@ if !(exist := FileExist(File2Del)) {
 	sleep, 		222
 	gosub, 		cleanup
 	gosub, 		WMP_refresh
-	return
+	return,
 } else {
 	retries := 	retries + 1
 	if (retries > 25) {
@@ -448,29 +463,29 @@ if !(exist := FileExist(File2Del)) {
 		sleep, 	400
 		goto, 	DELETE_
 }	}
-return
+return,
 
 cleanup:
-retries := 1
-File2Del :=""
-Media2del := 
-exist :=
-WMP2del := Delete RemoteWMP
+retries   :=  1
+File2Del  :=  ""
+Media2del :=  ""
+exist     :=  ""
+WMP2del   :=  Delete RemoteWMP
 tooltip,
-return
+return,
 
 add2Playlist:
-WMP := new RemoteWMP
-sleep, 20
-Media := WMP.player.currentMedia
-Controls := WMP.player.Controls
-sleep, 20
-FullPath:=Media.sourceurl
-sleep, 20
+WMP       :=  new RemoteWMP
+sleep,        20
+Media     :=  WMP.player.currentMedia
+Controls  :=  WMP.player.Controls
+sleep,        20
+FullPath  :=  Media.sourceurl
+sleep,        20
 if fileexist("New_Playlist.m3u") {
 	if !fileexist Playlist.m3u
 		fileMove New_Playlist.m3u, Playlist.m3u
-	else
+	else, 
 		try {
 			if !fileexist(Playlist%p_Item%.m3u)
 				fileMove New_Playlist.m3u, Playlist%p_Item%.m3u
@@ -478,26 +493,23 @@ if fileexist("New_Playlist.m3u") {
 			p_Item := p_Item+1
 			SLEEP, 80
 		}
-} else {
-	FileAppend %fullpath%`n, New_Playlist.m3u
-}
-return
+} else,	FileAppend %fullpath%`n, New_Playlist.m3u
+return,
 
 Dr:
 SecsDuration := (round(media.getItemInfo("Duration")))
-Sample_Duration_min := (Floor(SecsDuration/60))
-if Sample_Duration_Hr := (Floor(Sample_Duration_min/60))
-	Sample_Duration_min := Sample_Duration_min-(Sample_Duration_Hr*60)
-Sample_Duration_Sec := (SecsDuration-(Sample_Duration_min*60))
+Sample_Duration_min  := (Floor(SecsDuration/60))
+if Sample_Duration_Hr:= (Floor(Sample_Duration_min/60))
+	  Sample_Duration_min := Sample_Duration_min-(Sample_Duration_Hr*60)
+Sample_Duration_Sec  := (SecsDuration-(Sample_Duration_min*60))
 Output_Duration=%Sample_Duration_Hr%:%Sample_Duration_min%:%Sample_Duration_Sec%
 if !Split
-	extract_data_1=%OutDir%\%OutNameNoExt% - Extract.%OutExtension%
+	  extract_data_1  =  %OutDir%\%OutNameNoExt% - Extract.%OutExtension%
 else
-	extract_data_1=%OutDir%\%OutNameNoExt% - 1st half.%OutExtension%
-if instr(OutNameNoExt, "Trimmed")
-	Output_FullUnc=%OutDir%\%OutNameNoExt%.%OutExtension%
-else
-	Output_FullUnc=%OutDir%\%OutNameNoExt% - Trimmed.%OutExtension%
+	  extract_data_1  =  %OutDir%\%OutNameNoExt% - 1st half.%OutExtension%
+if instr(OutNameNoExt,   "Trimmed")
+	  Output_FullUnc  =  %OutDir%\%OutNameNoExt%.%OutExtension%
+else, Output_FullUnc  =  %OutDir%\%OutNameNoExt% - Trimmed.%OutExtension%
 	fileGetTime, Old_D8, %FullPath%, m
 ; if errorlevel
 	; msgbox error
@@ -511,14 +523,14 @@ if !trim2end {
 	run, %comspec% /c ffmpeg -i "%FullPath%" -ss %extract_endtime% -to %Output_Duration% -c:v copy -c:a copy "%extract_data_2%",,hide
 	if Split
 		goto Check_Output2
-	FileAppend , file '%extract_data_1%'`n, %extract_data_Concat%
-	FileAppend , file '%extract_data_2%'`n, %extract_data_Concat%
+	FileAppend , file '%extract_data_1%'`n, %xtractData_Cc%
+	FileAppend , file '%extract_data_2%'`n, %xtractData_Cc%
 	sleep, % S
 	msgbox spunkl
-	runWait, %comspec% /c ffmpeg -y -f concat -safe 0 -i "%extract_data_Concat%" -c copy "%Output_FullUnc%",,hidden
+	runWait, %comspec% /c ffmpeg -y -f concat -safe 0 -i "%xtractData_Cc%" -c copy "%Output_FullUnc%",,hidden
 	fileDelete, %extract_data_1%
 	fileDelete, %extract_data_2%
-	fileDelete, %extract_data_Concat%			;FileRecycle, %FullPath%
+	fileDelete, %xtractData_Cc%			;FileRecycle, %FullPath%
 }
 else Output_FullUnc := extract_data_1
 loop {
@@ -538,7 +550,7 @@ if PreserveFileDate
 if replaceoriginal 
 	fileRecycle, %FullPath%	;Output_FullUnc := FullPath
 settimer, check_3, -2000
-return
+return,
 
 check_3:
 if !fileExist(FullPath) {
@@ -550,14 +562,14 @@ if !fileExist(FullPath) {
 		tried := tried+1
 	goto Check_Output2
 }
-return
+return,
 
 Clip_Commander:
 if (clipboard!=Monster_Clip) {
 	settimer, Clip_Commander, off
 	menu, tray, Icon, WMP.ico
 }
-return
+return,
 
 class RemoteWMP {
 	__New() {
@@ -575,7 +587,7 @@ class RemoteWMP {
 	}
  	__Delete() {
 		if !this.player
-			return
+			return,
 		DllCall(NumGet(NumGet(this.ole+0)+3*A_PtrSize), "Ptr", this.ole, "Ptr", 0)
 		for k, obj in [this.ole, this.ocs, this.rms]
 			ObjRelease(obj)
@@ -586,8 +598,7 @@ class RemoteWMP {
 			this.player.Controls.currentPosition += sec
 		} catch {
 			sleep, 50
-		}
-	}
+	}	}
 	
  	TogglePause() {
 		trigger_PL 	:= False
@@ -741,7 +752,7 @@ IWMPRemoteMediaServices_CreateInstance() {
 		 NumPut(off, pObj+0, off + A_PtrSize, "UInt")
 	}
 	 NumPut(1, pObj+0, size - 4, "UInt")
-	 return pObj
+	 return, pObj
 }
 
 IUnknown_QueryInterface(this_, riid, ppvObject) {
@@ -758,39 +769,39 @@ IUnknown_QueryInterface(this_, riid, ppvObject) {
 		off := NumGet(this_+0, A_PtrSize, "UInt")
 		NumPut(this_ - off, ppvObject+0, "Ptr")
 		IUnknown_addRef(this_)
-		return 0 ; S_OK
+		return, 0 ; S_OK
  }
 
  if DllCall("ole32\IsEqualGUID", "Ptr", riid, "Ptr", &IID_IWMPRemoteMediaServices) {
 		off := NumGet(this_+0, A_PtrSize, "UInt")
 		NumPut((this_ - off)+(A_PtrSize + 4), ppvObject+0, "Ptr")
 		IUnknown_addRef(this_)
-		return 0 ; S_OK
+		return, 0 ; S_OK
  }
 
  if DllCall("ole32\IsEqualGUID", "Ptr", riid, "Ptr", &IID_IServiceProvider) {
  off := NumGet(this_+0, A_PtrSize, "UInt")
  NumPut((this_ - off)+((A_PtrSize + 4)*2), ppvObject+0, "Ptr")
  IUnknown_addRef(this_)
- return 0 ; S_OK
+ return, 0 ; S_OK
  }
 
  if DllCall("ole32\IsEqualGUID", "Ptr", riid, "Ptr", &IID_IOleClientSite) {
  off := NumGet(this_+0, A_PtrSize, "UInt")
  NumPut((this_ - off)+((A_PtrSize + 4)*3), ppvObject+0, "Ptr")
  IUnknown_addRef(this_)
- return 0 ; S_OK
+ return, 0 ; S_OK
  }
 
  NumPut(0, ppvObject+0, "Ptr")
- return 0x80004002 ; E_NOINTERFACE
+ return, 0x80004002 ; E_NOINTERFACE
 }
 
 IUnknown_addRef(this_) {
 	off := NumGet(this_+0, A_PtrSize, "UInt")
 	iunk := this_-off
 	NumPut((_refCount := NumGet(iunk+0, (A_PtrSize + 4)*4, "UInt") + 1), iunk+0, (A_PtrSize + 4)*4, "UInt")
-	return _refCount
+	return, _refCount
 }
 
 IUnknown_Release(this_) {
@@ -802,26 +813,26 @@ IUnknown_Release(this_) {
 	if (_refCount == 0)
 	DllCall("GlobalFree", "Ptr", iunk, "Ptr")
 	}
-	return _refCount
+	return, _refCount
 }
 
 IWMPRemoteMediaServices_GetServiceType(this_, pbstrType) {
  NumPut(DllCall("oleaut32\SysAllocString", "WStr", "Remote", "Ptr"), pbstrType+0, "Ptr")
- return 0
+ return, 0
 }
 
 IWMPRemoteMediaServices_GetScriptableObject(this_, pbstrName, ppDispatch) {
- return 0x80004001
+ return, 0x80004001
 }
 
 IWMPRemoteMediaServices_GetCustomUIMode(this_, pbstrFile) {
- return 0x80004001
+ return, 0x80004001
 }
 
 IServiceProvider_QueryService(this_, guidService, riid, ppvObject) {
- return IUnknown_QueryInterface(this_, riid, ppvObject)
+ return, IUnknown_QueryInterface(this_, riid, ppvObject)
 }
-return
+return,
 
 InvokeVerb(path, menu, validate=True) {
 	objShell := ComObjCreate("Shell.Application")
@@ -841,14 +852,14 @@ InvokeVerb(path, menu, validate=True) {
 			StringReplace, retmenu, retmenu, & 
 			if (retmenu = menu) {
 				verb.DoIt
-				return True
+				return, True
 		}	}
-		return False
+		return, False
 	} else objFolderItem.InvokeVerbEx(menu)
 } 
 
 AppVolume(app:="", device:="") {
-	return new AppVolume(app, device)
+	return, new AppVolume(app, device)
 }
 
 class AppVolume {
@@ -856,7 +867,7 @@ class AppVolume {
 	__New(app:="", device:="") {
 		static		IID_IASM2 := "{77AA99A0-1BD6-484F-8BC7-2C654C9A9B6F}"
 				, 	IID_IASC2 := "{BFB7FF88-7239-4FC9-8FA2-07C950BE9C6D}"
-				, 	IID_ISAV := "{87CE5498-68D6-44E5-9215-6DA47EF883D8}"
+				, 	IID_ISAV  := "{87CE5498-68D6-44E5-9215-6DA47EF883D8}"
 		
 		; Activate the session manager of the given device
 		pIMMD := VA_GetDevice(device)
@@ -893,14 +904,14 @@ class AppVolume {
 	}
 	
 	AdjustVolume(Amount) {
-		return this.SetVolume(this.GetVolume() + Amount)
+		return, this.SetVolume(this.GetVolume() + Amount)
 	}
 	
 	GetVolume() {
 		for k, pISAV in this.ISAVs
 		{
 			VA_ISimpleAudioVolume_GetMasterVolume(pISAV, fLevel)
-			return fLevel * 100
+			return, fLevel * 100
 		}
 	}
 	
@@ -908,72 +919,70 @@ class AppVolume {
 		level := level>100 ? 100 : level<0 ? 0 : level ; Limit to range 0-100
 		for k, pISAV in this.ISAVs
 			VA_ISimpleAudioVolume_SetMasterVolume(pISAV, level / 100)
-		return level
+		return, level
 	}
 	
 	GetMute() {
 		for k, pISAV in this.ISAVs
 		{
 			VA_ISimpleAudioVolume_GetMute(pISAV, bMute)
-			return bMute
-		}
-	}
+			return, bMute
+	}	}
 	
 	SetMute(bMute) {
 		for k, pISAV in this.ISAVs
 			VA_ISimpleAudioVolume_SetMute(pISAV, bMute)
-		return bMute
+		return, bMute
 	}
 	
 	ToggleMute() {
-		return this.SetMute(!this.GetMute())
+		return, this.SetMute(!this.GetMute())
 	}
 	
 	GetprocessName(PID) {
-		hprocess := DllCall("Openprocess"
+		hprocess := DllCall( "Openprocess"
 			, "UInt", 0x1000 ; DWORD dwDesiredAccess (process_QUERY_LIMITED_INFORMATION)
 			, "UInt", False ; BOOL bInheritHandle
 			, "UInt", PID ; DWORD dwprocessId
-			, "UPtr")
+			, "UPtr" )
 		dwSize := VarSetCapacity(strExeName, 512 * A_IsUnicode, 0) // A_IsUnicode
-		DllCall(	"QueryFullprocessImageName"
+		DllCall( "QueryFullprocessImageName"
 			,"UPtr", hprocess ; HANDLE hprocess
 			,"UInt", 0 ; DWORD dwFlags
 			,"Str", strExeName ; LPSTR lpExeName
 			,"UInt*", dwSize ; PDWORD lpdwSize
-			,"UInt")
-		DllCall("CloseHandle", "UPtr", hprocess, "UInt")
+			,"UInt" )
+		DllCall( "CloseHandle", "UPtr", hprocess, "UInt" )
 		SplitPath, strExeName, strExeName
-		return strExeName
-	}
-}
+		return, strExeName
+}	}
+
 ; --- V A additions ---
 ; ISimpleAudioVolume : {87CE5498-68D6-44E5-9215-6DA47EF883D8}
 VA_ISimpleAudioVolume_SetMasterVolume(this, ByRef fLevel, GuidEventContext="") {
-	return DllCall(NumGet(NumGet(this+0)+3*A_PtrSize), "ptr", this, "float", fLevel, "ptr", VA_GUID(GuidEventContext))
+	return, DllCall(NumGet(NumGet(this+0)+3*A_PtrSize), "ptr", this, "float", fLevel, "ptr", VA_GUID(GuidEventContext))
 }
 VA_ISimpleAudioVolume_GetMasterVolume(this, ByRef fLevel) {
-	return DllCall(NumGet(NumGet(this+0)+4*A_PtrSize), "ptr", this, "float*", fLevel)
+	return, DllCall(NumGet(NumGet(this+0)+4*A_PtrSize), "ptr", this, "float*", fLevel)
 }
 VA_ISimpleAudioVolume_SetMute(this, ByRef Muted, GuidEventContext="") {
-	return DllCall(NumGet(NumGet(this+0)+5*A_PtrSize), "ptr", this, "int", Muted, "ptr", VA_GUID(GuidEventContext))
+	return, DllCall(NumGet(NumGet(this+0)+5*A_PtrSize), "ptr", this, "int", Muted, "ptr", VA_GUID(GuidEventContext))
 }
 VA_ISimpleAudioVolume_GetMute(this, ByRef Muted) {
-	return DllCall(NumGet(NumGet(this+0)+6*A_PtrSize), "ptr", this, "int*", Muted)
+	return, DllCall(NumGet(NumGet(this+0)+6*A_PtrSize), "ptr", this, "int*", Muted)
 }
 
 SetAcrylic(thisColor, thisAlpha, hWnd) {
 	Static init, accent_state := 4,
 	Static pad := A_PtrSize = 8 ? 4 : 0, WCA_ACCENT_POLICY := 19
 	NumPut(accent_state, ACCENT_POLICY, 0, "int")
-	NumPut(0x11402200, ACCENT_POLICY, 8, "int")
+	NumPut(0xff4022ff, ACCENT_POLICY, 8, "int")
 	VarSetCapacity(WINCOMPATTRDATA, 4 + pad + A_PtrSize + 4 + pad, 0)
 	&& NumPut(WCA_ACCENT_POLICY, WINCOMPATTRDATA, 0, "int")
 	&& NumPut(&ACCENT_POLICY, WINCOMPATTRDATA, 4 + pad, "ptr")
-	&& NumPut(64, WINCOMPATTRDATA, 4 + pad + A_PtrSize, "uint")
+	&& NumPut(128, WINCOMPATTRDATA, 4 + pad + A_PtrSize, "uint")
 	if !(DllCall("user32\SetWindowCompositionAttribute", "ptr", hWnd, "ptr", &WINCOMPATTRDATA))
-		return
-	accent_size := VarSetCapacity(ACCENT_POLICY, 16, 0)
+		return,
 }
 
 Receive_WM_COPYDATA(wParam, lParam) {
@@ -1015,7 +1024,7 @@ run %COMSPEC% /c explorer.exe /select`, "%UNC%",, Hide
 sleep, %S%
 sendInput {F5}
 UNC:="", 1st:="", 2nd:=""
-return
+return,
 
 xtractmenu_open:
 if !Secs2Sample_Start {
@@ -1023,20 +1032,26 @@ if !Secs2Sample_Start {
 	msgbox undefined region
 }
 settimer, GUI_, -1
-return
+return,
  
 FIXW:
 if !hundle 
 	hundle 	:=	gethandle()
 sleep, 500
-SetAcrylic(bgrColor, 17, ahk_id %hundle%)
-tooltip % "Opacity tempfix applied`nfuck off "
+s:=gethandle2("ToolbarWindow323") 
+			SendMessage 0x0454, 0, 0x00000089,, ahk_id %s% 	 ; TB_SETEXTENDEDSTYLE=0x0454 tbstyle_Ex_doublebuffer 0x80
+
+f:=gethandle2("ToolbarWindow324") 
+			SendMessage 0x0454, 0, 0x00000089,, ahk_id %f%
+;tooltip % "Opacity tempfix applied`nfuck off "
+SetAcrylic(0x000000, 255, ahk_id %hundle%)
+
 settimer, tooloff, -3000
-return
+return,
 
 SLsk_Rescue:
 run % SLsk_Rescue
-return
+return,
 
 Restart_WMP:
 WMP := new RemoteWMP
@@ -1056,7 +1071,7 @@ togl_numpad_i:
 if togl_numpad {
 	menu, tray, check, Disable Numpad
 	if !num_init_trigger {
-		num_init_trigger := true
+		num_init_trigger := True
 		loop 10 {
 			aa := (a_index-1)
 			Loop Parse, numpad_blacklist, `,
@@ -1064,7 +1079,7 @@ if togl_numpad {
 				Hotkey, IfWinActive, % A_LoopField
 				Hotkey, % "Numpad" . aa, zz
 				numpadkeys_str := (numpadkeys_str . "," . "Numpad" . aa)
-				numpadkeys_Arr.Push("Numpad" . aa)
+				NumPKeysArr.Push("Numpad" . aa)
 		}	}
 		Loop Parse, num_others, `,
 		{
@@ -1074,23 +1089,23 @@ if togl_numpad {
 				Hotkey, IfWinActive, % A_LoopField
 				Hotkey, % bb, zz
 				numpadkeys_str := (numpadkeys_str . "," . bb)
-				numpadkeys_Arr.Push(bb)	
+				NumPKeysArr.Push(bb)	
 		}	}
 	} else {
-		for index, element in numpadkeys_Arr
+		for index, element in NumPKeysArr
 			Hotkey, % element, zz
 	}
 } else {
 	menu, tray, uncheck, Disable Numpad
 	if !num_init_trigger {
-		num_init_trigger := true
+		num_init_trigger := True
 		loop 10 {
 			cc := (a_index-1)
 			Loop Parse, numpad_blacklist, `,
 				Hotkey, IfWinActive, % A_LoopField
 				Hotkey, % "Numpad" . cc, zz
 				numpadkeys_str := (numpadkeys_str . "," . "Numpad" . cc)
-				numpadkeys_Arr.Push("Numpad" . cc)
+				NumPKeysArr.Push("Numpad" . cc)
 		}
 		Loop Parse, num_others, `,
 		{
@@ -1098,13 +1113,13 @@ if togl_numpad {
 				Hotkey, IfWinActive, % A_LoopField
 				Hotkey, % A_LoopField, zz
 				numpadkeys_str := (numpadkeys_str . "," . A_LoopField)
-				numpadkeys_Arr.Push(A_LoopField)	
+				NumPKeysArr.Push(A_LoopField)	
 		}
 	} else {
-		for index, element in numpadkeys_Arr
+		for index, element in NumPKeysArr
 			Hotkey, %element%, off
 }	}
-return
+return,
 
 zz:
 TOOLTIP FGS
@@ -1116,13 +1131,13 @@ if (bt contains "^" &&  bt != $)
 if (bt contains "!" &&  bt != $)	
 	bt := strreplace(	bt, "!", "Alt + ")
 TT((bt . " Disabled.")) 
-return
+return,
 
 
 ZinOut: 				; 		midi in out script
 a = "C:\Program Files\AutoHotkey\AutoHotkeyU32.exe" "C:\Script\AHK\Z_MIDI_IN_OUT\z_in_out.ahk"
 run % a,,hide
-return
+return,
 
 PlayPstateUpdateInterval: 					; 		wip
 playstate	:=
@@ -1175,7 +1190,7 @@ if (playstate = 3) { ; Playing = 3
 			trayTip, % id3Art " - " id3Ttl, % "WMP Paused", 3, 33
 			menu, tray, Tip, % "Windows Media Player - Paused`n" newiD3full
 }	}	}
-return
+return,
 
 Icon_Alternate: ; if (A_TimeIdle < (420000 - 1000)) {
 if !IconAlternateEnabled && trigger_PL {
@@ -1194,15 +1209,15 @@ if !IconAlternateEnabled && trigger_PL {
 	} 
 	else settimer, Icon_Alternate, off
 }
-return
+return,
 
 CursorReset:
 DllCall("SystemParametersInfo", "uint", SPI_SetCurSORS := 0x57, "uint", 0, "ptr", 0, "uint", 0)
-return
+return,
 
 AniCur_:
 setcur(%cur_%)
-return
+return,
 
 SetCur(image_unc="") {
 	SetSystemCursor(image_unc)
@@ -1226,9 +1241,11 @@ real_pos 	:= 	getpos()
 POST_GASM:
 
 if !real_pos {
-	tooltip, % "error po fuckin s" ; init issue
+	cntt += 1
+	tooltip, % "e   p    o f in s" ; init issue
 	sleep, 500
-	goto Nowplayinglist_delcurrent
+	if cntt < 9
+		goto Nowplayinglist_delcurrent
 }
 	
 else {
@@ -1249,7 +1266,7 @@ else {
 		Pastenskip := False
 }
 Pstate("On")
-return
+return,
 
 pastenonext: 											; 	these are all lazy and almost the same work
 WMP8 		:= 	new RemoteWMP
@@ -1258,7 +1275,7 @@ pastenonext := 	True
 Media 		:= 	WMP8.player.currentMedia
 oldsong 	=% 	Media.sourceURL
 id3full2 	:= 	iD3_StringGet2(oldsong)
-return
+return,
 
 godie:		;		main delete entry point				; 	these are all lazy and almost the same work
 godie 		:= 	True
@@ -1278,7 +1295,7 @@ id3Ttl2  	:= 	iD3_Track(oldsong)
 id3full 	:= 	iD3_StringGet2(oldsong)N
 id3full3 	:= 	id3full
 goto jumpnext
-return
+return,
 
 gethandle() 	{
 	WinGet, LL, List, ahk_class WMP Skin Host 
@@ -1290,9 +1307,21 @@ gethandle() 	{
 		if (style = 0x16CF0000 && exstyle = 0x000C0100 ) {
 			ControlGet, hundl, Hwnd,, SysListView321, % "ahk_id " . va
 			if 	 !hundl
-				 return false
-			else return hundl		
+				 return, false
+			else return, hundl		
 }	}	}
+
+
+gethandle2(cname) 	{
+	WinGet, LL, List, ahk_class WMP Skin Host 
+	loop %LL% 	{
+		va := LL%a_index%
+				ControlGet, hundl, Hwnd,, %cname%, % "ahk_id " . va
+				}
+			if 	 !hundl
+				 return, false
+			else return, hundl		
+}	
 
 getpos() {
 	id3fullstr 		:= 	iD3_StringGet2(NewSong)
@@ -1314,9 +1343,17 @@ getpos() {
 	}	
 	WMP4 := 	delete remotewmp 
 	if	 !real_pos
-		 return false
-	else return real_pos
+		 return, false
+	else return, real_pos
 }
+
+#w::
+s:=gethandle2("ToolbarWindow323") 
+			postmessage, 0x0454, 0, 0x00000089,, ahk_id %s% 	 ; TB_SETEXTENDEDSTYLE=0x0454 tbstyle_Ex_doublebuffer 0x80
+tooltip % S
+f:=gethandle2("ToolbarWindow324") 
+			postMessage, 0x0454, 0, 0x00000089,, ahk_id %f%
+			return,
 init_menu:
 ; Iconz := []
 ; Iconz.Push(LoadPicture(a_scriptDir . "\WMP.ico"))
@@ -1359,127 +1396,103 @@ if togl_numpad
 		menu, tray, check, 		Disable Numpad
 else 	menu, tray, uncheck, 	Disable Numpad
 menu, 	tray, Standard
-return
+return,
 
 scpl:
 runwait %COMSPEC% /C %scpl%,, hide
-return
+return,
 
 varz:
-global 	DEBUGTT := TRUE
-global 	tt 		:= 500
-global 	togl_numpad := true
-global 	aa
-global 	bb
-global 	cc
-global 	hHeader
-global 	cur_
-global 	scpl
-global 	iconz 
-global 	godie 
-global 	pastenskip 
-global 	numpadkeys_str 
-;global 	PRE_GASM
-global 	Stat3
-global 	IconChangeInterval
-global 	PstateUpdateInterval
-global 	iD3full2 
-global 	num_init_trigger
-global 	pastenonext
-global 	iD3full
+global DBGTT, tt, togl_numpad, aa, bb, cc, hHeader, cur_, scpl, iconz, godie, pastenskip, numpadkeys_str, PRE_GASM, Stat3, IconChangeInterval, PstateUpdateInterval, iD3full2, num_init_trigger, pastenonext, iD3full, WinTitle, WMPConv, WMP2del, Media2del, trigger_pa, submittedok, wmplistnew, wmplist, PlayPstateUpdateInterval, hundle, real_pos, retries, tracklist, deletearr, NumPKeysArr, num_others, S, Play, Stop, Prev, Next, Pause, Vol_Up, Search_Root, Genre, Vol_Down, WMP, Media, Controls, File2Del, oldsong, playstate, NewSong, Path2File, path2paste, gnr, choice, Output_FullUnc, real_poswmplist, wmplistnewtracklist, godiepastenskip, WMP2del, Media, File2Del, Controls, oldsong, id3Art2, id3Ttl2, id3full, id3full3, id3full2, 
 
-global 	WinTitle
-global 	WMPConv
-global 	WMP2del
-global 	Media2del
-global 	trigger_pa
-global 	submittedok 
-global 	wmplistnew
-global 	wmplist
-global 	PlayPstateUpdateInterval
-global 	hundle
-global 	real_pos
-global 	retries 			:= 	1
-global 	tracklist 			:= 	[]
-global 	deletearr 			:= 	[]
-global 	numpadkeys_Arr 		:= 	[]
-global 	AutoScroll			:= 	False
-global 	On 					:= 	"On"
-global 	Off 				:= 	"Off"
-global 	trigger_PL 			:= 	False
-global 	tvmX 				:= 	0x112C
-global 	ic1					:= 	"WMP.ico"
-global 	ic2					:= 	"WMP2.ico"
-global 	splitstr 			:= 	"Split @ a)"	
-global 	del2endstr 			:= 	"Delete to end"
-myDoxdir 					:= 	"d:\Documents\"
-MyIconsdir 					:= 	myDoxdir . "My Pictures\Icons\"
-AniCurPrefix				:= 	( MyIconsdir . "- CuRS0R\_ ANi\" )
-global 	AniCur_fprint		:=	( AniCurPrefix . "MY_BUSY.ANI" )
-global 	AniCur_hand			:=	( AniCurPrefix . "HAND.ANI" )
-global 	AniCur_Munch		:=	( AniCurPrefix . "CY_04BUS.ANI" )
-global 	AniCur_Apple		:=	( AniCurPrefix . "APPLE.ANI" )
-global 	AniCur_banana		:=	( AniCurPrefix . "BANANA.ANI" )
-global 	AniCur_COFFEE		:=	( AniCurPrefix . "COFFEE.ANI" )
-global 	AniCur_Pink			:=	( AniCurPrefix . "OU.ani" )
-global 	AniCur_Pian			:=	( AniCurPrefix . "PIANO.ANI" )
-global 	AniCur_Mnote		:=	( AniCurPrefix . "JA_01NOR.ANI" )
-global 	AniCur_Vial			:=	( AniCurPrefix . "SC_WAIT.ANI" )
-global 	AniCur_swords		:=	( AniCurPrefix . "CS_01NOR.ANI" )
-global 	AniCur_cs			:=	( AniCurPrefix . "cursor_busy.ANI")
-global 	AniCur_city			:=	( AniCurPrefix . "CS_04BUS.ANI" )
-global 	AniCur_Cogs			:=	( AniCurPrefix . "MO_WAIT.ANI" )
-global 	AniCur_Clock		:=	( AniCurPrefix . "TR_BUSY.ANI" )
-global 	AniCur_StopWatch	:=	( AniCurPrefix . "WI_04BUS.ANI" )
-global 	AniCur_Shutter		:=	( AniCurPrefix . "CP_04BUS.ANI" )
-global 	AniCur_Camera		:=	( AniCurPrefix . "WO_04BUS.ANI" )
-global 	AniCur_prop			:=	( AniCurPrefix . "TR_WAIT.ANI" )
-global 	AniCur_TV			:=	( AniCurPrefix . "TV.ANI" )
-global 	AniCur_mon			:=	( AniCurPrefix . "PC_BUSY.ANI" )
-global 	AniCur_pingpong		:=	( AniCurPrefix . "SC_WAIT.ANI" )
-global 	AniCur_peace		:=	( AniCurPrefix . "SX_BUSY.ANI" )
-global 	AniCur_Plane		:=	( AniCurPrefix . "WO_01NOR.ANI" )
-global 	AniCur_pred			:=	( AniCurPrefix . "pred.ANI" )
-global 	AniCur_DINOSAUR		:=	( AniCurPrefix . "DINOSAUR.ANI" )
-global 	AniCur_horse		:=	( AniCurPrefix . "HORSE.ANI" )
-global 	AniCur_jellyf		:=	( AniCurPrefix . "DA_BUSY.ANI" )
-global 	AniCur_wasp			:=	( AniCurPrefix . "DA_WAIT.ANI" )
-global 	AniCur_roach		:=	( AniCurPrefix . "NA_BUSY.ANI" )
-global 	AniCur_bfly			:=	( AniCurPrefix . "bfly.ANI" )
-global 	AniCur_flower		:=	( AniCurPrefix . "NA_WAIT.ANI" )
-global 	AniCur_flowerz		:=	( AniCurPrefix . "SX_WAIT.ANI" )
-global 	AniCur_tree			:=	( AniCurPrefix . "FL_01NOR.ANI" )
-global 	AniCur_Frozen		:=	( AniCurPrefix . "froz.ANI" )
-global 	AniCur_Drip			:=	( AniCurPrefix . "DB_04BUS.ANI" )
-global 	AniCur_umbr			:=	( AniCurPrefix . "FA_01NOR.ANI" )
-global 	AniCur_sun			:=	( AniCurPrefix . "GA_04BUS.ANI" )
-global 	AniCur_1664			:=	( AniCurPrefix . "ALLSEEING.ANI" )
-global 	AniCur_plasmab		:=	( AniCurPrefix . "SC_BUSY.ANI" )
-global 	AniCur_pyra			:=	( AniCurPrefix . "GE_04BUS.ANI" )
-global 	AniCur_tri			:=	( AniCurPrefix . "GE_01NOR.ANI" )
-global 	AniCur_tric			:=	( AniCurPrefix . "RO_04BUS.ANI" )
-global 	AniCur_triG			:=	( AniCurPrefix . "AR_04BUS.ANI" )
-global 	AniCur_palette		:=	( AniCurPrefix . "DV_WAIT.ANI" )
-global 	AniCur_sheet		:=	( AniCurPrefix . "JA_04BUS.ANI" )
-global 	AniCur_lbolt		:=	( AniCurPrefix . "RO_01NOR.ANI" )
-global 	AniCur_wvain		:=	( AniCurPrefix . "PD_01NOR.ANI" )
-global 	AniCur_rocket		:=	( AniCurPrefix . "SF_01NOR.ANI" )
-global 	AniCur_orbit		:=	( AniCurPrefix . "SF_04BUS.ANI" )
-global 	AniCur_95busy1		:=	( AniCurPrefix . "WH_BUSY.ANI" )
-global 	AniCur_95busy2		:=	( AniCurPrefix . "WI_BUSY.ANI" )
-global 	c0nda 				:= 	("C:\Users\" . A_UserName . "\anaconda3")
-global  scpl 				:= 	(("" "C:\Windows\system32\rundll32.exe" "") . (" shell32.dll,Control_RunDLL mmsys.cpl,,playback"))
-global 	SLsk_Rescue 		:= 	"C:\Script\AHK\Z_MIDI_IN_OUT\slsk_rescue.ahk",
-global 	ytsearchstr			:= 	"https://www.youtube.com/results?search_query="
-global 	Needle3 			:= 	"( . )|(^[a-z][\s])|( )|( )|( )|[.]"
-global 	Needle2 			:= 	"i)(\s[a-z]{1,2}\s)"
-global 	WMP, global Media, global Controls, global File2Del, global oldsong, global playstate, global NewSong, global Path2File, global WMP2del, global Media2del, global path2paste, global gnr, global choice, global Output_FullUnc, global checkbox_Height := "h15", global Play := 0x2e0000, global Stop = 18809, global Prev = 18810, global Next = 18811, global Pause = 32808, global Vol_Up = 32815,  global Vol_Down = 32816 
-global StartPos_Offset := 4, global Search_Root := "", global Genre := ""
-global 	extract_data_Concat	:=	"c:\out\temp.txt" 
-global 	Needle4 			:=	"i)[1234567890.'`)}{(_]|(-khz)(rmx)|(remix)|(mix)|(refix)|(vip)|(featuring)|( feat)|(ft)|(rfl)|(-boss)(-sour)|(its)|(it's)|(-)|(-bpm)|(edit)" 
-global 	Genres				:=	"i)(dnb)|(reggae)|(riddim)|(hiphop)|(garage)|(rock)|(ambient)|(samples)|(my music)|(audiobooks)|(sLSk)|(FOAD)"
-global 	num_others := "NumLock,NumpadDiv,NumpadMult,NumpadAdd,NumpadSub,NumpadEnter,NumpadPgDn,NumpadEnd,NumpadHome,NumpadClear,NumpadDel,NumpadIns,NumpadUp,NumpadLeft,NumpadRight,NumpadDown"
+global myDoxdir, MyIconsdir, AniCurPrefix, AniCur_fprint, AniCur_hand, AniCur_Munch, AniCur_Apple, AniCur_banana, AniCur_COFFEE, AniCur_Pink, AniCur_Pian, AniCur_Mnote, AniCur_Vial, AniCur_swords, AniCur_cs, AniCur_city, AniCur_Cogs, AniCur_Clock, AniCur_StopWatch, AniCur_Shutter, AniCur_Camera, AniCur_prop, AniCur_TV, AniCur_mon, AniCur_pingpong, AniCur_peace, AniCur_Plane, AniCur_pred, AniCur_DINOSAUR, AniCur_horse, AniCur_jellyf, AniCur_wasp, AniCur_roach, AniCur_bfly, AniCur_flower, AniCur_flowerz, AniCur_tree, AniCur_Frozen, AniCur_Drip, AniCur_umbr, AniCur_sun, AniCur_1664, AniCur_plasmab, AniCur_pyra, AniCur_tri, AniCur_tric, AniCur_triG, AniCur_palette, AniCur_sheet, AniCur_lbolt, AniCur_wvain, AniCur_rocket, AniCur_orbit, AniCur_95busy1, AniCur_95busy2
 
-global 	S := 2000 ;; sleep, Time (ms)
-return
+togl_numpad :=  True
+DBGTT       :=  True
+S           :=  2000 ;; sleep, Time (ms)
+tt 		    :=  500
+CHKBX_H     :=  "h15"
+
+c0nda 		:=  ("C:\Users\" . A_UserName . "\anaconda3")
+scpl 		:=  (("" "C:\Windows\system32\rundll32.exe" "") . (" shell32.dll,Control_RunDLL mmsys.cpl,,playback"))
+SLsk_Rescue :=  "C:\Script\AHK\Z_MIDI_IN_OUT\slsk_rescue.ahk",
+ytsearchstr	:=  "https://www.youtube.com/results?search_query="
+Needle3 	:=  "( . )|(^[a-z][\s])|( )|( )|( )|[.]"
+Needle2 	:=  "i)(\s[a-z]{1,2}\s)"
+xtractData_Cc	:=	"c:\out\temp.txt" 
+Needle4     :=	"i)[1234567890.'`)}{(_]|(-khz)(rmx)|(remix)|(mix)|(refix)|(vip)|(featuring)|( feat)|(ft)|(rfl)|(-boss)(-sour)|(its)|(it's)|(-)|(-bpm)|(edit)" 
+Genres      :=	"i)(dnb)|(Drum & Bass)|(reggae)|(riddim)|(hiphop)|(garage)|(rock)|(ambient)|(samples)|(my music)|(audiobooks)|(sLSk)|(FOAD)"
+num_others  :=  "NumLock,NumpadDiv,NumpadMult,NumpadAdd,NumpadSub,NumpadEnter,NumpadPgDn,NumpadEnd,NumpadHome,NumpadClear,NumpadDel,NumpadIns,NumpadUp,NumpadLeft,NumpadRight,NumpadDown"
+tracklist 	:= 	[]
+deletearr 	:= 	[]
+NumPKeysArr := 	[]
+AutoScroll	:= 	False
+On 			:= 	"On"
+Off 		:= 	"Off"
+trigger_PL 	:= 	False
+tvmX 		:= 	0x112C
+ic1			:= 	"WMP.ico"
+ic2			:= 	"WMP2.ico"
+splitstr 	:= 	"Split @ a)"	
+del2endstr 	:= 	"Delete to end"
+Play := 0x2e0000, Stop := 18809, Prev := 18810, Next := 18811, Pause := 32808, Vol_Up := 32815, Vol_Down = 32816, Offset_Start := 4, retries := 1
+
+myDoxdir         :=  "d:\Documents\"
+MyIconsdir       :=  myDoxdir . "My Pictures\Icons\"
+AniCurPrefix     :=  ( MyIconsdir . "- CuRS0R\_ ANi\" )
+AniCur_fprint	 :=	 ( AniCurPrefix . "MY_BUSY.ANI" )
+AniCur_hand		 :=	 ( AniCurPrefix . "HAND.ANI" )
+AniCur_Munch	 :=	 ( AniCurPrefix . "CY_04BUS.ANI" )
+AniCur_Apple	 :=	 ( AniCurPrefix . "APPLE.ANI" )
+AniCur_banana	 :=	 ( AniCurPrefix . "BANANA.ANI" )
+AniCur_COFFEE	 :=	 ( AniCurPrefix . "COFFEE.ANI" )
+AniCur_Pink		 :=	 ( AniCurPrefix . "OU.ani" )
+AniCur_Pian		 :=	 ( AniCurPrefix . "PIANO.ANI" )
+AniCur_Mnote	 :=	 ( AniCurPrefix . "JA_01NOR.ANI" )
+AniCur_Vial		 :=	 ( AniCurPrefix . "SC_WAIT.ANI" )
+AniCur_swords	 :=	 ( AniCurPrefix . "CS_01NOR.ANI" )
+AniCur_cs		 :=	 ( AniCurPrefix . "cursor_busy.ANI")
+AniCur_city		 :=	 ( AniCurPrefix . "CS_04BUS.ANI" )
+AniCur_Cogs		 :=	 ( AniCurPrefix . "MO_WAIT.ANI" )
+AniCur_Clock	 :=	 ( AniCurPrefix . "TR_BUSY.ANI" )
+AniCur_StopWatch :=	 ( AniCurPrefix . "WI_04BUS.ANI" )
+AniCur_Shutter	 :=	 ( AniCurPrefix . "CP_04BUS.ANI" )
+AniCur_Camera	 :=	 ( AniCurPrefix . "WO_04BUS.ANI" )
+AniCur_prop		 :=	 ( AniCurPrefix . "TR_WAIT.ANI" )
+AniCur_TV		 :=	 ( AniCurPrefix . "TV.ANI" )
+AniCur_mon		 :=	 ( AniCurPrefix . "PC_BUSY.ANI" )
+AniCur_pingpong	 :=	 ( AniCurPrefix . "SC_WAIT.ANI" )
+AniCur_peace	 :=	 ( AniCurPrefix . "SX_BUSY.ANI" )
+AniCur_Plane	 :=	 ( AniCurPrefix . "WO_01NOR.ANI" )
+AniCur_pred		 :=	 ( AniCurPrefix . "pred.ANI" )
+AniCur_DINOSAUR	 :=	 ( AniCurPrefix . "DINOSAUR.ANI" )
+AniCur_horse	 :=	 ( AniCurPrefix . "HORSE.ANI" )
+AniCur_jellyf	 :=	 ( AniCurPrefix . "DA_BUSY.ANI" )
+AniCur_wasp		 :=	 ( AniCurPrefix . "DA_WAIT.ANI" )
+AniCur_roach	 :=	 ( AniCurPrefix . "NA_BUSY.ANI" )
+AniCur_bfly		 :=	 ( AniCurPrefix . "bfly.ANI" )
+AniCur_flower	 :=	 ( AniCurPrefix . "NA_WAIT.ANI" )
+AniCur_flowerz	 :=	 ( AniCurPrefix . "SX_WAIT.ANI" )
+AniCur_tree		 :=	 ( AniCurPrefix . "FL_01NOR.ANI" )
+AniCur_Frozen	 :=	 ( AniCurPrefix . "froz.ANI" )
+AniCur_Drip		 :=	 ( AniCurPrefix . "DB_04BUS.ANI" )
+AniCur_umbr		 :=	 ( AniCurPrefix . "FA_01NOR.ANI" )
+AniCur_sun		 :=	 ( AniCurPrefix . "GA_04BUS.ANI" )
+AniCur_1664		 :=	 ( AniCurPrefix . "ALLSEEING.ANI" )
+AniCur_plasmab	 :=	 ( AniCurPrefix . "SC_BUSY.ANI" )
+AniCur_pyra		 :=	 ( AniCurPrefix . "GE_04BUS.ANI" )
+AniCur_tri		 :=	 ( AniCurPrefix . "GE_01NOR.ANI" )
+AniCur_tric		 :=	 ( AniCurPrefix . "RO_04BUS.ANI" )
+AniCur_triG		 :=	 ( AniCurPrefix . "AR_04BUS.ANI" )
+AniCur_palette	 :=	 ( AniCurPrefix . "DV_WAIT.ANI" )
+AniCur_sheet	 :=	 ( AniCurPrefix . "JA_04BUS.ANI" )
+AniCur_lbolt	 :=	 ( AniCurPrefix . "RO_01NOR.ANI" )
+AniCur_wvain	 :=	 ( AniCurPrefix . "PD_01NOR.ANI" )
+AniCur_rocket	 :=	 ( AniCurPrefix . "SF_01NOR.ANI" )
+AniCur_orbit	 :=	 ( AniCurPrefix . "SF_04BUS.ANI" )
+AniCur_95busy1	 :=	 ( AniCurPrefix . "WH_BUSY.ANI" )
+AniCur_95busy2	 :=	 ( AniCurPrefix . "WI_BUSY.ANI" )
+return,
+
 Open_ScriptDir()
+
