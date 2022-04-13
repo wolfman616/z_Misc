@@ -1,29 +1,41 @@
 #cs ----------------------------------------------------------------------------
 	AutoIt Version: 3.3.14.5
-		Author: MATTHEW WOLFF
-			Script function: Windows 10 DWM hook
-				Date: 22.2.2022
+		Author: MATTHEW J WOLFF
+			Script function: Windows 10 Event hook ->  DWM 
+				Date: 17.4.2022
 #ce ----------------------------------------------------------------------------
 
-#noTrayIcon ;#include <GUIConstants.au3> 
+#noTrayIcon                  ; #include <GUIConstants.au3>  
+#include <Process.au3>
+#include <TrayConstants.au3> ; Req 4 $TRAY_ICONSTATE_SHOW, $TRAY_ITEM_EXIT and $TRAY_ITEM_PAUSE
 #include <WindowsConstants.au3>
-#include <msgboxConstants.au3>
+#include <MsgboxConstants.au3>
 #include <WinAPI.au3>
 #include <Process.au3>
 #include <Misc.au3>
-#include <TrayConstants.au3> ; Required for $TRAY_ICONSTATE_SHOW, $TRAY_ITEM_EXIT and $TRAY_ITEM_PAUSE
+#include <File.au3>
+#include <WinAPIProc.au3>
+#include <Array.au3>
 
-global 	$BlackClassList = "TaskListThumbnailWnd,SysDragImage,WMPMessenger,Scintilla,BasicWindow,OleMainThreadWndClass ProgMan,WorkerW,Listbox,SideBar_HTMLHostWindow,MozillaWindowClass,Shell_TrayWnd,MSTasklistWClass,ToolbarWindow32,TaskListOverlayWnd,tooltips_class32,WMP Skin Host,WMPTransition,CWmpControlCntr,Shell_LightDismissOverlay,Shell_Flyout,OnScreenPanelWindow,ZafWindow,wacom,nvidia,olechan,kbxLabelClass,WTLAlphaMouse,Tablet,WTouch_,directuihwnd,Net UI Tool Window"
-global 	$hDLL, $hWinEventProc, $hHook, $Style, $StyleOld, $Class, $ClassLog
-global 	$sStruct = DllStructCreate("dword;int;ptr;int")
-local 	$idrestart = TrayCreateItem("restart")
+DllCall("User32.dll", "bool", "SetProcessDPIAware") 
 
-Opt("TrayAutoPause", 0)
-
-traySetIcon ( "1.ico" ) 	;	TraySetPauseIcon( "2.ico" )
+global $hDLL, $hWinEventProc, $hHook, $Style, $StyleOld, $Class, $ClassLog, $sStruct, $BlackClassList
+$sStruct = DllStructCreate("dword;int;ptr;int")
+$BlackClassList = "TaskListThumbnailWnd,SysDragImage,WMPMessenger,Scintilla,BasicWindow,OleMainThreadWndClass ProgMan,WorkerW,Listbox,SideBar_HTMLHostWindow,MozillaWindowClass,Shell_TrayWnd,MSTasklistWClass,ToolbarWindow32, TaskListOverlayWnd,tooltips_class32,WMP Skin Host, WMPTransition,CWmpControlCntr,Shell_LightDismissOverlay,Shell_Flyout,OnScreenPanelWindow,ZafWindow,wacom,nvidia,olechan,kbxLabelClass,WTLAlphaMouse,Tablet,WTouch_,directuihwnd,Net UI Tool Window,midi,MultitaskingViewFrame"
+Local $sDrive = "", $sDir = "", $sFileName = "", $sExtension = ""
+Local $aPathSplit = _PathSplit(@ScriptFullPath, $sDrive, $sDir, $sFileName, $sExtension)
+;_ArrayDisplay($aPathSplit, "_PathSplit of " & @ScriptFullPath)
+local $idrestart = TrayCreateItem("restart")
+;$arrProc = ProcessList()
+;_ArrayDisplay($arrProc,  "2D display transposed", "|7", 64))
+traySetIcon(      "1.ico" ) 	
+TraySetPauseIcon( "2.ico" )
+Opt("TrayAutoPause", 1)
 DllCall("User32.dll", "bool", "SetProcessDPIAware")
 If _Singleton(@ScriptName, 1) = 0 Then
     msgbox($MB_SYSTEMMODAL, "Error", @ScriptFullPath & ' Already Running ')
+	Run("explorer.exe " & $sDrive & $sDir)
+	_WinAPI_TerminateProcess ( $hProcess [, $iExitCode = 0] )
     exit
 endIf
 
@@ -50,28 +62,22 @@ while 1
 wEnd	
 
 Func Traywatch()
-    ;TrayCreateItem("Radio 1", -1, -1, $TRAY_ITEM_RADIO)
+  ;  TrayCreateItem("Radio 1", -1, -1, $TRAY_ITEM_RADIO)
   ;  TrayItemSetState(-1, $TRAY_CHECKED)
-   ; TrayCreateItem("Radio 2", -1, -1, $TRAY_ITEM_RADIO)
-  ;  TrayCreateItem("Radio 3", -1, -1, $TRAY_ITEM_RADIO)
   ;  TrayCreateItem("") ; Create a separator line.
-
-    local $idAbout = TrayCreateItem("About")
-  ;  TrayCreateItem("") ; Create a separator line.
-
-    TraySetState($TRAY_ICONSTATE_SHOW) ; Show the tray menu.
-
+     local $idAbout = TrayCreateItem("About")
+  ;  TrayCreateItem("") ;   separator line.
+	TraySetState($TRAY_ICONSTATE_SHOW) ; Show the tray menu.
 	while 1
 		Switch TrayGetMsg()
-			Case $idAbout ; Display a message box about the AutoIt version and installation path of the AutoIt executable.
+			Case $idAbout
 				msgbox($MB_SYSTEMMODAL, "", "AutoIt tray menu example." & @CRLF & @CRLF & _
 					"Version: " & @AutoItVersion & @CRLF & _
-					"Install Path: " & StringLeft(@AutoItExe, StringInStr(@AutoItExe, "\", $STR_NOCASESENSEBASIC, -1) - 1)) ; Find the folder of a full path.
-			Case $idrestart ; Exit the loop.
+					"Install Path: " & StringLeft(@AutoItExe, StringInStr(@AutoItExe, "\", $STR_NOCASESENSEBASIC, -1) - 1))
 				ReCreateMyself()
 		EndSwitch
     WEnd
-EndFunc   ;==>Example
+EndFunc ;==>TrayWatch
 
 func _WinEventProc($hHook, $iEvent, $hWnd, $idObject, $idChild, $iEventThread, $iEventTime)
     local $PID = WinGetProcess($hWnd), $sEventProcName = _ProcessGetName($PID)
@@ -84,98 +90,25 @@ func _WinEventProc($hHook, $iEvent, $hWnd, $idObject, $idChild, $iEventThread, $
 				; msgbox(16 + 262144, "SIDE", "ssssGay") 	
 					; return
 				; endif
-
-			case "chrome.exe"
+			case "chrome.exe","opera.exe","firefox.exe","edge.exe","WINWORD.EXE","OUTLOOK.EXE","devenv.exe","GitHubDesktop.exe","Autohotkey2.exe"
 				return
-			case "opera.exe"
+			case "logonui.exe","lockapp.exe","matrix.scr","wallpaper64.exe","wallpaper32.exe","StartMenuExperienceHost.exe"
 				return
-			case "matrix.scr"
+			case "steam.exe","steamwebhelper.exe","terraria.exe","cengine.exe","RobloxPlayerBeta.exe","discord.exe" 
 				return
-			case "RobloxPlayerBeta.exe"
+			case "AccessibilityInsights.exe","ui32.exe","ImageGlass.exe","PowerToys.exe","RzSynapse.exe"
 				return
-			case "lockapp.exe"
+			case "ScreenToGif.exe","d2r.exe","dimmer.exe","GoogleDriveFS.exe","sidebar.exe","NVIDIA Share.exe"
 				return
-			case "logonui.exe"
+			case "Wacom_TabletUser.exe","Wacom_TouchUser.exe","WacomDesktopCenter.exe","Wacom_Tablet.exe","inkscape.exe" 
 				return
-			case "firefox.exe"
-				return
-			case "edge.exe"
-				return
-			case "steam.exe"
-				return
-			case "steamwebhelper.exe"
-				return
-			case "discord.exe"
-				return
-			case "terraria.exe"
-				return
-			; case "wmplayer.exe"
-				; return
-			case "wallpaper64.exe"
-				return
-			case "wallpaper32.exe"
-				return
-			case "ui32.exe"
-				return
-			case "sidebar.exe"
-				return
-			case "ImageGlass.exe"
-				return
-			case "sndvol.exe"
-				return
-			case "StartMenuExperienceHost.exe"
-				return
-			case "devenv.exe"
-				return
-			case "dimmer.exe"
-				return
-			case "RzSynapse.exe"
-				return
-			case "d2r.exe"
-				return
-			case "cengine.exe"
-				return
-			case "ScreenToGif.exe"
-				return
-			case "NVIDIA Share.exe"
-				return
-			case "GitHubDesktop.exe"
-				return
-			case "Autohotkey2.exe" 
-				return
-			case "GoogleDriveFS.exe" 
-				return
-			case "Wacom_TabletUser.exe" 
-				return
-			case "Wacom_TouchUser.exe" 
-				return
-			case "WacomDesktopCenter.exe" 
-				return
-			case "Wacom_Tablet.exe" 
-				return
-			case "gimp-2.10.exe" 
-				return
-			case "OUTLOOK.EXE" 
-				return
-			case "WINWORD.EXE" 
-				return
+			;case "gimp-2.10.exe","sndvol.exe"
+			;	return
 		endSwitch
 
 		local $sTitle = winGetTitle($hWnd)
 		switch $sTitle
-			case "ninjmag"
-				return
-			case "Roblox"
-				return
-			case "MIDI IN / OUT"
-				return
-			case "MIDI"
-				return
-			case "APCGUI"
-				return
-			case "APCBackMain"
-				return
-			case "no_glass"
+			case "no_glass","MIDI","MIDI IN / OUT","ninjmag","APCBackMain","APCGUI","Lingering Line","Roblox"
 				return
 		endSwitch
 		
@@ -197,78 +130,18 @@ func _WinEventProc($hHook, $iEvent, $hWnd, $idObject, $idChild, $iEventThread, $
 					return		
 				case "#32768" 
 					_WinAPI_SetLayeredWindowAttributes($hWnd, 0x000000) 	; 	not working  
-				case "TaskListThumbnailWnd" 
+				case "TaskListThumbnailWnd","SysDragImage","LockScreenControllerProxyWindow","COMTASKSWINDOWCLASS","MSCTFIME UI","WMPMessenger","#43" 
 					return
-				case "SysDragImage" 
+				case "TaskListThumbnailWnd","LockScreenBackstopFrame","IME","Scintilla","BasicWindow","OleMainThreadWndClass","ProgMan","WorkerW","Listbox" 
 					return
-				case "LockScreenControllerProxyWindow" 
+				case "SideBar_HTMLHostWindow","MozillaWindowClass","Shell_TrayWnd","MSTasklistWClass","ToolbarWindow32","TaskListOverlayWnd","XAMLMessageWindowClass" 
 					return
-				case "COMTASKSWINDOWCLASS" 
+				case "BioFeedbackUX XAML Host","OfficePowerManagerWindow","UserAdapterWindowClass","GDI+ Hook Window Class""Static","crashpad_SessionEndWatcher" 
 					return
-				case "MSCTFIME UI" 
+				case "CicMarshalWndClass","XCPTimerClass","Windows.UI.Core.CoreWindow","Autohotkey2","OleDdeWndClass"
 					return
-				case "TaskListThumbnailWnd" 
-					return
-				case "WMPMessenger" 
-					return
-				case "LockScreenBackstopFrame" 
-					return
-				case "IME" 
-					return
-				case "Scintilla" 
-					return
-				case "BasicWindow" 
-					return
-				case "OleMainThreadWndClass" 
-					return
-				case "ProgMan" 
-					return
-				case "WorkerW" 
-					return
-				case "Listbox" 
-					return
-				case "SideBar_HTMLHostWindow" 
-					return
-				case "MozillaWindowClass" 
-					return
-				case "Shell_TrayWnd" 
-					return
-				case "MSTasklistWClass" 
-					return
-				case "ToolbarWindow32" 
-					return
-				case "TaskListOverlayWnd" 
-					return
-				case "XAMLMessageWindowClass" 
-					return
-				case "#43" 
-					return
-				;case "ConsoleWindowClass" 
+				;case "tooltips_class32","ConsoleWindowClass" 
 					;return
-				case "OleDdeWndClass" 
-					return
-				case "BioFeedbackUX XAML Host" 
-					return
-				case "OfficePowerManagerWindow" 
-					return
-				case "UserAdapterWindowClass" 
-					return
-				case "GDI+ Hook Window Class" 
-					return
-				case "crashpad_SessionEndWatcher" 
-					return
-				case "Static" 
-					return
-				case "CicMarshalWndClass" 
-					return
-				case "XCPTimerClass" 
-					return
-				case "Windows.UI.Core.CoreWindow" 
-					return
-				;case "tooltips_class32" 
-					;return
-				case "Autohotkey2" 
-					return
 				case else
 				#CS 
 					$ClassLog = $ClassLog & @CRLF & $Class
@@ -282,21 +155,21 @@ func _WinEventProc($hHook, $iEvent, $hWnd, $idObject, $idChild, $iEventThread, $
 			$ClassLog = $ClassLog & @CRLF & $Injsuxs
 		endIf
 	endIf
-endFunc   	; 		WinEventProc
+endFunc  ;==>WinEventProc
 
 func _DwmEnableBlurBehindWindow($hWnd)
-         const $DWM_BB_ENABLE = 0x00000001
-         DllStructSetData($sStruct, 1, $DWM_BB_ENABLE)
-         DllStructSetData($sStruct, 2, "1")
-         DllStructSetData($sStruct, 4, "1")
-         _WinAPI_SetLayeredWindowAttributes($hWnd, 0x000000); Must be here!
-         $Ret = DllCall(	"dwmapi.dll", "int", "DwmEnableBlurBehindWindow", "hwnd", $hWnd, "ptr", DllStructGetPtr($sStruct))
-         if @error then
-             return 0
-         else
-             return $Ret
-         endIf
- endFunc 	; 		DwmEnableBlurBehindWindow
+	const $DWM_BB_ENABLE = 0x00000001
+	DllStructSetData($sStruct, 1, $DWM_BB_ENABLE)
+	DllStructSetData($sStruct, 2, "1")
+	DllStructSetData($sStruct, 4, "1")
+	_WinAPI_SetLayeredWindowAttributes($hWnd, 0x000000); Must be here!
+	$Ret = DllCall( "dwmapi.dll", "int", "DwmEnableBlurBehindWindow", "hwnd", $hWnd, "ptr", DllStructGetPtr($sStruct))
+	if @error then
+		return 0
+	else
+		return $Ret
+	endIf
+ endFunc ;==>DwmEnableBlurBehindWindow
 
 func _SetWinEventHook($hDLLUser32)
     local $aRet
@@ -314,21 +187,18 @@ func _SetWinEventHook($hDLLUser32)
             "uint", BitOR($WINEVENT_OUTOFCONTEXT, $WINEVENT_SKIPOWNPROCESS))
     if @error then return SetError(@error, 0, 0)
     return $aRet[0]
-endFunc   	; 		SetWinEventHook
+endFunc   	;==>SetWinEventHook
 
 Func ReCreateMyself()
-   ; If @Compiled Then
+  ; If @Compiled Then
       ;  Run(@ScriptFullPath);just run the exe
   ;  Else        ;$AutoIt3Path = RegRead("HKEY_local_MACHINE\SOFTWARE\AutoIt v3\AutoIt", "betaInstallDir");installDir for beta
        $AutoIt3Path = RegRead("HKEY_local_MACHINE\SOFTWARE\AutoIt v3\AutoIt", "InstallDir") ;installDir for production
-	 
-       $ToRun1 = '"' & $AutoIt3Path & '\AutoIt3.exe "' & ' "' & @ScriptFullPath & '"'
+       $ToRun1 = (StringLeft(@AutoItExe, StringInStr(@AutoItExe, "\", $STR_NOCASESENSEBASIC, -1) - 1)) & " & @ScriptFullPath & ")
       ConsoleWrite($ToRun1 & @CRLF);to test we have got it right
       Run($ToRun1)
   ;  EndIf
-    
     Exit
-
 EndFunc   ;==>ReCreateMyself
 
 func OnAutoItexit()
@@ -338,4 +208,4 @@ func OnAutoItexit()
     endIf
     if $hHook then DllCall("User32.dll", "int", "UnhookWinEvent", "hwnd", $hHook)
     if $hDLL then DllClose($hDLL)
-endFunc   	; 		OnAutoItexit
+endFunc   	;==>OnAutoItexit
