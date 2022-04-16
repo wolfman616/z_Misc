@@ -1,5 +1,7 @@
-﻿Windows 10 CLSID Locations
-x := []
+﻿;Windows 10 CLSID Locations
+#notrayicon
+global x, clsid 
+x:= []
 x["3D Objects (folder)"]                           := "{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}"
 x["Add Network Location"]                          := "{D4480A50-BA28-11d1-8E75-00C04FA31A86}"
 x["Administrative Tools"]                          := "{D20EA4E1-3957-11d2-A40B-0C5020524153}"
@@ -109,7 +111,7 @@ x["Programs and Features"]                         := "{7b81be6a-ce2b-4676-a29e-
 x["Public (folder)"]                               := "{4336a54d-038b-4685-ab02-99bb52d3fb8b}"
 x["Quick access"]                                  := "{679f85cb-0220-4080-b29b-5540cc05aab6}"
 x["Recent folders"]                                := "{22877a6d-37a1-461a-91b0-dbda5aaebc99}"
-x["Recent Items Instance Folder"]                  := "{4564b25e-30cd-4787-82ba-39e73a750b14}"
+x["Recent files"]                                  := "{4564b25e-30cd-4787-82ba-39e73a750b14}"
 x["Recovery"]                                      := "{9FE63AFD-59CF-4419-9775-ABCC3849F861}"
 x["Recycle Bin"]                                   := "{645FF040-5081-101B-9F08-00AA002F954E}"
 x["Region"]                                        := "{62D8ED13-C9D0-4CE8-A914-47DD628FB1B0}"
@@ -176,3 +178,34 @@ x["Windows Mobility Center"]                       := "{5ea4f148-308c-46d7-98a9-
 x["Windows Features"]                              := "{67718415-c450-4f3c-bf8a-b487642dc39b}"
 x["Windows To Go"]                                 := "{8E0C279D-0BD1-43C3-9EBD-31C3DC5B8A77}"
 x["Work Folders"]                                  := "{ECDB0924-4208-451E-8EE0-373C0956DE16}"
+for, index, element in x
+	if  !ss
+		 ss:= index
+	else SS:= SS . "|" . index
+gui, 	clsids: New, -DPIScale +toolwindow -SysMenu +AlwaysOnTop, MwMain
+gui, 	clsids: -Caption +LastFound +HwndMainhWnd
+Gui, 	clsids: Font, s10,% "Continuum light"
+Gui,    clsids: Add,  listbox, w285 x0    r46   vClsid,%          SS
+Gui,    clsids: Add,  button,  w100 x168  y1095 ghidies,%         "Hide"
+Gui,    clsids: Add,  button,  w120 x14   y1095 default gOkies, % "Open Loc"
+Gui,    clsids: Show, h1150 w285 x3555 y52  
+;Gui,   clsids: Submit, NoHide
+return
+
+GuiClose:
+ExitApp
+
+Okies:
+Gui, clsids: Submit, NoHide
+;msgbox, % (asas:= "explorer shell:::" . x[Clsid])
+run,% (asas:= "explorer shell:::" . x[Clsid])
+return
+
+tt((Clsid . "selected"))
+run,% asas
+return
+
+hidies:
+exitapp
+Gui, clsids: hide
+return
