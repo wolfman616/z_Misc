@@ -2,7 +2,7 @@
 	AutoIt Version: 3.3.14.5
 		Author: MATTHEW J WOLFF
 			Script function: Windows 10 Event hook ->  DWM 
-				Date: 17.4.2022
+				Date: 13.4.2022
 #ce ----------------------------------------------------------------------------
 
 #noTrayIcon                  ; #include <GUIConstants.au3>  
