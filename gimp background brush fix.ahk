@@ -14,7 +14,7 @@ if (A_Is64bitOS && A_PtrSize = 4) {
 }
 if !(fileexist(gimp)){
 	msgbox,,% "Error",% "Cant find the gimps executable at:`n" gimp
-	FileSelectFile, gimp,,% "C:\Program Files\",% "gimp location...",% "Executrable / LNK (*.exe; *.lnk)"
+	FileSelectFile, gimp,,% "C:\Program Files\",% "gimp location...",% "Executable / LNK (*.exe; *.lnk)"
 }
 gosub, Vars
 run,% gimp,,min, pid
