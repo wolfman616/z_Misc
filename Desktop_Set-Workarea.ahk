@@ -6,6 +6,7 @@
 onexit, xit
 ;global _RECT   :=  "left,top,right,bottom"
 ;global Srekt   :=  new _Struct(_RECT) 
+VarSetCapacity(Srekt, 16)
 success :=  DllCall("SystemParametersInfo", "uint", 0x0030, "uint", 0, "uint", &Srekt, "uint", 0 )
 vWinX   :=  NumGet(&Srekt,   0, "Int")
 vWinY   :=  NumGet(&Srekt,   4, "Int")
