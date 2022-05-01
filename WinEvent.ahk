@@ -9,12 +9,11 @@ setWorkingDir,        %A_ScriptDir%
 SetBatchLines,        -1
 SetWinDelay,          -1
 ;ListLines,           Off 
-#include  	          <_struct>
+#include              <_struct>
 #NoEnv 
-gui, DGuI:new, +owner
-gui, DGui:-Caption -DPIScale -SysMenu +ToolWindow +owndialogs
+gui, DGuI: new, +owner
+gui, DGui: -Caption -DPIScale -SysMenu +ToolWindow +owndialogs
 global UProc := RegisterCallback("UEventHook", "")
-global TargetHandle, OutputVarWin
 PreLabL: ; ===>" binds " below line 500
 INIT_SEQ := "RegReads>Varz>Menu_Tray_Init>Menu_Style_Init>Hooks>quotEI>reload_orload_admhk>Main"
 gosub, init_matt
@@ -46,12 +45,7 @@ return,
 	;EVENT_SYSTEM_MENUEND:=0x0005
 	;EVENT_SYSTEM_MENUSTART:=0x0004
 
-#F::
-initt   := DllCall("SetWinEventHook", "Uint", winevents["MENUPOPUPSTART"], "Uint",winevents["MENUPOPUPSTART"], "Ptr", 0, "Ptr", UProc ,"Uint", 0, "Uint", 0, "Uint", 0x0000 | 0x0002)
-return
-#z::
-Hookmps := DllCall("SetWinEventHook", "Uint", winevents["MENUPOPUPEND"], "Uint",winevents["MENUPOPUPEND"], "Ptr", 0, "Ptr", (UProc := RegisterCallback("UEventHook", "")),"Uint", 0, "Uint", 0, "Uint", 0x0000| 0x0002)
-return
+return,
 
 UEventHook(UProc, event, hWnd, idObject, idChild, dwEventThread, dwmsEventTime) {
 global
@@ -171,6 +165,8 @@ global
 	Iconchange_Check(hwnd,Class)
 	pushclsl_(Class)
 	switch       Class {
+		case "#32768":
+			Contextmenu:=True
 		case "gdkWindowToplevel":
 			nnd := Format("{:#x}", hwnd) ; return proper hex
 			;sleep 300
@@ -497,18 +493,20 @@ CRITICAL
 				SLEEP, 500
 				SEND, {SPACE}
 			}
-		case "MozillaDialogClass":
-			Escape_TargetWin = ahk_id %Youtube_Popoutwin%
-			winget, Style, Style,% hnd_
-			winget, exStyle, exStyle,% hnd_
-			IF((STYLE = 0x16CE0084) && (EXSTYLE = 0x00000101) ) {
-				Youtube_Popoutwin := BK_UN_T
-				winclose,
-				wingetPos, X, Y, , EdtH,% hnd_
-				WinMove,% hnd_,, , , , (EdtH - 39)
-				winset, Style, 0x16860084,% hnd_	
-				MSGBOX,% (Youtube_Popoutwin . "`nAhk_id: " . BK_UN_T)
-			}
+		; case "MozillaDialogClass":
+			; Escape_TargetWin = ahk_id %Youtube_Popoutwin%
+			; winget, Style, Style,% hnd_
+			; winget, exStyle, exStyle,% hnd_
+			; IF((STYLE = 0x16CE0084) && (EXSTYLE = 0x00000101) ) {
+				; Youtube_Popoutwin := BK_UN_T
+				; winclose,
+				; wingetPos, X, Y, , EdtH,% hnd_
+				; WinMove,% hnd_,, , , , (EdtH - 39)
+				; winset, Style, 0x16860084,% hnd_	
+				; MSGBOX,% (Youtube_Popoutwin . "`nAhk_id: " . BK_UN_T)
+			; }
+		case "#32768":	
+			Contextmenu:=True		
 		case "#32770":		
 			if (Title_last = "Information") {
 				tooltip, c_nt
@@ -612,6 +610,8 @@ CRITICAL
 		settimer, quotE, -1
 	switch Class { ; case "Autohotkey": { ; if % "C:\Script\AHK\adminhotkeys.ahk in " Title_last ; { ; menu, tray, uncheck, Launch AdminHotkeyz, ; tooltip detected admin hotkey disconnecting ; } ; }
 	
+		case "#32768":
+			Contextmenu:=False
 		case "ApplicationFrameWindow","WINDOWSCLIENT":
 			wingetTitle, Last_Title,% hndDS 
 			if ( Last_Title = "Roblox" ) {	;winClose,% hndDS
@@ -1662,9 +1662,11 @@ menu, 	F, 	add,% "Save",            Savegui
 goto,   StyleMenu_Show
 
 StyleMenu_Show:
+
 menu, 	F,  Show
 	 menu, F, DeleteAll
-
+Hdle := MenuGetHandle(F)
+msgbox, % Hdle
 return,  
 ;`~			
 NewTrayMenuParam( LabelPointer = "", Title = "", Icon = "" ) {
@@ -1759,7 +1761,9 @@ loop,     parse, str_aL,%      _x
 return  ;END
 ;	^-=___=-^				^-=___=-^				^--___=-^   ^   ~   ~   _   ¬   ¬   ¬   ¬   ¬   ¬   ¬   ¬   _
 Varz:   ; 01010101010 ' ` ' `' `':C\Root\`'`'''`'      `''`0101'`'`'```''`'`'     ``'010101`''`'0xFFEEDD`'`'`'`'``'`'     			`''`''KILL!'`'`' '`''`'``'' `'`''`''` ''`'` '`''` `''` `''` `'` 
-global AHKdir, AF, AF2, AutoFireScript, Scr_, dbgtt, AutoFireScript2, TargetScriptTitle, TargetScriptTitle2, AF_Delay, SysShadowStyle_New, SysShadowExStyle_New, toolx, offsett, XCent, YCent, starttime, text, X_X, Last_Title, autofire, RhWnd_old, MouseTextID, DMT, roblox, toggleshift, Norm_menuStyle, Norm_menuexStyle, Title_last, dcStyle, classname, tool, tooly, EventLogBuffer_Old, Roblox_hwnd, Time_Elapsed, KillCount, SBAR_2berestored_True, Sidebar, TT, TT4g, TTFoc, TTcr, TTds, TTmb, dbg, TClass, TTitle, TProcName, delim, delim2, TitleCount, ClassCount, ProcCount, style2, exstyle2, ArrayProc, ArrayClass, ArrayTitle, Array_LProc, Array_LTitle, Array_LClass, Style_ClassnameList2, Style_procnameList2, Style_wintitleList2, Youtube_Popoutwin, Script_Title, np, m2dstatus, crashmb, 8skin_crash, OutputVarWin, F, s1, s2, s3, FileListStr, oldlist, FileCount, ADELIM, hTarget, hTargetprev, hgui, xPrev, yPrev, hPrev, logvar, ADM_wTtL, triggeredGFS, Matrix, Maxbox, MinBox, LeftScroll, ClickThru, RightAlign, RightoLeft, AppWindow, Save, Reset, MiDiRun, test_move, mattdwmrun, Quoting, mmenuListTtl, MenuLablAr, MenuLablTitlAr, mmenuListLbl, Desk_Wi, Desk_Hi, FileListStr_Ar, hTargetPrev, wPrev, hPrev, xPrev, yPrev, hidegui, q_dlim, quotes, DEBUGTEST_HWND, hook4g, HookMb, HookCr, HookOD, HookFc, DEBUGTEST_FOC, hook4gProc4g_, AhkPath, HookMb, ProcMb_, ProcCr_, ProcDstroyd, procFc_, nnd, 1998, 1999, SkpO, old_focus1, old_focus2, old_focus3, old4gnd1, old4gnd2, old4gnd3, qstr, mattdwmrun2, test_move, SidebarPath, Path_PH, AHK_Rare, CleanME_PLZz, Schd_T, HKCUCurVer, stylekey, AdHkRun, PConfig, YT_DL, M2dRun, Mag_, DWMFixS, WMPRun, MiDiRun, MiDi_, adh, ScpW, MiDir, winevents, winevent_I, Split_Tail, Split_Head, RiPpLe, ripoldm, t_x, t_Y, lo0, Grants_Son, mouse24, wintitlekey, procnamekey, classnamekey, OBJ4g, OBJFc, OBJCR, OBJDS, MNPPS, WIN_TARGET_DESC, MSG_WIN_TARGET, WINEVENT_SkpOROCESS, WINEVENT_OUTOFCONTEXT, OoC, Desktop_Margin, hooked_events, newhook, firefoxhandles, classeslast, clst_max_I, classeslast, Clss_, Pnamee_, AHkold, SysMetrix
+global AHKdir, AF, AF2, AutoFireScript, Scr_, dbgtt, AutoFireScript2, TargetScriptTitle, TargetScriptTitle2, AF_Delay, SysShadowStyle_New, SysShadowExStyle_New, toolx, offsett, XCent, YCent, starttime, text, X_X, Last_Title, autofire, RhWnd_old, MouseTextID, DMT, roblox, toggleshift, Norm_menuStyle, Norm_menuexStyle, Title_last, dcStyle, classname, tool, tooly, EventLogBuffer_Old, Roblox_hwnd, Time_Elapsed, KillCount, SBAR_2berestored_True, Sidebar, TT, TT4g, TTFoc, TTcr, TTds, TTmb, dbg, TClass, TTitle, TProcName, delim, delim2, TitleCount, ClassCount, ProcCount, style2, exstyle2, ArrayProc, ArrayClass, ArrayTitle, Array_LProc, Array_LTitle, Array_LClass, Style_ClassnameList2, Style_procnameList2, Style_wintitleList2, Youtube_Popoutwin, Script_Title, np, m2dstatus, crashmb, 8skin_crash, OutputVarWin, F, s1, s2, s3, FileListStr, oldlist, FileCount, ADELIM, hTarget, hTargetprev, hgui, xPrev, yPrev, hPrev, logvar, ADM_wTtL, triggeredGFS, Matrix, Maxbox, MinBox, LeftScroll, ClickThru, RightAlign, RightoLeft, AppWindow, Save, Reset, MiDiRun, test_move, 
+
+global mattdwmrun, Quoting, mmenuListTtl, MenuLablAr, MenuLablTitlAr, mmenuListLbl, Desk_Wi, Desk_Hi, FileListStr_Ar, hTargetPrev, wPrev, hPrev, xPrev, yPrev, hidegui, q_dlim, quotes, DEBUGTEST_HWND, hook4g, HookMb, HookCr, HookOD, HookFc, DEBUGTEST_FOC, hook4gProc4g_, AhkPath, HookMb, ProcMb_, ProcCr_, ProcDstroyd, procFc_, nnd, 1998, 1999, SkpO, old_focus1, old_focus2, old_focus3, old4gnd1, old4gnd2, old4gnd3, qstr, mattdwmrun2, test_move, SidebarPath, Path_PH, AHK_Rare, CleanME_PLZz, Schd_T, HKCUCurVer, stylekey, AdHkRun, PConfig, YT_DL, M2dRun, Mag_, DWMFixS, WMPRun, MiDiRun, MiDi_, adh, ScpW, MiDir, winevents, winevent_I, Split_Tail, Split_Head, RiPpLe, ripoldm, t_x, t_Y, lo0, Grants_Son, mouse24, wintitlekey, procnamekey, classnamekey, OBJ4g, OBJFc, OBJCR, OBJDS, MNPPS, WIN_TARGET_DESC, MSG_WIN_TARGET, WINEVENT_SkpOROCESS, WINEVENT_OUTOFCONTEXT, OoC, Desktop_Margin, hooked_events, newhook, firefoxhandles, classeslast, clst_max_I, classeslast, Clss_, Pnamee_, AHkold, SysMetrix, Contextmenu, TargetHandle
 
  ;	^-=___=-^ 	 ;-=-=;'`'``''`'`'``''`'`'``''`'`'`
 tt := 800 			     ; default tooltip timeout
