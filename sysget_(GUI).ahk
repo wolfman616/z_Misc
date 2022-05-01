@@ -1,21 +1,101 @@
 ﻿;	sysmetrics
 ;	metric 				n_index  	desc
-gosub, varz
-menu, tray,   icon,%  "C:\Script\AHK\APP_COG.ico"
-menu, M_align, add,%  "Left",    	Align_l
-menu, M_align, add,%  "Center",  	Align_c
-menu, M_align, add,%  "Right",  	Align_r
-menu, tray,    add,%  "Aligment",  :M_align
-menu, tray,    add,%  "extended entries",  GoGoGadget_Gui
-menu, M_align, Check  ,%  "Center"
+DetectHiddenWindows, On
 
+gosub, varz
+global TBBUTTON, vCount, extension_set, alignment
+alignment := "C"
+;tray
+menu, tray,      icon,%   "C:\Script\AHK\APP_COG.ico"
+menu, M_align,   add,%    "Left",    	 Align_l
+if alignment = L
+menu,      M_align,   check,%  "Left", 
+else menu, M_align, uncheck,%  "Left", 
+
+menu,      M_align,     add,%  "Center", Align_c
+if alignment = C
+menu,      M_align,   check,%  "Center", 
+else menu, M_align, uncheck,%  "Center", 
+menu,      M_align,     add,%  "Right",  Align_r
+if alignment = R
+menu,      M_align,   check,%  "Right", 
+else menu, M_align, uncheck,%  "Right", 
+
+menu, tray,      add,%    "Aligment",  :M_align
+menu, tray,      add,%    "extended entries",  GoGoGadget_Gui
+menu, M_align,   Check,%  "Center"
+
+;gui
+Menu, m_file,    Add
+Menu, m_view,    Add
+Menu, m_Options, Add
+Menu, premenu,   Add
+
+Menu, m_file,    DeleteAll
+Menu, m_view,    DeleteAll
+Menu, m_Options, DeleteAll
+Menu, premenu,   DeleteAll
 GoGoGadget_Gui:
+
+Menu, MenuBar,   Add, File,     :m_file
+Menu, MenuBar,   Add, View,     :m_view
+Menu, MenuBar,   Add, Options,  :m_Options
+Menu, m_file,    Add, Save, MyMenuLabel
+Menu, m_file,    Add, Open previous results, MyMenuLabel
+Menu, m_file,    Add, Open results in new Window, MyMenuLabel
+Menu, m_view,    Add, Position, :premenu
+Menu, premenu,   Add, Left,     MyMenuLabel
+Menu, premenu,   Add, Center,   MyMenuLabel
+Menu, premenu,   Add, Bottom,   MyMenuLabel
+Menu, m_view,    Add, Icons,    MyMenuLabel
+Menu, m_view,    Add, Legend,   MyMenuLabel
+Menu, m_view,    Add, Extended, extension_toggle
+if extension_set 
+	Menu, m_view,    check, Extended
+
+Menu, m_Options, Add, Size,     MyMenuLabel
+Menu, m_Options, Add, Font,     MyMenuLabel
+Menu, m_Options, Add, Colours,  MyMenuLabel
+
+
 Gui_extended := !Gui_extended
 
 gui, Gui_sys: Destroy
 Gui, Gui_sys: New, -dpiscale +hwndWindle, System-Metrics
 Gui, Gui_sys: Margin,% marginSz,% marginSz
-
+Gui, Gui_sys: Menu, MenuBar
+;RICHEDIT50W
+hModuleME := DllCall("kernel32.dll\LoadLibrary", Str,"msftedit.dll", Ptr)
+vPos := "y35" 
+Gui, Gui_sys:Add, Custom , x0 y0 ClassToolbarWindow32 0x100 ;TBSTYLE_TOOLTIPS := 0x100
+;Gui, Add, Custom, ClassToolbarWindow32 0x1000 ;TBSTYLE_LIST := 0x1000 ;text to side of buttons
+;Gui, Add, Custom, ClassToolbarWindow32 0x1100
+ControlGet, hTB, Hwnd,, ToolbarWindow321, % "ahk_id " Windle
+SendMessage, 0x43C, 0, 0,, % "ahk_id " hTB ;TB_SETMAXTEXTROWS ;text omitted from buttons
+;note: if more than one button has the same idCommand, then only the last button with that idCommand will have a ToolTip
+vCount := 5, vSize := A_PtrSize=8?32:20
+VarSetCapacity(TBBUTTON, vCount*vSize, 0)
+Loop, % vCount
+{
+	vTxt%A_Index% := "TB " A_Index
+	vOffset := (A_Index-1)*vSize
+	;TBSTATE_ENABLED := 4
+	NumPut(A_Index-1,      TBBUTTON, vOffset,   "Int")                   ;iBitmap
+	NumPut(A_Index-1,      TBBUTTON, vOffset+4, "Int")                   ;idCommand
+	NumPut(0x4,            TBBUTTON, vOffset+8, "UChar")                 ;fsState
+	NumPut(&vTxt%A_Index%, TBBUTTON, vOffset+(A_PtrSize=8?24:16), "Ptr") ;iString
+}
+hIL := IL_Create(5, 2, 0)
+IL_Add(hIL, "C:\Script\AHK\APP_COG.ico", 0)    ;green H
+IL_Add(hIL, "C:\Icon\24\recycle24shadow.ico", 0)                   ;green S
+IL_Add(hIL, "C:\Icon\24\invert_goatse_24.ico", 0)                   ;red H
+IL_Add(hIL, "C:\Icon\24\unndoo3_0.ico", 0)                   ;red S
+IL_Add(hIL, "C:\Icon\24\reedoo_2 - Copy.ico", 0)                   ;file icon
+SendMessage, 0x430, 0, % hIL,, % "ahk_id " hTB ;TB_SETIMAGELIST
+TB_ADDBUTTONSW := 0x444 ;TB_ADDBUTTONSA := 0x414
+vMsg := A_IsUnicode?0x444:0x414
+SendMessage, % vMsg, % vCount, % &TBBUTTON,, % "ahk_id " hTB ;TB_ADDBUTTONSW / TB_ADDBUTTONSA
+extension_set:
 if Gui_extended {
 	menu, tray, Check  ,%  "extended entries"
  	Gui_sysL_H := "h1000"
@@ -25,7 +105,9 @@ if Gui_extended {
 	Gui_sysL_H := "h865"
 	Gui_sys_H  := "h889"
 }
-Gui, Gui_sys:Add, ListView, w1024 %Gui_sysL_H% 0x4 LV0x8200 Grid R38 +Multi gTranny vCopy, Parameter-Metric|Value|Description
+	;Gui, Gui_sys: Add, Custom, % vPos " ClassRICHEDIT50W r1"
+	;ControlSetText, RICHEDIT50W1, % "RICH 1", % "ahk_id " Windle
+gui, Gui_sys:Add, ListView, w1024 y35 x0 %Gui_sysL_H% 0x4 LV0x8200 Grid R38 +Multi gTranny vCopy, Parameter-Metric|Value|Description
  LV_ModifyCol(1, "180 Text"), LV_ModifyCol(2, "Text 106"), LV_ModifyCol(3, "Text c0xFF2211 1100") 
 
 sysmetrics_str1:= strreplace(sysmetrics_str1,  "Â", "")
@@ -36,7 +118,13 @@ sysmetrics_str1:= strreplace(sysmetrics_str1, "`r", "")
 a := (Metric_VALUE(sysmetrics_str1)), 
 if Gui_extended 
 	b := (Metric_VALUE(sysmetrics_str2))
-Gui,  Gui_sys: Show, noactivate w1000 %Gui_sys_H% center
+	poop("Gui_sys", Windle)
+OnMessage(0x111, "WM_COMMAND")
+
+gui,  Gui_sys: Show, noactivate w1000 %Gui_sys_H% center
+if hTB
+	SendMessage, 0x421,,,, % "ahk_id " hTB ;TB_AUTOSIZE
+		;ControlMove,, 0, -10, 0, 0, % "ahk_id " hTB
 
 ~^c::
 tranny:
@@ -46,6 +134,11 @@ if winactive("ahk_id " Windle) {
 }
 return,
 
+extension_toggle:
+extension_set:=!extension_set
+goto GoGoGadget_Gui 
+return
+
 ~escape::
 if !(winactive("ahk_id " Windle))
 	return,
@@ -53,6 +146,7 @@ guiclose:
 exitapp
 
 Align_L:
+alignment := "L"
 GuiLeftAlignX := ("x" . (A_ScreenWidth * 0.3) - (0.5 * Gui_sys_W))
 msgbox % GuiLeftAlignX
 Gui,  Gui_sys: Show, noactivate w1006 %Gui_sys_H% x5 y57
@@ -62,6 +156,7 @@ menu, M_align, uncheck,%  "Right"
 return,
 
 Align_C:
+alignment := "C"
 Gui,  Gui_sys: Show, noactivate w%Gui_sys_W% %Gui_sys_H% center
 menu, M_align, check  ,%  "Center"
 menu, M_align, uncheck,%  "Left"
@@ -69,6 +164,7 @@ menu, M_align, uncheck,%  "Right"
 return,
 
 Align_R:
+alignment := "R"
 Gui,  Gui_sys: Show, NoActivate w%Gui_sys_W% %Gui_sys_H% x2632 y62
 menu, M_align, Check  ,%  "Right"
 menu, M_align, Uncheck,%  "Left"
@@ -184,3 +280,41 @@ sysmetrics_str3 =
 #SM_CYKANJIWINDOW 	|18 	îSM_CYKANJIWINDOW: For double byte character set versions of the system, this is the height of the Kanji window at the bottom of the screen, in pixels.
 )
 return,
+
+MyMenuLabel:
+tooltip poop
+return
+
+WM_COMMAND(wParam, lParam, uMsg, hWnd)
+{
+	DetectHiddenWindows, On
+	WinGetClass, vWinClass, % "ahk_id " lParam
+	if (vWinClass = "ToolbarWindow32")
+	{
+		ToolTip, % wParam +1
+		Loop, % vCount
+		{
+		;if a_index = wParam +1
+	;	{
+	;	fukoff:= 0x4
+	;	}
+			vTxt%A_Index% := "TB " A_Index
+			vOffset := (A_Index-1)*vSize
+			;TBSTATE_ENABLED := 4
+			NumPut(A_Index-1,      TBBUTTON, vOffset,   "Int")                   ;iBitmap
+			NumPut(A_Index-1,      TBBUTTON, vOffset+4, "Int")                   ;idCommand
+			NumPut(0x0,            TBBUTTON, vOffset+8, "UChar")                 ;fsState
+			NumPut(&vTxt%A_Index%, TBBUTTON, vOffset+(A_PtrSize=8?24:16), "Ptr") ;iString
+		}
+			;NumPut(0x4,            TBBUTTON, vOffset+8, "UChar")                 ;fsState
+
+		Sleep 1500
+		ToolTip
+	}
+}
+
+poop(gname, hGUI){
+global
+	
+}
+	
