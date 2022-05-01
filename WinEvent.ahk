@@ -1,5 +1,4 @@
 ﻿#Singleinstance,      Force
-;ListLines,           Off 
 coordMode,  tooltip,  Screen	
 coordmode,  mouse,    screen
 DetectHiddenWindows,  On
@@ -9,14 +8,15 @@ SetTitleMatchMode,    Slow
 setWorkingDir,        %A_ScriptDir%
 SetBatchLines,        -1
 SetWinDelay,          -1
-#Persistent
+;ListLines,           Off 
+#include  	          <_struct>
 #NoEnv 
-
 gui, DGuI:new, +owner
 gui, DGui:-Caption -DPIScale -SysMenu +ToolWindow +owndialogs
-global ProcJIZM_ := RegisterCallback("jizzyfuckstart", "")
-
+global UProc := RegisterCallback("UEventHook", "")
+global TargetHandle, OutputVarWin
 PreLabL: ; ===>" binds " below line 500
+INIT_SEQ := "RegReads>Varz>Menu_Tray_Init>Menu_Style_Init>Hooks>quotEI>reload_orload_admhk>Main"
 gosub, init_matt
 return,
 
@@ -24,10 +24,10 @@ Main: ; sript & hooks initiated
 dbgtt := True
 wm_allow()
 
-; Time_Idle := A_TimeIdlePhysical	;	total time to screensaver = 420
-; if Time_Idle < 440
+	; Time_Idle := A_TimeIdlePhysical	;	total time to screensaver = 420
+	; if Time_Idle < 440
 	; settimer, timer_idletime,% ("-" . (430 - A_TimeIdlePhysical))
-	settimer jizz, -1
+	
 return,
 
 	;gui, +HWNDhgui +AlwaysOnTop
@@ -37,40 +37,154 @@ return,
 	
 timer_idletime: 		; testing
 ttp("timer complete.")
-return
-;EVENT_OBJECT_SELECTIONREMOVE:=0x8008 ; UNDO SELECTION MISTAKES
-;MENUHOOKS:
-;EVENT_SYSTEM_MENUPOPUPEND:=0x0007
-;EVENT_SYSTEM_MENUPOPUPSTART:=0x0006
-;EVENT_SYSTEM_MENUEND:=0x0005
-;EVENT_SYSTEM_MENUSTART:=0x0004
+return,
+
+	;EVENT_OBJECT_SELECTIONREMOVE:=0x8008 ; UNDO SELECTION MISTAKES
+	;MENUHOOKS:
+	;EVENT_SYSTEM_MENUPOPUPEND:=0x0007
+	;EVENT_SYSTEM_MENUPOPUPSTART:=0x0006
+	;EVENT_SYSTEM_MENUEND:=0x0005
+	;EVENT_SYSTEM_MENUSTART:=0x0004
 
 #F::
-initt := DllCall("SetWinEventHook", "Uint", winevents["MENUPOPUPSTART"], "Uint",winevents["MENUPOPUPSTART"], "Ptr", 0, "Ptr", ProcJIZM_ ,"Uint", 0, "Uint", 0, "Uint", 0x0000 | 0x0002)
+initt   := DllCall("SetWinEventHook", "Uint", winevents["MENUPOPUPSTART"], "Uint",winevents["MENUPOPUPSTART"], "Ptr", 0, "Ptr", UProc ,"Uint", 0, "Uint", 0, "Uint", 0x0000 | 0x0002)
 return
-
 #z::
-Hookmps :=  DllCall("SetWinEventHook", "Uint", winevents["MENUPOPUPEND"], "Uint",winevents["MENUPOPUPEND"], "Ptr", 0, "Ptr", (ProcJIZM_ := RegisterCallback("jizzyfuckstart", "")),"Uint", 0, "Uint", 0, "Uint", 0x0000| 0x0002)
+Hookmps := DllCall("SetWinEventHook", "Uint", winevents["MENUPOPUPEND"], "Uint",winevents["MENUPOPUPEND"], "Ptr", 0, "Ptr", (UProc := RegisterCallback("UEventHook", "")),"Uint", 0, "Uint", 0, "Uint", 0x0000| 0x0002)
 return
 
-jizzyfuckstart(ProcJIZM_, event, hWnd, idObject, idChild, dwEventThread, dwmsEventTime) {
+UEventHook(UProc, event, hWnd, idObject, idChild, dwEventThread, dwmsEventTime) {
 global
-	;static initt := DllCall("SetWinEventHook", "Uint", 0x0006, "Uint",0x0006, "Ptr", 0, "Ptr",  ,"Uint", 0, "Uint", 0, "Uint", 0x0000 | 0x0002)
-	;static ProcJIZM_ := RegisterCallback("jizzyfuckstart", "")
 	i:=Format("{:#x}", event) 
 	for, index, element in winevents
 		if element = %i%
-			evt := Index
-	ttp(( "Event: " evt "`nhandle: " hWnd "`nOBJ: " idObject ), "3000")
+			evt   := Index
+	ttp(( "Event: " evt "`nhandle: " hWnd "`nOBJ: " idObject ), "800")
 }
 
+stripchars(str2strip){
+	if instr(strpt, ";")
+		return, 0
+	strpt:=StrReplace(str2strip, ".exe")
+	if instr(strpt, ":")
+		strpt := StrReplace(strpt, ":" , "c0L")
+	if instr(strpt, " ")
+		strpt := StrReplace(strpt, " " , "_")
+	if instr(strpt, "+")
+		strpt := StrReplace(strpt, "+" , "Plus")
+	if instr(strpt, ".")
+		strpt := StrReplace(strpt, "." , "dot")
+	if instr(strpt, "-")
+		strpt := StrReplace(strpt, "-" , "dash")
+	return,  strpt
+}
+
+windowiconset: 
+wingetClass, Cls_,% TargetHandle 
+if (cls_ && !(cls_ = stripchars(Cls_))) { ;eg ClassNm is HwndWrapper[DefaultDomain;;1858c3ff-3932-4b1b-9310-b3dd5ccd5738]
+	winGet, prname, processname,% TargetHandle
+	if !prname {
+		msgbox,% "error. Class and Proc-name"
+		return,
+	}	
+	fileSelectFile,    filePath, Options, C:\ICON\,% prname "Icon Selector" ,% "Icunt (*.ico)"
+	if !fileexist, filepath 	 ;  not sure how but it works
+	{
+		WindowIconSet(OutputVarWin,filePath)
+		msgbox ok
+	 } else, msgbox,% filepath ". error with selected file."
+	prname:=stripchars(prname)	; use Pname for future
+	regWrite,% "REG_SZ",% "HKEY_CURRENT_USER\SOFTWARE\_MW\Icons\WinPname"  ,% prname ,% filePath
+	b   := ("ico" . prname), %b% := filePath
+} else {
+	icopresent := ("ico" . Cls_)
+	if !(%icopresent%)
+		FileSelectFile,  filePath, Options, C:\ICON\,% Cls_ "Icon Selector",% "Icunt (*.ico)"
+	("ico" . Cls_)   := filePath
+	WindowIconSet(OutputVarWin,filePath) 	; use classname for future
+	regWrite,% "REG_SZ",% "HKEY_CURRENT_USER\SOFTWARE\_MW\Icons\WinClass"  ,% Cls_ ,% filePath
+	b   := ("ico" . Cls_), %b% := filePath
+}
+return,
+ 
+windowiconrem:
+	regdelete,% "HKEY_CURRENT_USER\SOFTWARE\_MW\Icons\WinClass"  ,% Cls_ 
+	regdelete,% "HKEY_CURRENT_USER\SOFTWARE\_MW\Icons\WinPname"  ,% Pname
+	winget ppath, ProcessPath,% TargetHandle
+	WindowIconSet(OutputVarWin,ppath)
+	e   := ("ico" . Cls_) 
+	%e% := ""
+	if (%e%)
+		msgbox error 
+return,
+  
+Iconchange_Check(handle,cl="") {
+if !(IsWindow(handle))  
+ return
+	if !(cl = stripchars(cl))
+		return, 0
+	b  := ("ico" . cl)
+	if !(%b%="") {
+		if  !("h_" . b)
+			 ("h_" . b) := []
+		else for index, element in ("h_" . b)
+			if (element = %handle%)
+				return,
+		("h_" . b).push(handle)
+		WindowIconSet(handle,(%b%))	
+		return, 1
+}	}
+
+pushclsl_(cls="") {
+	clst_max_I      += 1 
+	if clst_max_I    > 20
+	   classeslast.pop(1)   ;   pop da' head
+	classeslast.push(cls)
+} 
+
+;ShadowBorder(handle) {
+;global
+	;;;-- used DllCall to draw a shadow around a gui
+	;;;sss:=DllCall("User32.dll\GetClassLongPtr", ( A_PtrSize = 8 ? "Ptr": "" ), handle, "int", -16)
+;	sss:=DllCall("User32.dll\SetClassLongPtr" , "Ptr", handle, "int", -10, "uint", 7)
+	;;;suxs:= DllCall("SetClassLongPtr", "ptr", handle, "int", -26, "ptr",  | 0x20000)
+;	msgbox,% "result is " sss
+;	sss:=DllCall("User32.dll\GetClassLongPtr", ( A_PtrSize = 8 ? "Ptr": "" ), handle, "int", -10)
+;	msgbox,% "result is " sss
+	;;;dwNewLong := new _Struct("LONG_PTR") ; this doesnt work for one reason or another, dll injection is only solution
+;;	;DllCall( "User32.dll\SetClassLongPtr" ( A_PtrSize = 8 ? "Ptr": "" ), "Ptr",hwnd, "Int",-10, "LONG", "BLACK_BRUSH")
+	;;;Return DllCall("SetClassLong" . (A_PtrSize = 8 ? "Ptr" : ""), "Ptr", HGUI, "Int", -26, "Ptr", Style, "UInt")
+;} 
+
+#c::
+for  index, element in classeslast
+if   index = 1
+	 classeslast_list:=element . "`n"
+else classeslast_list:=classeslast_list . element . "`n"
+msgbox,,% "Last-Initialized Classes",% classeslast_list
+return,
+
 OnObjectCreated(HookCr, event, hWnd, idObject, idChild, dwEventThread, dwmsEventTime) {
-	CRITICAL
+global
 	wingetClass, Class,% (hwand := "ahk_id " . Format("{:#x}", hWnd)) ;if( Title_last = "Folder In Use" ) {;;asas := ; "AHK_Class WindowsForms10.Window.8.app.0.141b42a_r6_ad1"
 	wingettitle, Title_last,% hwand ;;winget, hwnd2, ID , %asas%;;if asas;
-	switch       Class {			 ; winclose ahk_id %hwnd2%;;}
-		case     "OperationStatusWindow": 		
+	Iconchange_Check(hwnd,Class)
+	pushclsl_(Class)
+	switch       Class {
+		case "gdkWindowToplevel":
+			nnd := Format("{:#x}", hwnd) ; return proper hex
+			;sleep 300
+			;tooltip % A_now
+			;winshow, ahk_id %nnd%
+			;poop(nnd)
+			;return,
+		;case "WTouch_Message_Window":
+		;case "Notepad":
+		;	msgbox % Format("{:#x}", hWnd)
+		;	ShadowBorder(hWnd) ;			msgbox jdjdjj
+		case "OperationStatusWindow": 		
 			if (Title_last = "Replace or Skip Files") || (Title_last = "Confirm Folder Replace") || (Title_last = "Folder In Use") {
+				return,
 				msgbox,% " test 5 ",,,4
 				DEBUGTEST_FOC := True
 				DEBUGTEST_HWND    := wineXist("A")
@@ -81,26 +195,23 @@ OnObjectCreated(HookCr, event, hWnd, idObject, idChild, dwEventThread, dwmsEvent
 				msgbox,%  ("old1" old_focus1 "`nold2" old_focus2 "`nold3" old_focus3 "`nol4g1" old4gnd1 "`nol4g2" old4gnd2 "`nol4g3" old4gnd3) ;go_off_n_test_FOCUS:; ;wingetTitle, 
 				winactivate,% ("ahk_id " . old_focus1)Title_last ,% hwand ; WinGetActiveStats, Title, Width, Height, X, Y
 				settimer, tooloff, -128
-				return,
 			}
 		case "MozillaDialogClass":
 			winget, Style, Style,% hwand
 			winget, exStyle, exStyle,% hwand
 			If ((STYLE = 0x16CE0084) && (EXSTYLE = 0x00000101))
-				winset, Style,0x16860084,% hwand
-		case "NotifyIconOverflowWindow","DropDown","TaskListThumbnailWnd","Net UI Tool Window Layered":
+				winset, Style,0x16860084,% hwand 
+		case "NotifyIconOverflowWindow","TaskListThumbnailWnd","Net UI Tool Window Layered":
 			winset, ExStyle, ^0x00000100,% hwand
 			winset, Style,    0x94000000,% hwand
 		case "MMCMainFrame":
 			1998 := hwand
 			settimer, 1998, -700
-			return,
 		case "TaskListThumbnailWnd":	
 			SetAcrylicGlassEffect(hWnd)
 		case "CabinetWClass":
 			1999 := hwand
 			settimer, 1999, -700
-			return,
 		case "RegEdit_RegEdit","FM":
 			ControlGet, ctrlhand, Hwnd,, SysListView321,% hwand
 			SendMessage 0x1036, 0, 0x00000020,, ahk_id %ctrlhand% 	 ; enable row select (vs single cell) 	LVM_SETEXTENDEDLISTVIEWSTYLE := 0x1036
@@ -111,16 +222,13 @@ OnObjectCreated(HookCr, event, hWnd, idObject, idChild, dwEventThread, dwmsEvent
 			winset, ExStyle, 0x000800A8,%  "HUD Time",% "ahk_id " Time_hWnd:=Format("{:#x}",Time_hWnd)
 			winset, ExStyle, 0x000800A8,%  "Moon Phase II"
 			sidebar := True
-			return,
 		case "ApplicationFrameWindow","Chrome_WidgetWin_1","WINDOWSCLIENT":	
 			if (Title_Last="Roblox") {
 				p ="C:\Program Files\AHK\AutoHotkeyU32_UIA.exe" "C:\Script\AHK\Roblox_Rapid.ahk"
 				result := Send_WM_COPYDATA("status", "M2Drag.ahk - AutoHotkey")
 				settimer, RobloxGetHandle, -2000
 				run,% p	;run "%AF%"			;run "C:\Program Files\AHK\AutoHotkeyU32_UIA.exe" "%AF%"
-				
-		sbardisabletoggle() 
-
+				sbardisabletoggle() 
 				if (m2dstatus != "not running or paused"	) && (m2dstatus !=False)     {
 					PostMessage, 0x0111, 65306,,, M2Drag.ahk - AutoHotkey
 					PostMessage, 0x0111, 65305,,, M2Drag.ahk - AutoHotkey	
@@ -132,13 +240,10 @@ OnObjectCreated(HookCr, event, hWnd, idObject, idChild, dwEventThread, dwmsEvent
 					if (m2dstatus != "not running or paused"	) && (m2dstatus !=False) {
 						PostMessage, 0x0111, 65306,,, M2Drag.ahk - AutoHotkey		
 						PostMessage, 0x0111, 65305,,, M2Drag.ahk - AutoHotkey		
-					}
-					return
-			}	}
+			}	}	}
 		case "MsiDialogCloseClass":
-			if id := winexist("ahk_class MsiDialogCloseClass") {
+			if id := winexist("ahk_class MsiDialogCloseClass") 
 				txt  :=  "dialog",   c_ntrolName  :=  "Static1"
-			}
 			if (mainc_nt = Format("{:#x}", (WinExist("ahk_exe msiexec.exe",txt)))) {
 				ControlGet, c_ntHandle, hWnd ,,%c_ntrolName% , ahk_id %mainc_nt%
 				StyleMenu_Showindow( c_ntHandle, !IsWindowVisible( c_ntHandle))
@@ -149,17 +254,18 @@ OnObjectCreated(HookCr, event, hWnd, idObject, idChild, dwEventThread, dwmsEvent
 			StyleMenu_Showindow(hWnd, !IsWindowVisible(hWnd))
 			winset, Style, 0x80000000,% hndDS
 		case "#32770":
+			explorer_opensave_DLG:="Open,Save As,Save File As,Save Image,Enter name of file to save to...,"
 			if (Title_last = "Information") {
 				winactivate, ahk_class #32770
-				
+				winwaitactive,ahk_id %hwnd%
 				send, N
-				return,
 			}
-			if ( (Title_last = "Open") || (Title_last = "Save As") || (Title_last = "Save File As ...") || (Title_last = "Save Image") || (Title_last = "Enter name of file to save to...") ) {
-				nnd := Format("{:#x}", hwnd) ; return proper hex
-				gosub, 32770Fix
-				return,
-			}
+			else if Title_last {
+				if instr(explorer_opensave_DLG,(Title_last . ",")) {
+		       ;	if ( (Title_last = "Open") || (Title_last = "") || (Title_last = " ...") || (Title_last = "") || (Title_last = "...") ) {
+					nnd := Format("{:#x}", hwnd) ; return proper hex
+					gosub, 32770Fix
+				}
 			winget PName, ProcessName,% hwand
 			if (PName = "notepad++.exe")       {
 				winget, currentstyle, Style,% hwand
@@ -170,33 +276,23 @@ OnObjectCreated(HookCr, event, hWnd, idObject, idChild, dwEventThread, dwmsEvent
 			 else, if (PName = "explorer.exe") { ; wingetTitle, Title_last, ahk_id %hWnd%
 				if (Title_last = "Folder In Use")   {
 					WinGetText, testes,% hwand
-					traytip,% "bctfe",% "6161 Folder in use mB0cks'tected`n" testes	
-					; asas := "AHK_Class WindowsForms10.Window.8.app.0.141b42a_r6_ad1" ; winget, hwnd2, ID , %asas% ; if asas { ;not working and not good ; winclose ahk_id %hwnd2% ; winactivate, ahk_id %fuk% ; sleep, 20 ; send {left} ; send {enter} ; return, ;	}
-			}	}				
+					tt("File handle open")
+			} } }
 		case "Notepad++":
 			if !np {
 				 sem := "Notepad++ Insert AHK Parameters.ahk - AutoHotkey"
 				 if !WinExist(sem) 
-					run "C:\Script\AHK\- Script\Notepad++ Insert AHK Parameters.ahk",,hide
+					run,% "C:\Script\AHK\- Script\Notepad++ Insert AHK Parameters.ahk",,hide
 				np := True
 			}
-	;	case "MozillaDropShadowWindowClass": ; copied from regular menus and no joy
-	;	{ 		
-	;		winset, transparent , 230,% hwand
-	;		winset, ExStyle, 0x00000181,% hwand
-	;		winset, Style, 0x84800000,% hwand	
-	;		SetAcrylicGlassEffect(hWnd) 
-	;		return,
-	;	} 
 	 	case "Autohotkey":
-			ccc := "C:\Script\AHK\adminhotkeys.ahk"
-			if CCC in %Title_last%
-			{
-				menu, tray, check, Launch AdminHotkeyz,
-				tooltip  %Title_last% detected admin hotkey connecting
+			if instr(Title_last,(ccc := "C:\Script\AHK\adminhotkeys.ahk")) { ;if CCC in %Title_last%
+				menu, tray, check, Launch Adhkrun
+				tt(Title_last . " detected admin hotkey connecting")
 			}
 		default: 
-			if (IsWindow(hWnd))            {
+			if (IsWindowVisible(hWnd))     {
+				;Iconchange_Check(hwnd,Class)
 				winget Style, Style,% hwand
 				if (Style & 0x10000000)    {
 					if !Tool || if Tool=20
@@ -213,10 +309,7 @@ OnObjectCreated(HookCr, event, hWnd, idObject, idChild, dwEventThread, dwmsEvent
 					tooly = % offset	
 					classname=%Class%`n
 					settimer, EventLogBuffer_Push, -4000
-			}	}
-			return,
-		return, 		;	 	end case	
-	}	
+	}	}	}	
 	
 	winget PName, ProcessName,% hwand ;logvar := (logvar . "`r`n" . ( PName . "e" . Class . "e" . Title_last ))
 	if TTcr
@@ -224,47 +317,47 @@ OnObjectCreated(HookCr, event, hWnd, idObject, idChild, dwEventThread, dwmsEvent
 	StyleDetect(hWnd, Style_ClassnameList2,	Class,      Array_LClass) 
 	StyleDetect(hWnd, Style_wintitleList2,  Title_last, Array_LTitle) 
 	StyleDetect(hWnd, Style_procnameList2,	PName,      Array_LProc) 
-	
+	if instr(pname, "Wacom")
+		msgbox % Class
 	switch pname {
-		;ase "RzSynapse.exe":
+		;xase "RzSynapse.exe":
 			;settimer RZ_LOG, -1
+		case "WTabletServicePro.exe":
+			;msgbox
 		case "GoogleDriveFS.exe":
-			msgbox,% (Title_last . " titlelast!")
+			;msgbox,% (Title_last . " titlelast!")
 	}
-	
 	switch, Title_last {
 		case "Razer Synapse Account Login":
 			settimer RZ_LOG, -1
 		case "Google Drive Sharing Dialog":
-			msgbox, gfs
+			;msgbox, gfs
 	}
-
 	EventLogBuffer_Push:
-		If !EventLogBuffer
-			EventLogBuffer = % EventLogBuffer_Old
-		else
-			EventLogBuffer=%EventLogBuffer%`n%EventLogBuffer_Old%
-		EventLogBuffer_Old:="", clist:="", offset:="", tool:=""
-		return,
+	If !EventLogBuffer
+		EventLogBuffer = % EventLogBuffer_Old
+	else
+		EventLogBuffer=%EventLogBuffer%`n%EventLogBuffer_Old%
+	EventLogBuffer_Old:="", clist:="", offset:="", tool:=""
+	return,
 }
 
 On4ground(hook4g, event, hWnd4, idObject, idChild, dwEventThread, dwmsEventTime) {
-old4gnd3 := old4gnd2
-old4gnd2 := old4gnd1
-old4gnd1 := hWnd4
+old4gnd3 := old4gnd2, old4gnd2 := old4gnd1, old4gnd1 := hWnd4
 CRITICAL
-
-	if (DEBUGTEST_FOC && (hWnd4 != DEBUGTEST_HWND)) {
-		msgbox,% ("focus lost " . DEBUGTEST_HWND)	;ttp(("focus lost " . DEBUGTEST_HWND))
-		DEBUGTEST_HWND := ""
-		DEBUGTEST_FOC := False
-	}
-	4gnd_hwnd =% "ahk_id " hWnd4
+	; if (DEBUGTEST_FOC && (hWnd4 != DEBUGTEST_HWND)) {
+		; msgbox,% ("focus lost " .  DEBUGTEST_HWND)	;ttp(("focus lost " . DEBUGTEST_HWND))
+		; DEBUGTEST_HWND := ""
+		; DEBUGTEST_FOC := False
+	; }
+	4gnd_hwnd := ("ahk_id " . hWnd4)
 	wingetClass, Class,% 4gnd_hwnd
 	wingettitle, Title_last, 4gnd_hwnd	
 	winget,      PName, ProcessName,% 4gnd_hwnd
 	if TT4g
 		tooltip, 4Ground EVENT:`n%PName%`n%Title_last%`nAHK_Class %Class%`nAHK_ID %hWnd4%
+	Iconchange_Check(hWnd4,Class)
+
 	switch Class {
 		case "#32770":	; msg box 
 			wingettitle, Title_last,% 4gnd_hwnd	
@@ -293,14 +386,13 @@ CRITICAL
 		case "ApplicationFrameWindow","Chrome_WidgetWin_1","WINDOWSCLIENT":
 			ttt := "M2Drag.ahk - AutoHotkey", result := Send_WM_COPYDATA("status",ttt)
 			wingettitle, Title_last,% 4gnd_hwnd	
-			;if (Title_last != "Roblox")
-			;	TOOLTIP
 			ttt := "M2Drag.ahk - AutoHotkey", result := Send_WM_COPYDATA("status", "M2Drag.ahk - AutoHotkey")
 			settimer, tooloff, -2222
 			if roblox {
 				gethandle_roblox() 
 				settimer, m2_Status_check, -4000
 				return,
+				
 				m2_Status_check:
 				if( m2dstatus != "not running or paused"	) {
 					PostMessage, 0x0111, 65306,,, M2Drag.ahk - AutoHotkey	; 	65306 = Pause
@@ -308,7 +400,6 @@ CRITICAL
 				}
 				m2dstatus := False
 			}
-			return,
 		Default:
 			ttt := "M2Drag.ahk - AutoHotkey", result := Send_WM_COPYDATA("status", "M2Drag.ahk - AutoHotkey")
 			if (result = "FAIL") {
@@ -354,9 +445,8 @@ CRITICAL
 			invert_win(hWnd4)		
 	}
 	switch, Title_last {
-		case "Razer Synapse Account Login":
+		case "Razer Synapse Account Login":	;case "Google Drive Sharing Dialog":;msgbox
 			settimer RZ_LOG, -1
-	;case "Google Drive Sharing Dialog":;msgbox
 	}
 return,	
 }
@@ -375,6 +465,7 @@ CRITICAL
 	wingetClass, Class,% hnd_
 	winget PName, ProcessName,% hnd_
 	wingettitle, Title_last,% hnd_	
+	Iconchange_Check(hWnd4,Class)
 
 	if TTFoc
 		tooltip,% ("FOCUS EVENT:`n" PName "`n" Title_last "`nAHK_Class " Class "`nAHK_ID " BK_UN_T)
@@ -383,6 +474,7 @@ CRITICAL
 			settimer RZ_LOG, -1
 		case "GoogleDriveFS.exe":
 			if !triggeredGFS {
+			return
 				triggeredGFS := True
 				sleep, 1000 ;msgbox % BK_UN_T "asdsads"
 				invert_win(BK_UN_T)
@@ -394,8 +486,7 @@ CRITICAL
 			;msgbox
 	}	
 	switch Class {
-	case "WTouch_Message_Window":
-	msgbox jdjdjj
+
 		case "MozillaDialogClass":
 			winget, Style, Style,% hnd_
 			If(STYLE = "0x16CE0084") { ;&& (EXSTYLE = 0x00000101)   
@@ -545,29 +636,29 @@ CRITICAL
 ; end of hooks  <<<--------------------------------------- 
 return, 
 ; binds 		<<<---------------------------------------
-~^s::	 ; 		Capture Save hotkey Ctrl-S
-wingetActiveTitle, A_Title 
-if winactive("ahk_exe notepad++.exe") 				{ 
-	if instr(A_Title, ".ahk") 						{   
-		if instr(A_Title, "*")						{   	
-			A_Title := StrReplace(A_Title, "*" , "") 	; *ASTERISK denotes unsaved doc in np++ WinTitle
-			SplitPath, A_Title, tName, npDir, npExtension, npNameNoExt, npDrive 
-			ser := npNameNoExt . ".ahk - AutoHotkey"
-			TargetScriptName := (npNameNoExt . ".ahk"	)
-			if (WinExist(ser)) or if (npNameNoExt = "WinEvent") {
-				MsgBox, 4129,%ser% dtect`NnReload AHK Script, Reload %TargetScriptName% now?`nTimeout in 6 Secs, 7
-				; IfMsgBox Timeout
-					; ttp("cuntface")
-				ifmsgbox OK					
-					if npNameNoExt = WinEvent		
-{					
-						reload
-						exit 
-						}
-					traytip, %TargetScriptName%, reloading, 2, 32
-					postMessage, 0x0111, 65303,,, %TargetScriptName% - AutoHotkey		; Reload WMsg 
-}	}	}	}	
-return, 
+; ~^s::	 ; 		Capture Save hotkey Ctrl-S
+; wingetActiveTitle, A_Title 
+; if winactive("ahk_exe notepad++.exe") 				{ 
+	; if instr(A_Title, ".ahk") 						{   
+		; if instr(A_Title, "*")						{   	
+			; A_Title := StrReplace(A_Title, "*" , "") 	; *ASTERISK denotes unsaved doc in np++ WinTitle
+			; SplitPath, A_Title, tName, npDir, npExtension, npNameNoExt, npDrive 
+			; ser := npNameNoExt . ".ahk - AutoHotkey"
+			; TargetScriptName := (npNameNoExt . ".ahk"	)
+			; if (WinExist(ser)) or if (npNameNoExt = "WinEvent") {
+				; MsgBox, 4129,%ser% dtect`NnReload AHK Script, Reload %TargetScriptName% now?`nTimeout in 6 Secs, 7
+				;;IfMsgBox Timeout
+				;;	ttp("cuntface")
+				; ifmsgbox OK					
+					; if npNameNoExt = WinEvent		
+; {					
+						; reload
+						; exit 
+						; }
+					; traytip, %TargetScriptName%, reloading, 2, 32
+					; postMessage, 0x0111, 65303,,, %TargetScriptName% - AutoHotkey		; Reload WMsg 
+; }	}	}	}	
+; return, 
 
 #M::  					;		ALTgr + Right Arrow
 +#M::	
@@ -584,7 +675,7 @@ return,
 gosub, AeroTheme_Set ; does nothing atm
 return,
 ;#z::
-;Hookmps :=  DllCall("SetWinEventHook", "Uint", winevents["MENUPOPUPEND"], "Uint",winevents["MENUPOPUPEND"], "Ptr", 0, "Ptr", (ProcCr_ := RegisterCallback("jizzyfuckstart", "")),"Uint", 0, "Uint", 0, "Uint", 0x0000| 0x0002)
+;Hookmps :=  DllCall("SetWinEventHook", "Uint", winevents["MENUPOPUPEND"], "Uint",winevents["MENUPOPUPEND"], "Ptr", 0, "Ptr", (ProcCr_ := RegisterCallback("UEventHook", "")),"Uint", 0, "Uint", 0, "Uint", 0x0000| 0x0002)
 
 gosub, quotE
 return,
@@ -596,14 +687,19 @@ return,
 		; traytip,% "escapetarget dispatched",% Escape_TargetWin
 ; }	}   ; return,
 ;guiclose:
+ 
 ~esc::
-settimer jizz, -1
+send {escape up}
+IF !JIZD
+	settimer JIZZ, -1
+;ELSE, MSGBOX,% "JIZZED"
 return,
 
-jizz:
-;ttp("cuntjsjfkjs")
-gui, ttt: hide
-Gui, eventgui: hide
+JIZZ:
+;msgbox,% "JIZZIN"
+GLOBAL JIZD:=TRUE
+gui, ttt: DESTROY
+Gui, eventgui: DESTROY
 return,
 	;	<------------< [ End of Script ] <------------------<
 	;	>------------> [ Begin ... Functions ] >------------>
@@ -657,12 +753,11 @@ Send_WM_COPYDATA(ByRef StringToSend, ByRef TargetScriptTitle) {
 	SetTitleMatchMode %Prev_TitleMatchMode%
 	return, ErrorLevel
 }
+
 Receive_WM_COPYDATA(wParam, lParam) {
 	StringAddress := NumGet(lParam + 2*A_PtrSize)
 	CopyOfData := StrGet(StringAddress)
-	;msgbox % copyofdata
-	if CopyOfData contains Þ ;
-	{ 	
+	if instr(CopyOfData, "Þ") { ;
 		if !FileListStr {
 			FileListStr := CopyOfData, FileCount := 1
 		} else, {
@@ -670,12 +765,10 @@ Receive_WM_COPYDATA(wParam, lParam) {
 		}
 		FileListStrGen(Delimiter:="Þ") 
 	}
-	else, if (CopyOfData = "RobloxFalse")
-	{
-		roblox := False
-		Result := Send_WM_COPYDATA("RobloxClosing", TargetScriptTitle2)
+	else, if (CopyOfData = "RobloxFalse") {
+		roblox  := False
+		Result  := Send_WM_COPYDATA("RobloxClosing", TargetScriptTitle2)
 		Result1 := Send_WM_COPYDATA("RobloxClosing", TargetScriptTitle),
-		msgbox, aaa, aaa
 	}
 	else, if CopyOfData = 10
 		m2dstatus := "Suspended"
@@ -700,6 +793,7 @@ FileListStrGen(abc) {
 	settimer, FileListStrGen2, -500
 	return,
 }
+
 gethandle_roblox() {
 	loop 3 {
 		winget, Roblox_hWnd, id, AHK_Class WINDOWSCLIENT
@@ -707,6 +801,7 @@ gethandle_roblox() {
 			roblox := False
 		else, return, Roblox_hWnd
 }	}
+
 TestMbkill(handle) {
 	if !8skin_crash 
 		8skin_crash = 1
@@ -720,9 +815,10 @@ TestMbkill(handle) {
 		run C:\Apps\Kill.exe robloxplayerbeta.exe,, hide
 	}
 	if winexist("ahk_id %handle%")
-		 return, 0
+		  return, 0
 	else, return, 1
 }	
+
 MessageBoxKill(Target_MSGBOX) {
 	Target_hwnd := WinExist(Target_MSGBOX)	;winactivate ;send n ;ControlGet, OutputVar, SubCommand , Value, Button2, WinTitle, WinText, ExcludeTitle, ExcludeText	;ControlSendraw, ahk_parent, n, ahk_class #32770
 	ControlClick, "Button2", "ahk_class #32770",	;ControlSend, ahk_parent, {N}, ahk_id %anus%
@@ -742,18 +838,23 @@ MessageBoxKill(Target_MSGBOX) {
 			traytip,% KillCount " kills", 4000, 2000
 			settimer, tooloff, -7000
 }	}	}
+
 IsWindow(hWnd) {
 	return, DllCall("IsWindow", "Ptr", hWnd)
 }
+
 IsWindowEnabled(hWnd) {
 	return, DllCall("IsWindowEnabled", "Ptr", hWnd)
 }
+
 IsWindowVisible(hWnd) {
 	return, DllCall("IsWindowVisible", "Ptr", hWnd)
 }
+
 StyleMenu_Showindow(hWnd, nCmdShow := 1) {
 	DllCall("StyleMenu_Showindow", "Ptr", hWnd, "Int", nCmdShow)
 }
+
 IsChild(hWnd) {
 	winget Style, Style, ahk_id %hWnd%
 	return, Style & 0x40000000 ; WS_CHILD
@@ -761,6 +862,7 @@ IsChild(hWnd) {
 GetParent(hWnd) {
 	return, DllCall("GetParent", "Ptr", hWnd, "Ptr")
 }
+
 SetAcrylicGlassEffect(hWnd) {
 	Static Init, accent_state := 4
 	Static Pad := A_PtrSize = 8 ? 4 : 0, WCA_ACCENT_POLICY := 19
@@ -802,12 +904,20 @@ Display_Msg(Text, Display_Msg_Time, X_X) {
 Hooks:
 OnExit("AtExit")
 OnMessage(0x4a, "Receive_WM_COPYDATA")
-hook4g  :=  DllCall("SetWinEventHook", "Uint", OBJ4g, "Uint", OBJ4g, "Ptr", 0, "Ptr", (Proc4g_ := RegisterCallback("On4ground", "")),"Uint", 0, "Uint", 0, "Uint", OoC | SkpO)
-HookFc  :=  DllCall("SetWinEventHook", "Uint", OBJFc, "Uint", OBJFc, "Ptr", 0, "Ptr", (procFc_ := RegisterCallback("OnFocus", "")),  "Uint", 0, "Uint", 0, "Uint", OoC | SkpO)
-HookMb  :=  DllCall("SetWinEventHook", "Uint", 0x0010,"Uint", 0x0010,"Ptr", 0, "Ptr", (ProcMb_ := RegisterCallback("OnMsgBox", "")), "Uint", 0, "Uint", 0, "Uint", OoC | SkpO)
-HookCr  :=  DllCall("SetWinEventHook", "Uint", OBJCR, "Uint", OBJCR, "Ptr", 0, "Ptr", (ProcCr_ := RegisterCallback("OnObjectCreated", "")),  "Uint", 0, "Uint", 0, "Uint", OoC| SkpO) 
-HookOD  :=  DllCall("SetWinEventHook", "Uint", OBJDS, "Uint", OBJDS, "Ptr", 0, "Ptr", (ProcOD_ := RegisterCallback("OnObjectDestroyed", "")),"Uint", 0, "Uint", 0, "Uint", OoC| SkpO)
-;Hookmps :=  DllCall("SetWinEventHook", "Uint", MNPPS, "Uint", MNPPS, "Ptr", 0, "Ptr", (ProcCr_ := RegisterCallback("jizzyfuckstart", "")),"Uint", 0, "Uint", 0, "Uint", OoC| SkpO)
+hook4g  :=  DllCall("SetWinEventHook", "Uint", OBJ4g, "Uint", OBJ4g, "Ptr", 0, "Ptr", (Proc4g_ := RegisterCallback("On4ground", "")),        "Uint", 0, "Uint", 0, "Uint", OoC | SkpO)
+HookFc  :=  DllCall("SetWinEventHook", "Uint", OBJFc, "Uint", OBJFc, "Ptr", 0, "Ptr", (procFc_ := RegisterCallback("OnFocus", "")),          "Uint", 0, "Uint", 0, "Uint", OoC | SkpO)
+HookMb  :=  DllCall("SetWinEventHook", "Uint", 0x0010,"Uint", 0x0010,"Ptr", 0, "Ptr", (ProcMb_ := RegisterCallback("OnMsgBox", "")),         "Uint", 0, "Uint", 0, "Uint", OoC | SkpO)
+HookCr  :=  DllCall("SetWinEventHook", "Uint", OBJCR, "Uint", OBJCR, "Ptr", 0, "Ptr", (ProcCr_ := RegisterCallback("OnObjectCreated", "")),  "Uint", 0, "Uint", 0, "Uint", OoC | SkpO) 
+HookOD  :=  DllCall("SetWinEventHook", "Uint", OBJDS, "Uint", OBJDS, "Ptr", 0, "Ptr", (ProcOD_ := RegisterCallback("OnObjectDestroyed", "")),"Uint", 0, "Uint", 0, "Uint", OoC | SkpO)
+;Hookmps :=  DllCall("SetWinEventHook", "Uint", MNPPS, "Uint", MNPPS, "Ptr", 0, "Ptr", (ProcCr_ := RegisterCallback("UEventHook", "")),"Uint", 0, "Uint", 0, "Uint", OoC| SkpO)
+onmydick:=0x0010
+loop, parse,% (a:="OBJ4g,OBJFc,onmydick,OBJCR,OBJDS"), `,
+	hooked_events.push(a_loopfield)
+	; for index, element in hooked_events
+	; if !ass
+		; ass := element
+	; else ass := ass . "," . element
+	; msgbox % ass
 return,     
 
 FileListStrGen2:
@@ -939,7 +1049,7 @@ Gdip_ShutdownI(pToken) {
    DllCall("gdiplus\GdiplusShutdown", "Uint", pToken)
    If hModule := DllCall("GetModuleHandle", "str", "gdiplus")
          DllCall("FreeLibrary"    , "Uint", hModule)
-   return, 0
+   return, 0 
 }
 
 invert_win(hw)                  { ; not working atm
@@ -1216,23 +1326,46 @@ Loop %list_rzexe% {
 		send %Pa5s_RZ%
 		PixelGetColor, color, 219, 326
 		if color != 0x02DD02
-			msgbox,% "default snot saved"
+			def:="default snot saved"
 		else, send {enter}
 }	}	
 CoordMode,% coord_old
 return,
+
 ;------------==========================++++++++++++++++++++*+*+*+*
 ;~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~
 ;------------==========================++++++++++++++++++++*+*+*+*
 RegReads: ; -=-==-=====-= REG READZZZZ =-=-=----==--@~@'''~~--__
 AhkPath := ErrorLevel ? "" : AHKdir "\AutoHotkey.exe"
-RegRead, Log1RZ, HKEY_CURRENT_USER\Software\_Mouse2Drag\Login , rz
+
+keys:="HKCU\SOFTWARE\_MW\Icons\WinClass,HKCU\SOFTWARE\_MW\Icons\WinPname"
+loop parse, keys, `,
+{
+	Loop, Reg,% A_Loopfield
+	{
+		fuka:=A_LoopRegName
+		regRead, v_, HKCU\SOFTWARE\_MW\Icons\WinClass, %fuka%
+		if instr(fuka, ":")
+			fuka := StrReplace(fuka, ":" , "c0L")
+		if instr(fuka, " ")
+			fuka := StrReplace(fuka, " " , "_")
+		if instr(fuka, "+")
+			fuka := StrReplace(fuka, "+" , "Plus")
+		if instr(fuka, ".")
+			fuka := StrReplace(fuka, "." , "dot")
+		if instr(fuka, "-")
+			fuka := StrReplace(fuka, "-" , "dash")
+		v1_ :=  ("ico" .       fuka)
+		global (%v1_%) := v_
+}	}
+
+regRead, Log1RZ, HKEY_CURRENT_USER\Software\_Mouse2Drag\Login , rz
 if Log1RZ {
 	loop, parse, Log1RZ, `,
 	{
 		if (A_index = "1")
 			Log1_RZ := A_LoopField
-		if (A_index = "2")
+		if (A_index = "2") 
 			Pa5s_RZ := A_LoopField
 }	}
 Loop, Reg,% wintitlekey
@@ -1295,6 +1428,8 @@ else, {
 	regwrite, REG_SZ,% (HKCUCurVer . "\Themes"),	    	 CurrentTheme,	% test_aero_theme 
 }
 return,
+
+
 ;------------==========================++++++++++++++++++++*+*+*+*
 quotEI:
 q_dlim	= \
@@ -1347,13 +1482,15 @@ mattdwmrun2:  ; []()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>()
 test_move:    ; []()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>()
 Mag_:         ; []()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>()
 MiDi_:        ; []()<>()[]()<>()[]()<>()[]()<>()[]()<>()[]()<>()[
-CleanME_PLZz: ; []()<>()[]()<>()[]()<>()[]()<>()[]()<>()[
-DWMFixS:      ; []()<>()[]()<>()[]()<>()[]()<>()[]()
-PConfig:      ; []()<>()[]()<>()[]()<>()[]()<>()  
+CleanME_PLZz: ; []()<>()[]()<>()[]()<>()[]()<>()[]()<>()[](
+DWMFixS:      ; []()<>()[]()<>()[]()<>()[]()<>()[]()<>
+PConfig:      ; []()<>()[]()<>()[]()<>()[]()<>()[ 
+clsids:       ; []()<>()[]()<>()[]()<>()[]()<>(  
 WMPRun:       ; []()<>()[]()<>()[]()<>()[]()<
 M2dRun:       ; []()<>()[]()<>()[]()<>()[]
 YT_DL:        ; []()<>()[]()<>()[]()<>()
-											
+	SysMetrix:
+	
 LABElA(( Your_Label_Sir := A_thislabeL ))
 return,
 			
@@ -1404,6 +1541,7 @@ return
 ;------------=========================++++++++++++++++++++*+*+*+*
 Open_ScriptDir() ; not called ever, using to invoke its label(s).
 ;------------=========================++++++++++++++++++++*+*+*+*
+
 Stylemenu_init:  ; tooltip % "Analyzing, please wait" ++++*+*+*+*
 TargetHandle := "", style:=""
 if Dix
@@ -1412,27 +1550,32 @@ if Dix
 Dix := True
 MouseGetPos, OutputVarX, OutputVarY, OutputVarWin, OutputVarControl
 TargetHandle := ("ahk_id " . OutputVarWin)
-wingetTitle, TargetTitle,% TargetHandle
+wingetClass, Cls_,%                TargetHandle 
+;winget       pname__, Processname,% TargetHandle
+wingetTitle, TargetTitle,%          TargetHandle
 if !TargetTitle 
 	return,
 winget, PName,     ProcessName,%      TargetHandle
 winget, Style2,    Style,% 		      TargetHandle
 winget, ExStyle2,  ExStyle,% 	      TargetHandle
 
+
 menu_Style_main:
-menu,         F,   Add,%     PName,   donothing
-menu,         F,   Disable,% PName
-menu,         F,   Add,%   Grants_Son["Sys_Menu"], toggle_sysmenu
+if Pname {
+	menu,         F,   Add,%     PName, donothing
+	menu,         F,   Disable,% PName
+}
+menu,         F,   Add,%     Grants_Son["Sys_Menu"],  toggle_sysmenu
 if (Style2    &    0x00080000)
-	  menu,   F,   check,% Grants_Son["Sys_Menu"]
+	  menu,   F,   check,%   Grants_Son["Sys_Menu"]
 else, menu,   F,   uncheck,% Grants_Son["Sys_Menu"]
-      menu,   F,   add,% Grants_Son["Clickthru"],   toggle_Clickthru
+      menu,   F,   add,%     Grants_Son["Clickthru"], toggle_Clickthru
 if(ExStyle2   &    0x00000001)
-	  menu,   F,   check,% Grants_Son["Clickthru"]
+	  menu,   F,   check,%   Grants_Son["Clickthru"]
 else, menu,   F,   uncheck,% Grants_Son["Clickthru"]
-      Menu,   F,   add,% Grants_Son["AppWindow"],   toggle_AppWindow
+      Menu,   F,   add,%     Grants_Son["AppWindow"], toggle_AppWindow
 if(ExStyle2   &    0x00040000)
-	  menu,   F,   check,% Grants_Son["AppWindow"]
+	  menu,   F,   check,%   Grants_Son["AppWindow"]
 else, menu,   F,   uncheck,% Grants_Son["AppWindow"]
 goto, menus_subitem
 
@@ -1461,12 +1604,12 @@ if(ExStyle2  &   0x00020000)
 else, menu,      S1, uncheck,%  "Static edge"
       menu,      S1, Add,%      Grants_Son["Maxbox"],       toggle_Maxbox
 if (Style2   &    0x00010000)                     
-	  menu,      S1, check,%     Grants_Son["Maxbox"]        
-else, menu,      S1, uncheck,%   Grants_Son["Maxbox"]       
-      menu,      S1, Add,%       Grants_Son["MinBox"],       toggle_MinBox
-if (Style2   &   0x00020000)                    
-	  menu,      S1, check,%     Grants_Son["MinBox"]          
-else, menu,      S1, uncheck,%   Grants_Son["MinBox"]          
+	  menu,      S1, check,%    Grants_Son["Maxbox"]        
+else, menu,      S1, uncheck,%  Grants_Son["Maxbox"]       
+      menu,      S1, Add,%      Grants_Son["MinBox"],       toggle_MinBox
+if (Style2   &   0x00020000)                   
+	  menu,      S1, check,%    Grants_Son["MinBox"]          
+else, menu,      S1, uncheck,%  Grants_Son["MinBox"]          
       menu,      S2, Add,%      "HScroll",     toggle_hscroll
 if (Style2   &   0x00100000)                  
 	  menu,      S2, check,% 	"HScroll"  
@@ -1501,13 +1644,27 @@ goto, Submenus
 ; Reset			:= 	"Reset window style preferences"
 menus_other: ; below submenus
 menu, 	F, 	add,  m2drag bypass,     toggle_m2drag_bypass
-menu, 	F, 	Icon, m2drag bypass,%     mouse24
+menu, 	F, 	Icon, m2drag bypass,%    mouse24
 menu, 	F, 	add,% "Get window text", getwintxt
-menu, 	F, 	add,% Save,              Savegui
+if !pname
+msgbox error pname
+if !cls_
+msgbox error clsn
+Cls_:=stripchars(Cls_)
+Pname:=stripchars(Pname)
+e := ("ico" . Pname)
+ee := ("ico" . Cls_)
+if ((%e%) || (%ee%))
+{
+	menu, 	F, 	add,% "remove icon",     windowiconrem
+} else menu, 	F, 	add,% "Set icon",        windowiconset
+menu, 	F, 	add,% "Save",            Savegui
 goto,   StyleMenu_Show
 
 StyleMenu_Show:
 menu, 	F,  Show
+	 menu, F, DeleteAll
+
 return,  
 ;`~			
 NewTrayMenuParam( LabelPointer = "", Title = "", Icon = "" ) {
@@ -1534,7 +1691,7 @@ for index, element in MenuLablTitlAr
 return,
 ; ~`~`~~`~;`~`~`~`~		~`~`~`~		~`~`~`~		~`~`~`  ~`~`~` ~`~`~	`~` ~`~ `~  ~`~`	~`~	`~`~`~	`~	`~`
 test_icons:
-mti := (NewTrayMenuParam("", "Launch PowerConfig", ((icn := "C:\Icon\") . "20\alien.ico") )), mti := (NewTrayMenuParam("", "Launch MattDWM", (icn . "24\dwm24.ico") )), mti := (NewTrayMenuParam("", "Launch YouTube_DL", (icn . "24\YouTube.ico") )), mti := (NewTrayMenuParam("", "DWM_Axnt_fix", (icn . "24\refresh.png") )), mti := (NewTrayMenuParam("", "LoadAeroRegKeyz", (icn . "24\refresh.png") )), mti := (NewTrayMenuParam("", "Launch M2Drag", (ScpW . "\Mouse242.ico") )), mti := (NewTrayMenuParam("", "Launch screen clean!", (icn . "24\AF_Icon.ico") ))
+mti := (NewTrayMenuParam("", "Launch PowerConfig", ((icn := "C:\Icon\") . "20\alien.ico") )), mti := (NewTrayMenuParam("", "Launch MattDWM", (icn . "24\dwm24.ico") )), mti := (NewTrayMenuParam("", "Launch YouTube_DL", (icn . "24\YouTube.ico") )), mti := (NewTrayMenuParam("", "DWM_Axnt_fix", (icn . "24\pNG\refresh.png") )), mti := (NewTrayMenuParam("", "LoadAeroRegKeyz", (icn . "24\PNG\refresh.png") )), mti := (NewTrayMenuParam("", "Launch M2Drag", (ScpW . "\Mouse242.ico") )), mti := (NewTrayMenuParam("", "Launch screen clean!", (icn . "24\AF_Icon.ico") ))
 mti := ""
 return, 
 ; ~`~`~~`~;`~`~`~`~		~`~`~`~		~`~`~`~		~`~`~`  ~`~`~` ~`~`~	`~` ~`~ `~  ~`~`	~`~	`~`~`~	`~	`~`
@@ -1544,6 +1701,7 @@ return,
 ;~~~~~~~^^;  []
 menu, 	tray, 	  NoStandard ;  menu, tray, icon,% TrayIconPath
 menu, 	tray, 	  Icon, Context32.ico
+menu, 	tray, 	  add, 	"SysMetrix", SysMetrix
 menu, 	tray, 	  add, 	Open Script Dir, Open_ScriptDir
 
 menu, 	tray, 	  Standard
@@ -1561,13 +1719,16 @@ result := service_restart("WTabletServicePro")
 settimer, testresult, -4500
 return
 
+syscols:
+
+
 testresult:  ;0 = OK
 if result ! = 0	
 {
 	tries := tries + 1
 	if(tries > 5) {
 		msgbox % "unable to restart the " Target_Service " service"
-		exitapp
+		exitapp 
 	}
 	Tooltip retrying
 	sleep 2000
@@ -1583,13 +1744,13 @@ _x := ("|"), _y := "£"
 ;        -String
 str_aL:=("Sys_Menu" . _y . """Title (+ & X Conrols) (SysMenu)""" . _x . "Maxbox" . _y . """Maximise Button (□)""" . _x . "MinBox" . _y . """Minimise Button (_)""" . _x . "LeftScroll" . _y . """Left Scroll Orientation""" . _x . "ClickThru" . _y . """Click-through""" . _x . "RightAlign" . _y . """Generic Right-alignment""" . _x . "RightoLeft" . _y . """Right-to-Left reading""" . _x . "AppWindow" . _y . """Taskbar Item (not 100%)""" . _x . "Save" . _y . """Save window style preferences""" . _x . "Reset" . _y . """Reset window style preferences""")
 ;        -Parse
-loop,     parse, str_aL,% _x
+loop,     parse, str_aL,%      _x
 	loop, parse, A_loopfield,% _y
 		switch a_index {  
 			case "1":
-				my_i := A_loopfield
+				eyeBall:=A_loopfield
 			case "2": ; msgbox %
-				Grants_Son[my_i] := A_loopfield
+				Grants_Son[eyeBall] := A_loopfield
 		}
 		;for index, element in grants_son
 		;msgbox % index "`n" element
@@ -1598,49 +1759,42 @@ loop,     parse, str_aL,% _x
 return  ;END
 ;	^-=___=-^				^-=___=-^				^--___=-^   ^   ~   ~   _   ¬   ¬   ¬   ¬   ¬   ¬   ¬   ¬   _
 Varz:   ; 01010101010 ' ` ' `' `':C\Root\`'`'''`'      `''`0101'`'`'```''`'`'     ``'010101`''`'0xFFEEDD`'`'`'`'``'`'     			`''`''KILL!'`'`' '`''`'``'' `'`''`''` ''`'` '`''` `''` `''` `'` 
-global AHKdir, AF, AF2, AutoFireScript, Scr_, dbgtt, AutoFireScript2, TargetScriptTitle, TargetScriptTitle2, AF_Delay, SysShadowStyle_New, SysShadowExStyle_New, toolx, offsett, XCent, YCent, starttime, text, X_X, Last_Title, autofire, RhWnd_old, MouseTextID, DMT, roblox, toggleshift, Norm_menuStyle, Norm_menuexStyle, Title_last, dcStyle, classname, tool, tooly, EventLogBuffer_Old, Roblox_hwnd, Time_Elapsed, KillCount, SBAR_2berestored_True, Sidebar, TT, TT4g, TTFoc, TTcr, TTds, TTmb, dbg, TClass, TTitle, TProcName, delim, delim2, TitleCount, ClassCount, ProcCount, style2, exstyle2, ArrayProc, ArrayClass, ArrayTitle, Array_LProc, Array_LTitle, Array_LClass, Style_ClassnameList2, Style_procnameList2, Style_wintitleList2, Youtube_Popoutwin, Script_Title, np, m2dstatus, crashmb, 8skin_crash, OutputVarWin, F, s1, s2, s3, FileListStr, oldlist, FileCount, ADELIM, hTarget, hTargetprev, hgui, xPrev, yPrev, hPrev, logvar, ADM_wTtL, triggeredGFS, Matrix, Maxbox, MinBox, LeftScroll, ClickThru, RightAlign, RightoLeft, AppWindow, Save, Reset, MiDiRun, test_move, mattdwmrun, Quoting, mmenuListTtl, MenuLablAr, MenuLablTitlAr, mmenuListLbl, Desk_Wi, Desk_Hi, FileListStr_Ar, hTargetPrev, wPrev, hPrev, xPrev, yPrev, hidegui, q_dlim, quotes, DEBUGTEST_HWND, hook4g, HookMb, HookCr, HookOD, HookFc, DEBUGTEST_FOC, hook4gProc4g_, AhkPath, HookMb, ProcMb_, ProcCr_, ProcDstroyd, procFc_, nnd, 1998, 1999, SkpO, old_focus1, old_focus2, old_focus3, old4gnd1, old4gnd2, old4gnd3, qstr, mattdwmrun2, test_move, SidebarPath, Path_PH, AHK_Rare, CleanME_PLZz, Schd_T, HKCUCurVer, stylekey, AdHkRun, PConfig, YT_DL, M2dRun, Mag_, DWMFixS, WMPRun, MiDiRun, MiDi_, adh, ScpW, MiDir, winevents, winevent_I, Split_Tail, Split_Head, ripple, ripoldm, t_x, t_Y, lo0, Grants_Son, mouse24, wintitlekey, procnamekey, classnamekey, OBJ4g, OBJFc, OBJCR, OBJDS, MNPPS, WIN_TARGET_DESC, MSG_WIN_TARGET, WINEVENT_SkpOROCESS, WINEVENT_OUTOFCONTEXT, OoC, Desktop_Margin, 
-
-
-
-
-
-
-
-
-
-
+global AHKdir, AF, AF2, AutoFireScript, Scr_, dbgtt, AutoFireScript2, TargetScriptTitle, TargetScriptTitle2, AF_Delay, SysShadowStyle_New, SysShadowExStyle_New, toolx, offsett, XCent, YCent, starttime, text, X_X, Last_Title, autofire, RhWnd_old, MouseTextID, DMT, roblox, toggleshift, Norm_menuStyle, Norm_menuexStyle, Title_last, dcStyle, classname, tool, tooly, EventLogBuffer_Old, Roblox_hwnd, Time_Elapsed, KillCount, SBAR_2berestored_True, Sidebar, TT, TT4g, TTFoc, TTcr, TTds, TTmb, dbg, TClass, TTitle, TProcName, delim, delim2, TitleCount, ClassCount, ProcCount, style2, exstyle2, ArrayProc, ArrayClass, ArrayTitle, Array_LProc, Array_LTitle, Array_LClass, Style_ClassnameList2, Style_procnameList2, Style_wintitleList2, Youtube_Popoutwin, Script_Title, np, m2dstatus, crashmb, 8skin_crash, OutputVarWin, F, s1, s2, s3, FileListStr, oldlist, FileCount, ADELIM, hTarget, hTargetprev, hgui, xPrev, yPrev, hPrev, logvar, ADM_wTtL, triggeredGFS, Matrix, Maxbox, MinBox, LeftScroll, ClickThru, RightAlign, RightoLeft, AppWindow, Save, Reset, MiDiRun, test_move, mattdwmrun, Quoting, mmenuListTtl, MenuLablAr, MenuLablTitlAr, mmenuListLbl, Desk_Wi, Desk_Hi, FileListStr_Ar, hTargetPrev, wPrev, hPrev, xPrev, yPrev, hidegui, q_dlim, quotes, DEBUGTEST_HWND, hook4g, HookMb, HookCr, HookOD, HookFc, DEBUGTEST_FOC, hook4gProc4g_, AhkPath, HookMb, ProcMb_, ProcCr_, ProcDstroyd, procFc_, nnd, 1998, 1999, SkpO, old_focus1, old_focus2, old_focus3, old4gnd1, old4gnd2, old4gnd3, qstr, mattdwmrun2, test_move, SidebarPath, Path_PH, AHK_Rare, CleanME_PLZz, Schd_T, HKCUCurVer, stylekey, AdHkRun, PConfig, YT_DL, M2dRun, Mag_, DWMFixS, WMPRun, MiDiRun, MiDi_, adh, ScpW, MiDir, winevents, winevent_I, Split_Tail, Split_Head, RiPpLe, ripoldm, t_x, t_Y, lo0, Grants_Son, mouse24, wintitlekey, procnamekey, classnamekey, OBJ4g, OBJFc, OBJCR, OBJDS, MNPPS, WIN_TARGET_DESC, MSG_WIN_TARGET, WINEVENT_SkpOROCESS, WINEVENT_OUTOFCONTEXT, OoC, Desktop_Margin, hooked_events, newhook, firefoxhandles, classeslast, clst_max_I, classeslast, Clss_, Pnamee_, AHkold, SysMetrix
 
  ;	^-=___=-^ 	 ;-=-=;'`'``''`'`'``''`'`'``''`'`'`
 tt := 800 			     ; default tooltip timeout
-loop, parse,% "ArrayProc,ArrayClass,ArrayTitle,Array_LProc,Array_LTitle,Array_LClass,MenuLablAr,MenuLablTitlAr,FileListStr_Ar,quotes,winevent_I,winevents,Grants_Son", `,
+loop, parse,% "ArrayProc,ArrayClass,ArrayTitle,Array_LProc,Array_LTitle,Array_LClass,MenuLablAr,MenuLablTitlAr,FileListStr_Ar,quotes,winevent_I,winevents,hooked_events,Grants_Son,firefoxhandles,classeslast", `,
 	%A_loopfield% := []  ; array_inits:
-mmenuListTtl := "4ground hook tip/focus hook tip/obj_create tip/obj_destroy tip/msgbox hook tip/Toggle debug/Toggle Sidebar off/DWM_Axnt_fix/LoadAeroRegKeyz/Launch PowerConfig/Launch MattDWM/Launch M2Drag/Launch WMP_MATT/Launch midi_in_out/Launch AdHkRun/Launch YouTube_DL/Launch test_move/Launch screen clean!"
-mmenuListLbl := "TT4g/TTFoc/TTcr/TTds/TTmb/Toggle_dbg/Toggle_sbar/DWMFixS/AeroTheme_Set/pconfig/mattdwmrun2/M2dRun/WMPRun/MiDi_/AdHkRun/YT_DL/test_move/CleanME_PLZz"
+mmenuListTtl := "4ground hook tip/focus hook tip/obj_create tip/obj_destroy tip/msgbox hook tip/Toggle debug/Toggle Sidebar off/DWM_Axnt_fix/LoadAeroRegKeyz/Launch PowerConfig/Launch MattDWM/Launch M2Drag/Launch WMP_MATT/Launch midi_in_out/Launch AdHkRun/Launch YouTube_DL/Launch test_move/Launch screen clean!/CLSIDS Folders/SetSysCols"
+mmenuListLbl := "TT4g/TTFoc/TTcr/TTds/TTmb/Toggle_dbg/Toggle_sbar/DWMFixS/AeroTheme_Set/pconfig/mattdwmrun2/M2dRun/WMPRun/MiDi_/AdHkRun/YT_DL/test_move/CleanME_PLZz/clsids/syscols"
 loop, 22 {               ; -=-=;'`'``''`'`'``''`'`'``''`'`'``
-	v1 := ("hChildMagnifier" . A_index) 
+	v1 :=  ("hChildMagnifier" . A_index) 
 	global (%v1%)
-	v2 := ("hgui" . A_Index) 
-	global  (%v2%)
-	v3 := ("HWNDhgui" . A_Index)  
-	global  (%v3%)       ; -=-=-;'`'``''`'`'``''``''``''
+	v2 :=  ("hgui" .            A_Index) 
+	global (%v2%)
+	v3 :=  ("HWNDhgui" .        A_Index)  
+	global (%v3%)       ; -=-=-;'`'``''`'`'``''``''``''
 }		
 						 ;`'``''`'`'``''`'`'``''`'`'`'``
-Matrix 	:=(	"-1	|0	|0	|0	|0|"  ;'``''`'`'``''`'`'``''`'`'
+Matrix :=(  "-1	|0	|0	|0	|0|"  ;'``''`'`'``''`'`'``''`'`'
 .           "0	|-1	|0	|0	|0|"  ;``''`'`'``''`'`'``''`'`'``'
 .           "0	|0	|-1	|0	|0|"  ;`''`'`'``''`'`'``''`'`'``'''
 .           "0	|0	|0	|1	|0|"  ;''`'`'``''`'`'``''`'`'``''`'
 .           "1	|1	|1	|0	|1 " ) ;'`'`'``''`'`'``''`'`'``''`'
 ;"!!! vARi4bl3z !!!!" ...		 ^-=___=-^	>>>>>>>>>>>>;??? ;  	 ~@~peww~@~	
 ; DWM_Run:= ((Autoit3path := "C:\Program Files (x86)\AutoIt3\AutoIt3_x64.exe") . " " . "C:\Script\autoit\_MattDwmBlurBehindWindow.au3") 
-regRead, AHKdir,  HKLM\SOFTWARE\AutoHotkey,% "InstallDir"    
+;regRead, AHKdir,  HKLM\SOFTWARE\AutoHotkey,% "InstallDir"    suddenly not working on 26/4/22
+AHKdir:="c:\program files\AutoHotkey" 
 sysget,  Desktop_Margin, MonitorWorkArea
 sysget,  Desk_Wi, 78
 sysget,  Desk_Hi, 79
 XCent := (floor(0.5*Desk_Wi))
 YCent := (floor(0.5*Desk_Hi))
 AHk64 := (AHKdir . "\Autohotkey.exe ")
+AHkold := "c:\program files\ahk\Autohotkey.exe "
+
 ScpW  := "C:\Script\AHK\Working"
-mattdwmrun2	:= "C:\Script\autoit\_MattDwmBlurBehindWindow.lnk"    ;   ^^^Wrong start dir envVar 1nce launched?
+mattdwmrun2	:= "C:\Script\autoit\_MattDwmBlurBehindWindow.au3"    ;   ^^^Wrong start dir envVar 1nce launched?
 test_move	:= "C:\Users\ninj\DESKTOP\winmove_test.ahk"
 SidebarPath := "C:\Program Files\Windows Sidebar\sidebar.exe"
 Path_PH 	:= "C:\Apps\Ph\processhacker\x64\ProcessHacker.exe"
@@ -1654,13 +1808,15 @@ AdHkRun := (sched_tsk:=(Schd_T . " /run /tn ") . (adh:="adminhotkeys.ahk") . "_4
 PConfig := (sched_tsk  .  "cmd_output_to_msgbox.ahk_407642875")                           
 YT_DL   := (( (AHkU64Uia := (AHKdir . "\AutoHotkeyU64_UIA.exe ")) . ScpW . "\YT.ahk" ))
 Mag_    := ( AHk64 . " " . ScpW . "\M2DRAG_MAG.AHK") 
-DWMFixS := ( AHkU64UiaaDM := ((AHKdir . "\AutoHotkeyU64_UIA - admin.exe ")) . (Scr_ . "\__TESTS\dwm_accentcolour.ahk"))
-WMPRun  := ( AHkU64    .  Scr_ . "\Z_MIDI_IN_OUT\wmp_Matt.ahk")
+DWMFixS := ( AHkU64UiaaDM := ((AHKdir . "\AutoHotkeyU64_UIA - admin.exe ")) . (Scr_ . "\Working\dwm_accentcolour.ahk"))
+;WMPRun  := ( AHkU64    .  Scr_ . "\Z_MIDI_IN_OUT\wmp_Matt.ahk")
+WMPRun  := ( AHkold    .  Scr_ . "\Z_MIDI_IN_OUT\wmp_Matt.ahk")
 MiDiRun := ( AHKdir    .  "AutoHotkeyU64.exe " . Scr_ . MiDir)
 ADM_wTtL:= ( Scr_      .  "\" . adh . " - AutoHotkey v1.1.33.10")
 MiDi_:= ( AHkU64 . Scr_ .  (MiDir:=("\Z_MIDI_IN_OUT" . "\z_in_out.ahk")))
+SysMetrix:=AHk64 . "C:\Script\AHK\sysget_(GUI).ahk"
 M2dRun  := ( AHkU64Uia .  Scr_ .  "\Working\M2Drag.ahk")
-
+clsids  := ( AHkU64    .  Scr_ . "\Explorer_CLSIDs_W10.ahk")
 BF := "Roblox_Rapid.ahk", BF2 := "Roblox_Bunny.ahk", af_1 := ("\" . BF),   Bun_ := ("\" . BF2), AF := (Scr_ . af_1), AF2 := (Scr_ . Bun_), AutoFireScript := BF, AutoFireScript2 := BF2 , TargetScriptTitle := (AutoFireScript . " ahk_class AutoHotkey"), TargetScriptTitle2 := (AutoFireScript2 . " ahk_class AutoHotkey"), AF_Delay := 10, SysShadowStyle_New := 0x08000000, SysShadowExStyle_New := 0x08000020, toolx := "-66", offsett := 40, delim := "Þ", delim1 := "µ", delim2 := "»",KILLSWITCH := "kill all AHK procs.ahk", mouse24 := "C:\Script\AHK\Working\mouse24.ico", 
 OBJ4g := 0x0003, OBJFc:=0x8005, OBJCR := 0x8000, OBJDS := 0x8001, MNPPS := 0x0006, WIN_TARGET_DESC := "Information", MSG_WIN_TARGET := WIN_TARGET_DESC, WINEVENT_SkpOROCESS := 0x0002, SkpO := WINEVENT_SkpOROCESS, WINEVENT_OUTOFCONTEXT := 0x0000, OoC := WINEVENT_OUTOFCONTEXT, wintitlekey := (stylekey . "\wintitle"), procnamekey := (stylekey . "\procname"), classnamekey := (stylekey . "\classname")
 
@@ -1668,8 +1824,7 @@ donothing:
 return,
 
 init_matt:
-InitLabelOrder := "Varz>Menu_Tray_Init>Menu_Style_Init>RegReads>Hooks>quotEI>reload_orload_admhk>Main"
-loop, parse, InitLabelOrder, ">",
+loop, parse, INIT_SEQ, ">",
 	gosub,% A_loopfield
 ;return,
 /*  ; Notes for popup: NP++; ahk_id 0x2e1120 PID: 8332; process name AutoHotkey.exe; Title Get Parameters; AHK_Class AutoHotkeyGUI; Style / ExStyle 0x940A0000 - 0x00000088; Control Edit1 C_hWnd: 0x130c78 ; Style / ExStyle 0x50010080 - 0x00000200
@@ -1734,15 +1889,6 @@ ID_HELP_WEBSITE := 65412
     ; OnExit(A_ThisFunc, 0)
     ; DllCall("ShutdownBlockReasonDestroy", "ptr", A_ScriptHwnd)
 ; }
-
-; Open_script_folder:
-; e = explorer /select, %a_ScriptFullPath%
-; tooltip % a_ScriptFullPath
-; run %comspec% /c %e%,,hide,
-; settimer, tooloff, -1222
-; return,
-
-
 ;Event Ranges  of WinEvent constant values specified by AIA for use across the industry. 
 EVENT_AIA_START :=  0xA000
 EVENT_AIA_END   :=  0xAFFF
@@ -1754,17 +1900,17 @@ EVENT_OEM_DEFINED_START := 0x0101	;The range of event constant values reserved f
 EVENT_OEM_DEFINED_END   := 0x01FF
 EVENT_UIA_PROPID_START  := 0x7500	; The range of event constant values reserved for UI Automation event identifiers. 
 EVENT_UIA_PROPID_END    := 0x75FF
-
 ; The range of event constant values reserved for UI Automation property-changed event identifiers. 
 event1 := ("EVENT_OBJECT_ACCELERATORCHANGE|0x8012|An object's KeyboardShortcut property has changed. Server applications send this event for their accessible objects.¬EVENT_OBJECT_CLOAKED|0x8017|Sent when a window is cloaked. A cloaked window still exists, but is invisible to the user.¬EVENT_OBJECT_CONTENTSCROLLED|0x8015|A window object's scrolling has ended. Unlike EVENT_SYSTEM_SCROLLEND, this event is associated with the scrolling window. Whether the scrolling is horizontal or vertical scrolling, this event should be sent whenever the scroll action is completed.  The hwnd parameter of the WinEventProc callback function describes the scrolling window  the idObject parameter is OBJID_CLIENT, and the idChild parameter is CHILDID_SELF.¬EVENT_OBJECT_CREATE|0x8000|An object has been created. The system sends this event for the following user interface elements: caret, header control, list-view control, tab control, toolbar control, tree view control, and window object. Server applications send this event for their accessible objects.  Before sending the event for the parent object, servers must send it for all of an object's child objects. Servers must ensure that all child objects are fully created and ready to accept IAccessible calls from clients before the parent object sends this event.  Because a parent object is created after its child objects, clients must make sure that an object's parent has been created before calling IAccessible::get_accParent, particularly if in-context hook functions are used.¬EVENT_OBJECT_DEFACTIONCHANGE|0x8011|An object's DefaultAction property has changed. The system sends this event for dialog boxes. Server applications send this event for their accessible objects.¬EVENT_OBJECT_DESCRIPTIONCHANGE|0x800D|An object's Description property has changed. Server applications send this event for their accessible objects.¬EVENT_OBJECT_DESTROY|0x8001|An object has been destroyed. The system sends this event for the following user interface elements: caret, header control, list-view control, tab control, toolbar control, tree view control, and window object. Server applications send this event for their accessible objects. Clients assume that all of an object's children are destroyed when the parent object sends this event.  After receiving this event, clients do not call an object's IAccessible properties or methods. However, the interface pointer must remain valid as long as there is a reference count on it due to COM rules, but the UI element may no longer be present. Further calls on the interface pointer may return failure errors  to prevent this, servers create proxy objects and monitor their life spans.¬EVENT_OBJECT_DRAGSTART|0x8021|The user started to drag an element. The hwnd, idObject, and idChild parameters of the WinEventProc callback function identify the object being dragged.¬EVENT_OBJECT_DRAGCANCEL|0x8022|The user has ended a drag operation before dropping the dragged element on a drop target. The hwnd, idObject, and idChild parameters of the WinEventProc callback function identify the object being dragged.¬EVENT_OBJECT_DRAGCOMPLETE|0x8023|The user dropped an element on a drop target. The hwnd, idObject, and idChild parameters of the WinEventProc callback function identify the object being dragged.¬EVENT_OBJECT_DRAGENTER|0x8024|The user dragged an element into a drop target's boundary. The hwnd, idObject, and idChild parameters of the WinEventProc callback function identify the drop target.¬EVENT_OBJECT_DRAGLEAVE|0x8025|The user dragged an element out of a drop target's boundary. The hwnd, idObject, and idChild parameters of the WinEventProc callback function identify the drop target.¬EVENT_OBJECT_DRAGDROPPED|0x8026|The user dropped an element on a drop target. The hwnd, idObject, and idChild parameters of the WinEventProc callback function identify the drop target.¬EVENT_OBJECT_END|0x80FF|The highest object event value.¬EVENT_OBJECT_FOCUS|0x8005|An object has received the keyboard focus. The system sends this event for the following user interface elements: list-view control, menu bar, pop-up menu, switch window, tab control, tree view control, and window object. Server applications send this event for their accessible objects.  The hwnd parameter of the WinEventProc callback function identifies the window that receives the keyboard focus.¬EVENT_OBJECT_HELPCHANGE|0x8010|An object's Help property has changed. Server applications send this event for their accessible objects.¬EVENT_OBJECT_HIDE|0x8003|An object is hidden. The system sends this event for the following user interface elements: caret and cursor. Server applications send this event for their accessible objects. When this event is generated for a parent object, all child objects are already hidden. Server applications do not send this event for the child objects.	Hidden objects include the STATE_SYSTEM_INVISIBLE flag  shown objects do not include this flag. The EVENT_OBJECT_HIDE event also indicates that the STATE_SYSTEM_INVISIBLE flag is set. Therefore, servers do not send the EVENT_STATE_CHANGE event in this case.¬EVENT_OBJECT_HOSTEDOBJECTSINVALIDATED|0x8020|A window that hosts other accessible objects has changed the hosted objects. A client might need to query the host window to discover the new hosted objects, especially if the client has been monitoring events from the window. A hosted object is an object from an accessibility framework MSAA or UI Automation that is different from that of the host. Changes in hosted objects that are from the same framework as the host should be handed with the structural change events, such as EVENT_OBJECT_CREATE for MSAA. For more info see comments within winuser.h.¬EVENT_OBJECT_IME_HIDE|0x8028|An IME window has become hidden.¬EVENT_OBJECT_IME_SHOW|0x8027|An IME window has become visible.¬EVENT_OBJECT_IME_CHANGE|0x8029|The size or position of an IME window has changed.¬EVENT_OBJECT_INVOKED|0x8013|An object has been invoked  for example, the user has clicked a button. This event is supported by common controls and is used by UI Automation.	For this event, the hwnd, ID, and idChild parameters of the WinEventProc callback function identify the item that is invoked.¬EVENT_OBJECT_LIVEREGIONCHANGED|0x8019|An object that is part of a live region has changed. A live region is an area of an application that changes frequently and/or asynchronously.¬EVENT_OBJECT_LOCATIONCHANGE|0x800B|An object has changed location, shape, or size. The system sends this event for the following user interface elements: caret and window objects. Server applications send this event for their accessible objects.  This event is generated in response to a change in the top-level object within the object hierarchy  it is not generated for any children that the object might have. For example, if the user resizes a window, the system sends this notification for the window, but not for the menu bar, title bar, scroll bar, or other objects that have also changed.  The system does not send this event for every non-floating child window when the parent moves. However, if an application explicitly resizes child windows as a result of resizing the parent window, the system sends multiple events for the resized children.	  If an object's State property is set to STATE_SYSTEM_FLOATING, the server sends EVENT_OBJECT_LOCATIONCHANGE whenever the object changes location. If an object does not have this state, servers only trigger this event when the object moves in relation to its parent. For this event notification, the idChild parameter of the WinEventProc callback function identifies the child object that has changed.¬EVENT_OBJECT_NAMECHANGE|0x800C|An object's Name property has changed. The system sends this event for the following user interface elements: check box, cursor, list-view control, push button, radio button, status bar control, tree view control, and window object. Server applications send this event for their accessible objects.¬EVENT_OBJECT_PARENTCHANGE|0x800F|An object has a new parent object. Server applications send this event for their accessible objects.¬EVENT_OBJECT_REORDER|0x8004|A container object has added, removed, or reordered its children. The system sends this event for the following user interface elements: header control, list-view control, toolbar control, and window object. Server applications send this event as appropriate for their accessible objects.	  For example, this event is generated by a list-view object when the number of child elements or the order of the elements changes. This event is also sent by a parent window when the Z-order for the child windows changes.¬")
+
 event2 := ("EVENT_OBJECT_SELECTION|0x8006|The selection within a container object has changed. The system sends this event for the following user interface elements: list-view control, tab control, tree view control, and window object. Server applications send this event for their accessible objects. This event signals a single selection: either a child is selected in a container that previously did not contain any selected children, or the selection has changed from one child to another.  The hwnd and idObject parameters of the WinEventProc callback function describe the container  the idChild parameter identifies the object that is selected. If the selected child is a window that also contains objects, the idChild parameter is OBJID_WINDOW.¬EVENT_OBJECT_SELECTIONADD|0x8007|A child within a container object has been added to an existing selection. The system sends this event for the following user interface elements: list box, list-view control, and tree view control. Server applications send this event for their accessible objects.  The hwnd and idObject parameters of the WinEventProc callback function describe the container. The idChild parameter is the child that is added to the selection.¬EVENT_OBJECT_SELECTIONREMOVE|0x8008|An item within a container object has been removed from the selection. The system sends this event for the following user interface elements: list box, list-view control, and tree view control. Server applications send this event for their accessible objects.  This event signals that a child is removed from an existing selection.  The hwnd and idObject parameters of the WinEventProc callback function describe the container  the idChild parameter identifies the child that has been removed from the selection.¬EVENT_OBJECT_SELECTIONWITHIN|0x8009|Numerous selection changes have occurred within a container object. The system sends this event for list boxes  server applications send it for their accessible objects.	  This event is sent when the selected items within a control have changed substantially. The event informs the client that many selection changes have occurred, and it is sent instead of several EVENT_OBJECT_SELECTIONADD or EVENT_OBJECT_SELECTIONREMOVE events. The client queries for the selected items by calling the container object's IAccessible::get_accSelection method and enumerating the selected items.  For this event notification, the hwnd and idObject parameters of the WinEventProc callback function describe the container in which the changes occurred.¬EVENT_OBJECT_SHOW|0x8002|A hidden object is shown. The system sends this event for the following user interface elements: caret, cursor, and window object. Server applications send this event for their accessible objects.  Clients assume that when this event is sent by a parent object, all child objects are already displayed. Therefore, server applications do not send this event for the child objects.  Hidden objects include the STATE_SYSTEM_INVISIBLE flag  shown objects do not include this flag. The EVENT_OBJECT_SHOW event also indicates that the STATE_SYSTEM_INVISIBLE flag is cleared. Therefore, servers do not send the EVENT_STATE_CHANGE event in this case.¬EVENT_OBJECT_STATECHANGE|0x800A|An object's state has changed. The system sends this event for the following user interface elements: check box, combo box, header control, push button, radio button, scroll bar, toolbar control, tree view control, up-down control, and window object. Server applications send this event for their accessible objects.	  For example, a state change occurs when a button object is clicked or released, or when an object is enabled or disabled.	  For this event notification, the idChild parameter of the WinEventProc callback function identifies the child object whose state has changed.¬EVENT_OBJECT_TEXTEDIT_CONVERSIONTARGETCHANGED|0x8030|The conversion target within an IME composition has changed. The conversion target is the subset of the IME composition which is actively selected as the target for user-initiated conversions.¬EVENT_OBJECT_TEXTSELECTIONCHANGED|0x8014|An object's text selection has changed. This event is supported by common controls and is used by UI Automation.  The hwnd, ID, and idChild parameters of the WinEventProc callback function describe the item that is contained in the updated text selection.¬EVENT_OBJECT_UNCLOAKED|0x8018|Sent when a window is uncloaked. A cloaked window still exists, but is invisible to the user.¬EVENT_OBJECT_VALUECHANGE|0x800E|An object's Value property has changed. The system sends this event for the user interface elements that include the scroll bar and the following controls: edit, header, hot key, progress bar, slider, and up-down. Server applications send this event for their accessible objects.¬EVENT_SYSTEM_ALERT|0x0002|An alert has been generated. Server applications should not send this event.¬EVENT_SYSTEM_ARRANGMENTPREVIEW|0x8016|A preview rectangle is being displayed.¬EVENT_SYSTEM_CAPTUREEND|0x0009|A window has lost mouse capture. This event is sent by the system, never by servers.¬EVENT_SYSTEM_CAPTURESTART|0x0008|A window has received mouse capture. This event is sent by the system, never by servers.¬EVENT_SYSTEM_CONTEXTHELPEND|0x000D|A window has exited context-sensitive Help mode. This event is not sent consistently by the system.¬EVENT_SYSTEM_CONTEXTHELPSTART|0x000C|A window has entered context-sensitive Help mode. This event is not sent consistently by the system.¬EVENT_SYSTEM_DESKTOPSWITCH|0x0020|The active desktop has been switched.¬EVENT_SYSTEM_DIALOGEND|0x0011|A dialog box has been closed. The system sends this event for standard dialog boxes  servers send it for custom dialog boxes. This event is not sent consistently by the system.¬EVENT_SYSTEM_DIALOGSTART|0x0010|A dialog box has been displayed. The system sends this event for standard dialog boxes, which are created using resource templates or Win32 dialog box functions. Servers send this event for custom dialog boxes, which are windows that function as dialog boxes but are not created in the standard way.  This event is not sent consistently by the system.¬EVENT_SYSTEM_DRAGDROPEND|0x000F|An application is about to exit drag-and-drop mode. Applications that support drag-and-drop operations must send this event the system does not send this event.¬EVENT_SYSTEM_DRAGDROPSTART|0x000E|An application is about to enter drag-and-drop mode. Applications that support drag-and-drop operations must send this event because the system does not send it.¬EVENT_SYSTEM_END|0x00FF|The highest system event value.¬EVENT_SYSTEM_FOREGROUND|0x0003|The foreground window has changed. The system sends this event even if the foreground window has changed to another window in the same thread. Server applications never send this event.	For this event, the WinEventProc callback function's hwnd parameter is the handle to the window that is in the foreground, the idObject parameter is OBJID_WINDOW, and the idChild parameter is CHILDID_SELF.¬EVENT_SYSTEM_MENUPOPUPEND|0x0007|A pop-up menu has been closed. The system sends this event for standard menus  servers send it for custom menus.  When a pop-up menu is closed, the client receives this message, and then the EVENT_SYSTEM_MENUEND event.	This event is not sent consistently by the system.¬EVENT_SYSTEM_MENUPOPUPSTART|0x0006|A pop-up menu has been displayed. The system sends this event for standard menus, which are identified by HMENU, and are created using menu-template resources or Win32 menu functions. Servers send this event for custom menus, which are user interface elements that function as menus but are not created in the standard way. This event is not sent consistently by the system.¬EVENT_SYSTEM_MENUEND|0x0005|A menu from the menu bar has been closed. The system sends this event for standard menus  servers send it for custom menus.  For this event, the WinEventProc callback function's hwnd, idObject, and idChild parameters refer to the control that contains the menu bar or the control that activates the context menu. The hwnd parameter is the handle to the window that is related to the event. The idObject parameter is OBJID_MENU or OBJID_SYSMENU for a menu, or OBJID_WINDOW for a pop-up menu. The idChild parameter is CHILDID_SELF.¬EVENT_SYSTEM_MENUSTART|0x0004|A menu item on the menu bar has been selected. The system sends this event for standard menus, which are identified by HMENU, created using menu-template resources or Win32 menu API elements. Servers send this event for custom menus, which are user interface elements that function as menus but are not created in the standard way.	For this event, the WinEventProc callback function's hwnd, idObject, and idChild parameters refer to the control that contains the menu bar or the control that activates the context menu. The hwnd parameter is the handle to the window related to the event. The idObject parameter is OBJID_MENU or OBJID_SYSMENU for a menu, or OBJID_WINDOW for a pop-up menu. The idChild parameter is CHILDID_SELF.	The system triggers more than one EVENT_SYSTEM_MENUSTART event that does not always correspond with the EVENT_SYSTEM_MENUEND event.¬EVENT_SYSTEM_MINIMIZEEND|0x0017|A window object is about to be restored. This event is sent by the system, never by servers.¬EVENT_SYSTEM_MINIMIZESTART|0x0016|A window object is about to be minimized. This event is sent by the system, never by servers.¬EVENT_SYSTEM_MOVESIZEEND|0x000B|The movement or resizing of a window has finished. This event is sent by the system, never by servers.¬EVENT_SYSTEM_MOVESIZESTART|0x000A|A window is being moved or resized. This event is sent by the system, never by servers.¬EVENT_SYSTEM_SCROLLINGEND|0x0013|Scrolling has ended on a scroll bar. This event is sent by the system for standard scroll bar controls and for scroll bars that are attached to a window. Servers send this event for custom scroll bars, which are user interface elements that function as scroll bars but are not created in the standard way.  The idObject parameter that is sent to the WinEventProc callback function is OBJID_HSCROLL for horizontal scroll bars, and OBJID_VSCROLL for vertical scroll bars.¬EVENT_SYSTEM_SCROLLINGSTART|0x0012|Scrolling has started on a scroll bar. The system sends this event for standard scroll bar controls and for scroll bars attached to a window. Servers send this event for custom scroll bars, which are user interface elements that function as scroll bars but are not created in the standard way.  The idObject parameter that is sent to the WinEventProc callback function is OBJID_HSCROLL for horizontal scrolls bars, and OBJID_VSCROLL for vertical scroll bars.¬EVENT_SYSTEM_SOUND|0x0001|A sound has been played. The system sends this event when a system sound, such as one for a menu, is played even if no sound is audible for example, due to the lack of a sound file or a sound card. Servers send this event whenever a custom UI element generates a sound.  For this event, the WinEventProc callback function receives the OBJID_SOUND value as the idObject parameter.¬EVENT_SYSTEM_SWITCHEND|0x0015|The user has released ALT+TAB. This event is sent by the system, never by servers. The hwnd parameter of the WinEventProc callback function identifies the window to which the user has switched.  If only one application is running when the user presses ALT+TAB, the system sends this event without a corresponding EVENT_SYSTEM_SWITCHSTART event.¬EVENT_SYSTEM_SWITCHSTART|0x0014|The user has pressed ALT+TAB, which activates the switch window. This event is sent by the system, never by servers. The hwnd parameter of the WinEventProc callback function identifies the window to which the user is switching.  If only one application is running when the user presses ALT+TAB, the system sends an EVENT_SYSTEM_SWITCHEND event without a corresponding EVENT_SYSTEM_SWITCHSTART event.")
 
 createeventgui:
+Split_Head :=  "OBJECT_REORDER,ECT_END"
+Split_Tail :=  "DRAGCANCEL,ECT_END"
 gui, eventgui: new, +owner, eventgui
 gui, eventgui: +LastFound +Hwndeventguihwnd -Caption -DPIScale +AlwaysOnTop -SysMenu +ToolWindow +owndialogs
 gui, eventgui: color, 0f0022
-Split_Head   :=  "OBJECT_REORDER,ECT_END"
-Split_Tail   :=  "DRAGCANCEL,ECT_END"
 gui, ttt: new, +owner, ttt
 gui, ttt: +LastFound +Hwndttthwnd -Caption -DPIScale +AlwaysOnTop -SysMenu +ToolWindow +owndialogs
 gui, ttt: color, 3f0059
@@ -1801,27 +1947,26 @@ loop, parse,% "event1,event2", `,
 						    winevent_I[eventname]  :=  mainstring
 					} else, winevent_I[eventname]  :=  A_loopfield
 			}
-sleep 200
+sleep, 200
 for Index, element in winevents {
 	max_index += 1
 	t_Ind := strreplace(Index,"EVENT_OBJECT_")
 	gui, ttt:Add, Text, x24 y8,% winevent_i[index]
 	gui, ttt:Add, Text,  ,% winevent_i[index]
-	
 	;msgbox % winevent_i[index]
 	LOOP, PARSE, Split_Tail, `, 
 	{
 		if Index CONTAINS %A_LOOPFIELD%
-			ripple += 1
+			RiPpLe += 1
 	}	
-	if ripple {
-		1_ := (23 - RIPPLE)
-		_1 := (24 - RIPPLE)
-		2_ := (46 - RIPPLE)
-		_2 := (47 - RIPPLE)
-		3_ := (63 - RIPPLE)
-		_3 := (64 - RIPPLE)
-		4_ := (72 - RIPPLE)
+	if RiPpLe {
+		1_ := (23 - RiPpLe)
+		_1 := (24 - RiPpLe)
+		2_ := (46 - RiPpLe)
+		_2 := (47 - RiPpLe)
+		3_ := (63 - RiPpLe)
+		_3 := (64 - RiPpLe)
+		4_ := (72 - RiPpLe)
 	} else {
 		1_ := 23 
 		_1 := 24
@@ -1834,106 +1979,116 @@ for Index, element in winevents {
 	if max_index BETWEEN 1 AND %1_%
 	{  
 		if (max_index =   "1") {
-			ripple   :=   0	
+			RiPpLe   :=   0	
 			col      :=   1
 		}
 		if (col       =   "1") {
-			t_X := "x48", t_Y := ("y" . ( (max_index * 24) + (rIPPLE * 24)) )
+			t_X := "x48", t_Y := ("y" . ((max_index * 24) + (RiPpLe * 24)))
 	}	}
 	Else if max_index BETWEEN %_1% AND %2_%
 	{
-		if (col            =    "1")   {
-			if ripple                  {
-				ripold    :=    rippple
-				rippple   :=    0
-			}
-			col           :=    2
+		switch col     {
+			case "1":
+				if  RiPpLe {
+					ripold  :=    rippple
+					rippple :=    0
+				}
+				col         :=    2	
+			case "2":  
+				t_Y := "y" . ((max_index - 20 ) * 24)
 		}
-		if (COL            =    "2")  
-			t_Y := "y" . ((max_index - 20 ) * 24)
 	}
 	Else if max_index BETWEEN %_2% AND %3_%
 	{
-		if (col       = "2") {
-			ripold:=rippple
-			rippple  := 0
-			col      := 3
-		} 
-		if (COL       = "3") 
-			t_Y := "y" . (((max_index-42) ) * 24) 
+		switch col     {
+			case "2":
+				ripold  := rippple
+				rippple := 0
+				col     := 3
+			case "3":
+				t_Y := "y" . (((max_index-42) ) * 24)
+		}
 	}	
 	Else if max_index BETWEEN %_3% AND %4_%
 	{
-		if (col = "3") {
-			rippple := 0
-			col     := 4
-		} 
-		if (COL = "4") 
-			t_Y     :=   ("y" . ((max_index-59) * 24) )
+		switch col     {
+			case "3":	
+				rippple := 0
+				col     := 4 
+			case "4":	
+			t_Y     :=   ("y" . ((max_index-59) * 24))
+		}
 	}	
 	t_X := ("x" . (48 + ( (COL-1) * 420) ) ) ; MSGBOX % T_X " " INDEX
 	LOOP,PARSE, Split_Head, `,
 	{
 		if Index CONTAINS %A_LOOPFIELD%
-			ripple += 1
+		   RiPpLe += 1
 	}
 	gui, eventgui:Add, Text, %t_X% %t_Y%, %Index%
 }
 
-;gui, ttt:Add, Text, x24 y24,% winevent_i[index]
-gui, ttt: show, autosize
-gui, eventgui: show, autosize
+;gui, ttt:      Add, Text, x24 y24,% winevent_i[index]
+ gui, ttt:      show, autosize
+ gui, eventgui: show, autosize
 return,
 
-WM_MOUSEMOVE(wParam, lParam, Msg, Hwnd) { 
+poop(hw){
+	Nnn  := (Gdip_Startup()), dcC  := (GetDC(hw)), mDC := (Gdi_CreateCompatibleDC(0)), mBM := (Gdi_CreateDIBSection(mDC, 1, 1, 32)), oBM := Gdi_SelectObject(mDC, mBM)
+	a:=DllCall("gdi32.dll\SetStretchBltMode", "Uint", dcC, "Int", 5)
+	b:=DllCall("gdi32.dll\StretchBlt", "Uint", dcC, "Int", 0, "Int", 0, "Int", desk_wi, "Int", desk_hi, "Uint", mdc, "Uint", 0, "Uint", 0, "Int", 1, "Int", 1, "Uint", "0x00CC0020")
+	Gdip_ShutdownI(Nnn)
+}
+
+WM_MOUSEMOVE(wParam, lParam, Msg, Hwnd) { ;disabled currently
 	Global ; Assume-global mode
-	Static Init := OnMessage(0x0200, "WM_MOUSEMOVE")
+	;Static Init := OnMessage(0x0200, "WM_MOUSEMOVE")
 	;VarSetCapacity(TME, 16, 0)
 	;NumPut(16, TME, 0)
 	;NumPut(2, TME, 4) ; TME_LEAVE
 	;NumPut(hColorPalette, TME, 8)
 	;DllCall("User32.dll\TrackMouseEvent", "UInt", &TME)
-	MouseGetPos,x,y,hwnd, MouseCtl
-	;GuiControlGet, ColorVal,, % MouseCtl%	ControlGet, ControlhWnd, hWnd ,, %Control%, ahk_id %Window%
-	ControlGet, ControlhWnd, hWnd ,, %MouseCtl%, ahk_id %hwnd%
-	if (MouseCtlold != MouseCtl) {
-		gui, ttt:destroy
-		MouseCtlold:=MouseCtl 
-		ControlGetText, TOAAA, %MouseCtl%, ahk_id %hwnd%
-		gui, ttt:new, +owner, ttt
-		gui, ttt: +LastFound +Hwndttthwnd -Caption -DPIScale +AlwaysOnTop -SysMenu +ToolWindow +owndialogs
-		gui, ttt: color, 3f0059
-		gui, ttt:Add, Text, x24 y14,% winevent_i[TOAAA]
-		gui, ttt:show,% "noactivate "(x_x := ("x" . ( x - 500))) " " (y_y := ("y" . ( y - 200)))  " autosize " ;" w500 h256"  
-		sleep 250
-}	}
-
-WM_MOUSELEAVE(wParam, lParam, Msg, Hwnd) { 
-	Global ; Assume-global mode
-	Static Init := OnMessage(0x02A3, "WM_MOUSELEAVE")
+	return,
 }
- 
-WM_LBUTTONDOWN(wParam, lParam, Msg, Hwnd) {
-	Global ; Assume-global mode
-	Static Init := OnMessage(0x0201, "WM_LBUTTONDOWN")
-	MouseGetPos,x,y, hwnd, MouseCtl
-			ControlGetText, TOAAA, %MouseCtl%, ahk_id %hwnd%
 
-	ToolTip, % TOAAA "`nHook Activated"
+; WM_MOUSELEAVE(wParam, lParam, Msg, Hwnd) {	; Global ; Assume-global mode	; Static Init := OnMessage(0x02A3, "WM_MOUSELEAVE"); } 
+
+WM_LBUTTONDOWN(wParam, lParam, Msg, Hwnd)   {
+	Global ; Assume- the position
+	Static Init := OnMessage(0x0201, "WM_LBUTTONDOWN")
+	wingettitle, tits, ahk_id %hwnd%
+	if tits !=% "eventgui"
+ 		return, 0
+	else {
+		if ( tits = "eventgui" )            {
+			MouseGetPos,x,y, hwnd, MouseCtl
+			ControlGetText, C_TXT, %MouseCtl%, ahk_id %hwnd%
+			if (newhook:=winevents[C_TXT] )	{
+				if (%newhook%Hookmps)       {
+					hooked_events.pop(newhook)
+					DllCall("UnhookWinEvent", "Ptr", %newhook%Hookmps), %newhook%Hookmps := 0
+					ToolTip, % C_TXT "`nHook DeActivated"
+					exit,
+				} else {
+					ToolTip, % C_TXT "`nHook Activated"
+					global	(%newhook%Hookmps) :=  DllCall("SetWinEventHook", "Uint", newhook, "Uint",newhook, "Ptr", 0, "Ptr", UProc ,"Uint", 0, "Uint", 0, "Uint", 0x0000| 0x0002)
+					hooked_events.push(newhook) ; neither will push or have any value
+					;hooked_events.push(element) ; neither will push or have any value
+					return, 1
+					return, 0
+	}	}	}	}
+return, 0	
 }
 
 ttp(TxT = "",Ti = "") {
 	if dbgtt {
 		tooltip, % TxT,
 		if !ti 
-			settimer, TT_Off, % ("-" . tt),
-		else 
-			settimer, TT_Off, % ("-" . ti),
+			  settimer, TT_Off, % ("-" . tt),
+		else, settimer, TT_Off, % ("-" . ti),
 }	}	
-
 
 TT_Off:
 tooltip,
-return
 return,
  
