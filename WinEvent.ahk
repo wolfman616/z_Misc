@@ -1,4 +1,4 @@
-﻿#Singleinstance,      Force
+#Singleinstance,      Force
 coordMode,  tooltip,  Screen	
 coordmode,  mouse,    screen
 DetectHiddenWindows,  On
@@ -25,43 +25,26 @@ Main: ; sript & hooks initiated
 dbgtt := True
 wm_allow()
 aero_lib()  
+Aero_StartUp()
 
-Aero_StartUp() ; Load important dll Files for more perfomance. ; Line: 52
-
-	; Time_Idle := A_TimeIdlePhysical	;	total time to screensaver = 420
+return,
+	; Time_Idle := A_TimeIdlePhysical	; total time to screensaver = 420
 	; if Time_Idle < 440
-	; settimer, timer_idletime,% ("-" . (430 - A_TimeIdlePhysical))
-	
-return,
-
-	;gui, +HWNDhgui +AlwaysOnTop
-	;DllCall("GetWindowBand", "ptr", hgui, "uint*", band)
-	;gui, Destroy
-	;hgui := ""	
-	
-timer_idletime: 		; testing
-ttp("timer complete.")
-return,
-
-	;EVENT_OBJECT_SELECTIONREMOVE:=0x8008 ; UNDO SELECTION MISTAKES
-	;MENUHOOKS:
-	;EVENT_SYSTEM_MENUPOPUPEND:=0x0007
-	;EVENT_SYSTEM_MENUPOPUPSTART:=0x0006
-	;EVENT_SYSTEM_MENUEND:=0x0005
-	;EVENT_SYSTEM_MENUSTART:=0x0004
-
-return,
+	; settimer, timer_idletime,% ("-" . (430 - A_TimeIdlePhysical))	
+	;timer_idletime: 		        ; test
+	;ttp("timer complete.")
+	;return,
 
 UEventHook(UProc, event, hWnd, idObject, idChild, dwEventThread, dwmsEventTime) {
 global
 	i:=Format("{:#x}", event) 
 	for, index, element in winevents
 		if element = %i%
-			evt   := Index
+			evt := Index
 	ttp(( "Event: " evt "`nhandle: " hWnd "`nOBJ: " idObject ), "800")
 }
 
-stripchars(str2strip){
+stripchars(str2strip) {
 	if instr(strpt, ";")
 		return, 0
 	strpt:=StrReplace(str2strip, ".exe")
@@ -79,46 +62,40 @@ stripchars(str2strip){
 }
  
 windowiconrem:
-	regdelete,% "HKEY_CURRENT_USER\SOFTWARE\_MW\Icons\WinClass"  ,% new_cls 
-	regdelete,% "HKEY_CURRENT_USER\SOFTWARE\_MW\Icons\WinPname"  ,% new_Pn
-	regdelete,% "HKEY_CURRENT_USER\SOFTWARE\_MW\Icons\WinPname"  ,% new_tt
-	winget ppath, ProcessPath,% TargetHandle
-	WindowIconSet(OutputVarWin,ppath)
-	e   := ("ico" . new_cls)  
-	%e% := ""
-	if (%e%)
-		msgbox error 
+regdelete,% "HKEY_CURRENT_USER\SOFTWARE\_MW\Icons\WinClass"  ,% new_cls 
+regdelete,% "HKEY_CURRENT_USER\SOFTWARE\_MW\Icons\WinPname"  ,% new_Pn
+regdelete,% "HKEY_CURRENT_USER\SOFTWARE\_MW\Icons\WinPname"  ,% new_tt
+winget ppath, ProcessPath,% TargetHandle
+WindowIconSet(OutputVarWin,ppath)
+e   := ("ico" . new_cls)  
+%e% := ""
+if (%e%)
+	msgbox % e " error"
 return,
   
-Iconchange_Check(handle,cl="",Pn="",TiTl="") {
-if  icon_cl_arr[cl]
-	if !handle 
-		handle:=winexist("ahk_class " cl)
-	if !(icon_cl_arr[cl]) && !(icon_PN_arr[Pn]) && !(icon_tt_arr[TTl])
-	{
-		return, False
-	}	else {
-		
-		if ttl
-		act:="tt"
-		else if cl
-		act:="cl"
-		else if Pn
-		act:="pn" ; %_arr ; [%act%]
-		tt23=icon_%act%_arr
-		if (%tt23%[%act%]) { 		 ; [%act%]
-
-			gilbert :=(%tt23%[%act%])
-			if ( instr(gilbert, " *")) {
-				StringTrimRight, filename, gilbert  , 2
-			;msgbox % filename
-			WindowIconSet(handle,filename)	
-			
-			icon_clhw_arr.push(handle)
-			return, True
-}	}	}}
-
-
+Iconchange_Check(handle,cl="",Pn="",TiTl="")              {
+	if  icon_cl_arr[cl]
+		if !handle 
+			handle:=winexist("ahk_class " cl)
+		if !(icon_cl_arr[cl]) && !(icon_PN_arr[Pn]) && !(icon_tt_arr[TTl])
+		{
+			return, False
+		} else {
+			if ttl
+				act:="tt"
+			else if cl
+				act:="cl"
+			else if Pn
+				act:="pn" ; %_arr ; [%act%]
+			tt23=icon_%act%_arr
+			if (%tt23%[%act%])                 { 		 ; [%act%]
+				gilbert :=(%tt23%[%act%])
+				if ( instr(gilbert, " *"))
+					StringTrimRight, filename, gilbert, 2
+				WindowIconSet(handle,filename)	
+				icon_clhw_arr.push(handle)
+				return, True
+}		}	}	
 
 windowiconset: 
 wingetClass, Cl_,% TargetHandle 
@@ -132,17 +109,17 @@ if !fileexist, new_icon_path 	 ;  not sure how but it works
 } else, msgbox,% new_icon_path ". error with selected file."
 
 if  !IProcName && !ITitle && !IClass
-	msgbox, nothing to save dave
-else { ; HKEY_CURRENT_USER\SOFTWARE\_MW\Icons\ttl,
-	if  IProcName && !ITitle && !IClass 
-	 action_     :=  "onlypn"
-	else if  !IProcName && ITitle && !IClass 
-	 action_     :=  "onlytt"
-	else if  !IProcName && !ITitle && IClass 
-	 action_     :=  "onlycl"
+	 msgbox, nothing to save dave
+else { 
+	if      IProcName  && !ITitle && !IClass 
+		action_ :=  "onlypn"
+	else if !IProcName && ITitle  && !IClass 
+		action_ :=  "onlytt"
+	else if !IProcName && !ITitle && IClass 
+		action_ :=  "onlycl"
 	else action_ :=  "mixed"
-	msgbox
 }
+
 switch action_ {
 	case "onlypn":
 		new_icon_path    :=  new_icon_path . " *"
@@ -156,25 +133,24 @@ switch action_ {
 		regWrite,% "REG_SZ",% "HKEY_CURRENT_USER\SOFTWARE\_MW\Icons\tt"  ,% tt_ ,% new_icon_path
 
 	case "onlycl":
-
 		new_icon_path     :=  new_icon_path . " *"
 		icon_cl_arr[Cl_] :=  new_icon_path
-		regWrite,% "REG_SZ",% "HKEY_CURRENT_USER\SOFTWARE\_MW\Icons\cl"  ,% cl_ ,% new_icon_path
+		regWrite,% "REG_SZ",% ("HKEY_CURRENT_USER\SOFTWARE\_MW\Icons\" . act)  ,% cl_ ,% new_icon_path
 
 	case "mixed":
 		if IProcName {
 			icon_pn_arr[pn_] := new_icon_path
-			regWrite,% "REG_SZ",% "HKEY_CURRENT_USER\SOFTWARE\_MW\Icons\pn"  ,% pn_ ,% new_icon_path
+			regWrite,% "REG_SZ",% ("HKEY_CURRENT_USER\SOFTWARE\_MW\Icons\" . act)  ,% pn_ ,% new_icon_path
 		}
 		if ITitle {
 			icon_tt_arr[tt_] :=  new_icon_path
-			regWrite,% "REG_SZ",% "HKEY_CURRENT_USER\SOFTWARE\_MW\Icons\tt"  ,% tt_ ,% new_icon_path
+			regWrite,% "REG_SZ",% ("HKEY_CURRENT_USER\SOFTWARE\_MW\Icons\" . act) ,% tt_ ,% new_icon_path
 
 		}
 
 		if IClass {
 			icon_cl_arr[Cl_] :=  new_icon_path
-			regWrite,% "REG_SZ",% "HKEY_CURRENT_USER\SOFTWARE\_MW\Icons\cl"  ,% cl_ ,% new_icon_path
+			regWrite,% "REG_SZ",% ("HKEY_CURRENT_USER\SOFTWARE\_MW\Icons\" .act)  ,% cl_ ,% new_icon_path
 		}
 }
 
