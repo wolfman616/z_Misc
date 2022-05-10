@@ -28,6 +28,7 @@ aero_lib()
 Aero_StartUp()
 
 return,
+
 	; Time_Idle := A_TimeIdlePhysical	; total time to screensaver = 420
 	; if Time_Idle < 440
 	; settimer, timer_idletime,% ("-" . (430 - A_TimeIdlePhysical))	
@@ -45,15 +46,16 @@ global
 }
  
 windowiconRem:
-WindowIconSet(OutputVarWin,ppath)
+WindowIconSet(OutputVarWin,Ppath)
 loop, parse,% "new_cl,new_Pn,new_tt",`,
 {
-	bumhole = %a_loopfield%
-	stringTrimLeft, iid_grp, bumhole, 4
-	regdelete,% ("HKEY_CURRENT_USER\SOFTWARE\_MW\Icons\" . iid_grp) ,% %bumhole% 
-	icon_%iid_grp%_arr.pop(%bumhole%)
+	icon_Path_temp_ := a_loopfield
+	stringTrimLeft, iid_grp, icon_Path_temp_, 4
+	regdelete,% ("HKEY_CURRENT_USER\SOFTWARE\_MW\Icons\" . iid_grp),% (%icon_Path_temp_%)
+	icon_%iid_grp%_arr.pop(%icon_Path_temp_%)
 }
-winget ppath, ProcessPath,% TargetHandle
+icon_Path_temp_ := ""
+winget, ppath, ProcessPath,% TargetHandle
 return,
   
 Iconchange_Check(handle,cl="",Pn="",TTl="")  {
@@ -66,16 +68,14 @@ Iconchange_Check(handle,cl="",Pn="",TTl="")  {
 		act:="cl"
 	if Pn
 		act:="pn"
-		
 	tt23=icon_%act%_arr
 	if %tt23%[%act%]  {
-		gilbert :=%tt23%[%act%]
-		if ( instr(gilbert, " *"))
-			StringTrimRight, filename, gilbert, 2
-		else filename:=gilbert
+		Ico_arr_temp_ := %tt23%[%act%]
+		if ( instr(Ico_arr_temp_, " *") )
+			StringTrimRight, filename, Ico_arr_temp_, 2
+		else filename:=Ico_arr_temp_
 		WindowIconSet(handle,filename)	
 		icon_clhw_arr.push(handle)
-		
 		return, True
 }	}		
 
@@ -83,7 +83,7 @@ window_icon_New:
 wingetClass, Cl_,% TargetHandle 
 winGet,      pn_, processname,% TargetHandle
 wingettitle, tt_,% TargetHandle
-fileSelectFile, new_icon_path, Options, C:\ICON\,% pn_ "Icon Selector" ,% "Icunt (*.ico)"
+fileSelectFile, new_icon_path, Options, C:\ICON\,% pn_ "Icon Selector" ,% "Icun (*.ico)"
 if fileexist( new_icon_path ) { 	
 	WindowIconSet(OutputVarWin,new_icon_path)
 	msgbox,% "ok Icon will be saved for " processname
@@ -94,9 +94,8 @@ if fileexist( new_icon_path ) {
 if  !IProcName && !ITitle && !IClass {
 	 msgbox, nothing to save dave
 	 return,
-}else { 
-
-	    if !IProcName && ITitle  && !IClass 
+} else { 
+	    if !IProcName  && ITitle  && !IClass 
 		 action_ :=  "tt"
 	else if !IProcName && !ITitle && IClass 
 		 action_ :=  "cl"
@@ -104,31 +103,19 @@ if  !IProcName && !ITitle && !IClass {
 		 action_ :=  "pn"
 	else { 
 		action_ :=  "pn"
-		new_icon_path    :=  new_icon_path . " *" 
+		new_icon_path := (new_icon_path . " *")
 }	}
-
 typeid = %action_%_
 icon_%action_%_arr[%typeid%] := new_icon_path     ; set array member up for current session
 regWrite,% "REG_SZ",% ("HKEY_CURRENT_USER\SOFTWARE\_MW\Icons\" . action_),% %typeid% ,% new_icon_path
-WindowIconSet(OutputVarWin,new_icon_path) 	      ; apply the new icon
-return,
-
-window_iconset_gui:
-gui, window_iconset_gui:new, +hwndwindow_iconset_gui_hWnd,% ("Set Icon for " . new_PN)
-gui, window_iconset_gui:
-gui, window_iconset_gui:add, checkbox, vIProcName,% ("Process "   .   new_PN)
-gui, window_iconset_gui:add, checkbox, vITitle,%    ("WindowTitle " . new_tt)
-gui, window_iconset_gui:add, checkbox, vIClass,%    ("save Class " .  new_cl)
-gui, window_iconset_gui:add, button, default gwindow_iconset_guiSubmit w80,% "Save (Enter)"
-gui, window_iconset_gui:add, button, w80     gwindow_iconset_guiDestroy,%	 "Cancel (Esc)"
-gui, show, center 
-OnMessage(0x200, "Help")
+WindowIconSet(OutputVarWin,new_icon_path)         ; apply the new icon
 return,
 
 #c::	;-=-LASTWINDOWSGUI-=--=-LASTWINDOWSGUI-=--=-LASTWINDOWSGUI-=--=-LASTWINDOWSGUI-=--=-LASTWINDOWSGUI-=--=-LASTWINDOWSGUI-=--=-LASTWINDOWSGUI-=-
 Menu, MenuBar,   Add, File,     last_classes_names2
 Menu, MenuBar,   Add, View,     last_classes_names2
 Menu, MenuBar,   Add, Options,  last_classes_names2
+
 guilastclass: ;gui, Gui_lastclass: Destroy
 gui, Gui_lastclass: New, +dpiscale +hwndWindle, Last Window-Class Objects
 gui, Gui_lastclass: Margin,% marginSz,% marginSz
@@ -212,7 +199,7 @@ global
 		case "OperationStatusWindow": 		
 			Aero_BlurWindow(hWnds)
 			if ((Title_last = "Replace or Skip Files") || (Title_last = "Confirm Folder Replace") || (Title_last = "Folder In Use")) {
-				return,
+				return, ;currently disabled
 				msgbox,% " test 5 ",,,4
 				DEBUGTEST_FOC := True
 				DEBUGTEST_HWND    := wineXist("A")
@@ -324,7 +311,6 @@ global
 				run,% "C:\Script\AHK\- Script\Notepad++ Insert AHK Parameters.ahk",,hide
 			np := True
 		default: 
- 
 			if (IsWindow(hWnds))           {
 				winget Style, Style,% hwand
 				if (Style & 0x10000000)    {
@@ -514,7 +500,7 @@ OnFocus(HookFc, event, BK_UN_T, idObject, idChild, dwEventThread, dwmsEventTime)
 				break
 	}		}
 	pushclsl2_(Class)
-	pushclsh2_(BK_UN_T)	;old_classfocus3 := old_classfocus2, old_classfocus2 := old_classfocus1, old_classfocus1 := Class	;if (old_classfocus2 = "SDL_app") || if (old_classfocus3 = "SDL_app") || if (old_classfocus1 = "SDL_app")
+	pushclsh2_(BK_UN_T)	
 	
 	;steamicu:
 	;Iconchange_Check(hWnd4st,"SDL_app")
@@ -571,10 +557,6 @@ OnFocus(HookFc, event, BK_UN_T, idObject, idChild, dwEventThread, dwmsEventTime)
 	; 	case "CabinetWClass":;{ ;winset, transparent, 130,% hnd_;msgbox;}
 }	}		 
 
-;MenPopStart(HookMps, event, hWnd, idObject, idChild, dwEventThread, dwmsEventTime) {
-;tooltip $ hWnd 
-;}
-
 OnMsgBox(HookMb, event, hWnd, idObject, idChild, dwEventThread, dwmsEventTime) {
 	wingetTitle, Title_last,% (h_Wd := ("ahk_id " . Format("{:#x}",hWnd)))	
 	if TTmb {
@@ -617,10 +599,9 @@ OnObjectDestroyed(HookOD, event, hWnd, idObject, idChild, dwEventThread, dwmsEve
 	winget PName, ProcessName,% hndDS	
 	if TTds
 		tooltip OBJ_DESTROY EVENT:`n%PName%`n%Title_last%`nAHK_Class %Class%`nAHK_ID %hndDS%
-	if pname contains AutoHotkey 
-	&& IsWindowVisible( hWnd)
-		settimer, quotE, -1
-		
+;	if pname contains AutoHotkey 
+;	&& IsWindowVisible( hWnd)
+;		settimer, quotE, -1
 	switch Class { ; case "Autohotkey": { ; if % "C:\Script\AHK\adminhotkeys.ahk in " Title_last ; { ; menu, tray, uncheck, Launch AdminHotkeyz, ; tooltip detected admin hotkey disconnecting ; } ; }
 		case "ApplicationFrameWindow","WINDOWSCLIENT":
 			wingetTitle, Last_Title,% hndDS 
@@ -659,7 +640,7 @@ return,
 			; if (WinExist(ser)) or if (npNameNoExt = "WinEvent") {
 				; MsgBox, 4129,%ser% dtect`NnReload AHK Script, Reload %TargetScriptName% now?`nTimeout in 6 Secs, 7
 				;;IfMsgBox Timeout
-				;;	ttp("cuntface")
+				;;	ttp("testi")
 				; ifmsgbox OK					
 					; if npNameNoExt = WinEvent		
 ; {					
@@ -886,9 +867,9 @@ HookFc  :=  DllCall("SetWinEventHook", "Uint", OBJFc, "Uint", OBJFc, "Ptr", 0, "
 HookMb  :=  DllCall("SetWinEventHook", "Uint", 0x0010,"Uint", 0x0010,"Ptr", 0, "Ptr", (ProcMb_ := RegisterCallback("OnMsgBox", "")),         "Uint", 0, "Uint", 0, "Uint", OoC | SkpO)
 HookCr  :=  DllCall("SetWinEventHook", "Uint", OBJCR, "Uint", OBJCR, "Ptr", 0, "Ptr", (ProcCr_ := RegisterCallback("OnObjectCreated", "")),  "Uint", 0, "Uint", 0, "Uint", OoC ) 
 HookOD  :=  DllCall("SetWinEventHook", "Uint", OBJDS, "Uint", OBJDS, "Ptr", 0, "Ptr", (ProcOD_ := RegisterCallback("OnObjectDestroyed", "")),"Uint", 0, "Uint", 0, "Uint", OoC | SkpO)
-;Hookmps :=  DllCall("SetWinEventHook", "Uint", MNPPS, "Uint", MNPPS, "Ptr", 0, "Ptr", (ProcCr_ := RegisterCallback("UEventHook", "")),"Uint", 0, "Uint", 0, "Uint", OoC| SkpO)
-onmydick:=0x0010
-loop, parse,% (a:="OBJ4g,OBJFc,onmydick,OBJCR,OBJDS"), `,
+
+omd:=0x0010
+loop, parse,% (a:="OBJ4g,OBJFc,omd,OBJCR,OBJDS"), `,
 	hooked_events.push(a_loopfield)
 	; for index, element in hooked_events
 	; if !ass
@@ -959,7 +940,7 @@ if !dbg {
 }
 return,
 
- ;= debug tooltip message TRAY-MENU toggles
+;= debug tooltip message TRAY-MENU toggles
 TT4g: ;TT4g := !TT4g debug tooltip message TRAY-MENU toggles
 TTFoc: ;TTFoc := !TTFoc
 TTcr: ;TTcr := !TTcr
@@ -1239,7 +1220,6 @@ gui, SaveGuI:add, button, w80 gSaveGUIDestroy,% 	   "Cancel (Esc)"
 gui, show, center, SAVE WINDOW STYLES
 OnMessage(0x200, "Help")
 return,
-
 
 PushNewSave: 	
 if TProcName  ;  regKey contains unique combo of info picked by user as a search key allowing for combinations of classnamed title and procname. Should be enough
@@ -1571,9 +1551,6 @@ return,
 admhotkey_reload_:
 PostMessage, 0x0111, 65303,,,% "adminhotkeys.ahk - AutoHotkey"
 return
-;------------=========================++++++++++++++++++++*+*+*+*
-Open_ScriptDir() ; not called ever, using to invoke its label(s).
-;------------=========================++++++++++++++++++++*+*+*+*
 
 Stylemenu_init:  ; tooltip % "Analyzing, please wait" ++++*+*+*+*
 TargetHandle := "", style:=""
@@ -1669,14 +1646,15 @@ menus_other: ; below submenus
 menu, 	F, 	add,  m2drag bypass,     toggle_m2drag_bypass
 menu, 	F, 	Icon, m2drag bypass,%    mouse24
 menu, 	F, 	add,% "Get window text", getwintxt
+
 ; if !new_PN
 ; msgbox error new_PN
 ; if !new_cl
 ; msgbox error clsn
+
 if (icon_PN_arr[new_PN]) || if (icon_cl_arr[new_cl]) 
-{
 	   menu, F, 	add,% "remove icon", windowiconrem
-} else menu, F, 	add,% "Set icon",    window_iconset_gui ;windowiconset
+else   menu, F, 	add,% "Set icon",    window_iconset_gui ;windowiconset
 menu, 	     F, 	add,% "Save",        Savegui
 goto,   StyleMenu_Show
 
@@ -1685,9 +1663,7 @@ menu, F, Show
 menu, F, DeleteAll
 return,  
 ;`~	;`~	;`~	;`~	;`~	;`~	;`~	;`~			
-;`~	;`~	;`~	;`~	;`~	;`~	;`~	;`~			
-;`~	;`~	;`~	;`~	;`~	;`~	;`~	;`~			
-;`~	;`~	;`~	;`~	;`~	;`~	;`~	;`~			
+
 NewTrayMenuParam( LabelPointer = "", Title = "", Icon = "" ) {
 	if Title                                                 {
 		MenuLablTitlAr[%LabelPointer%]:= Title
@@ -1728,8 +1704,10 @@ menu, 	tray, 	  add, 	"DESKTOP_AREA", DESKTOP_AREA
 menu, 	tray, 	  add, 	Open Script Dir, Open_ScriptDir
 
 menu, 	tray, 	  Standard
-gosub, 	MenuP               ; add the rest... /
+
+gosub, 	MenuP               ; add the rest...
 gosub, 	test_icons 			; and their ico
+
 menu, 	SubMenu1, add,  restart wacom,   SvcRestartWacom
 menu, 	SubMenu1, icon, restart wacom,   C:\Icon\24\DNA.ico
 
@@ -1885,7 +1863,9 @@ stylexarr["toggle_AppWindow"]  := "^0x00040000"
 
 donothing:
 return,
-
+;------------=========================++++++++++++++++++++*+*+*+*
+Open_ScriptDir() ; not called ever, using to invoke its label(s).
+;------------=========================++++++++++++++++++++*+*+*+*
 init_matt:
 loop, parse, INIT_SEQ, ">",
 	gosub,% A_loopfield
@@ -1937,8 +1917,8 @@ loop, parse,% "event1,event15,event2", `,
 									mainstring      :=  mainstring . azss
 								} else {
 									if(a_index != lo0) {
-										nigger      :=  SubStr(A_loopfield, ((a_index -1) * 100), 100)
-										mainstring  := (mainstring . nigger . "`n")
+										m_String_temp      :=  SubStr(A_loopfield, ((a_index -1) * 100), 100)
+										mainstring  := (mainstring . m_String_temp . "`n")
 						}	}	}	} 
 						    winevents_i[eventname]  :=  mainstring
 					} else, winevents_i[eventname]  :=  A_loopfield
@@ -2232,6 +2212,18 @@ WM_COMMAND(wParam, lParam, uMsg, hWnd) {
 		sleep, 1500
 		ToolTip
 }	}
+
+window_iconset_gui:
+gui, window_iconset_gui:new, +hwndwindow_iconset_gui_hWnd,% ("Set Icon for " . new_PN)
+gui, window_iconset_gui:
+gui, window_iconset_gui:add, checkbox, vIProcName,% ("Process "   .   new_PN)
+gui, window_iconset_gui:add, checkbox, vITitle,%    ("WindowTitle " . new_tt)
+gui, window_iconset_gui:add, checkbox, vIClass,%    ("save Class " .  new_cl)
+gui, window_iconset_gui:add, button, default gwindow_iconset_guiSubmit w80,% "Save (Enter)"
+gui, window_iconset_gui:add, button, w80     gwindow_iconset_guiDestroy,%	 "Cancel (Esc)"
+gui, show, center 
+OnMessage(0x200, "Help")
+return,
 
 poop(gname, hGUI){
 	global
