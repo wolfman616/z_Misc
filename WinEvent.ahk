@@ -214,7 +214,7 @@ global
 		case "MozillaDialogClass":
 			winget, Style, Style,% hwand
 			winget, exStyle, exStyle,% hwand
-			If ((STYLE = 0x16CE0084) && (EXSTYLE = 0x00000101))
+			If ((STYLE = 0x16CE0084) && (EXSTYLE = 0x00000101)) ; identifying popout window
 				winset, Style,0x16860084,% hwand 
 		case "NotifyIconOverflowWindow","TaskListThumbnailWnd","Net UI Tool Window Layered":
 			winset, ExStyle, ^0x00000100,% hwand
@@ -1198,7 +1198,6 @@ switch a_thislabel {
 		winset, ExStyle, stylexarr[ a_thislabel ],% ("ahk_id " . OutputVarWin )
 }
 goto ResetMenu
-return,
 
 SAVEGUI:
 if !TargetHandle
@@ -1212,9 +1211,9 @@ if !Style or !ExStyle
 	msgbox,% ("error " . A_lasterror)
 gui, SaveGuI:new , , SAVE WINDOW STYLES
 gui +hwndSaveGuI_hWnd
-gui, SaveGuI:add, checkbox, vTProcName ,	Process %savePN%
-gui, SaveGuI:add, checkbox, vTTitle ,		WindowTitle %save_new_Title%
-gui, SaveGuI:add, checkbox, vTClass ,		save Class %save_new_Class%
+gui, SaveGuI:add, checkbox, vTProcName, Process %savePN%
+gui, SaveGuI:add, checkbox, vTTitle,    WindowTitle %save_new_Title%
+gui, SaveGuI:add, checkbox, vTClass,    save Class %save_new_Class%
 gui, SaveGuI:add, button, default gSaveGUISubmit w80,% "Save (Enter)"
 gui, SaveGuI:add, button, w80 gSaveGUIDestroy,% 	   "Cancel (Esc)"
 gui, show, center, SAVE WINDOW STYLES
@@ -1231,11 +1230,11 @@ if TClass
 return
 
 SaveGUISubmit: 	
-gui, SaveGuI:Submit
+gui, SaveGuI: Submit
 return,
 
 SaveGUIDestroy:
-gui, SaveGuI:destroy
+gui, SaveGuI: destroy
 TProcName := "", TTitle := "", TClass := ""
 return,
 
@@ -1253,15 +1252,15 @@ Loop %list_rzexe% {
 	winGet, ExStyle, ExStyle,% SS
 	if ((Style = "0x16080000") && (ExStyle = "0x000C0000")) {
 		winactivate,% ss
-		send ^{a}
-		send %Log1_RZ%	
-		send {tab}
-		send ^{a}
-		send %Pa5s_RZ%
+		send, ^{a}
+		send, %Log1_RZ%	
+		send, {tab}
+		send, ^{a}
+		send, %Pa5s_RZ%
 		PixelGetColor, color, 219, 326
 		if color != 0x02DD02
 			def:="default snot saved"
-		else, send {enter}
+		else, send, {enter}
 }	}	
 CoordMode,% coord_old
 return,
@@ -1387,7 +1386,6 @@ Quoting := False
 return,
 ;------------==========================++++++++++++++++++++*+*+*+*
 32770Fix:     
-return
 wingetClass, Cls_A, a
 if Cls_A != "#32770"                   ;    "Save as" & "Open" dlgs called from the eventHook.
 	winwaitActive,% "ahk_class #32770" ;  * takesawhile to visually materialise ui, hence prev.
@@ -1403,8 +1401,8 @@ if (Cls_A = "#32770") {	               ;    "Active" is not actually ready to be
 	a:=DllCall("gdi32.dll\SetStretchBltMode", "Uint", dcC, "Int", 5)
 	b:=DllCall("gdi32.dll\StretchBlt", "Uint", dcC, "Int", 0, "Int", 0, "Int", desk_wi, "Int", desk_hi, "Uint", mdc, "Uint", 0, "Uint", 0, "Int", 1, "Int", 1, "Uint", "0x00CC0020")
 	Gdip_ShutdownI(Nnn)
-	if a = 0 || b = 0
-		goto gdipfix_start
+	if (a = 0 || b = 0)
+		goto, gdipfix_start
 }
 return,
 
@@ -1434,7 +1432,7 @@ LABElA(Tingz) 	 {
 			settimer, reload_orload_admhk, -1
 		default:
 		traytip, Launching %tingz%
-			run,% %Tingz%
+			run,% (%Tingz%)
 }	}	
 
 sbardisabletoggle()     {
@@ -1471,8 +1469,7 @@ return,
 
 window_iconset_guiSubmit: 	
 gui, window_iconset_gui:Submit
-goto window_icon_New
-return, 
+goto, window_icon_New
 
 pushclsl_(cls="")         {
 global	
@@ -1495,14 +1492,13 @@ clht_max_I         += 1
 } 
 
 pushclsl2_(cls2="")       {
-	global	
+global	
 	clst2_max_I     += 1 
 	if (clst2_max_I > 20) {
 		clst2_max_I -= 1 
 		classeslast2.removeat(1)   ;   pop da' head
 	}
 	classeslast2.push(cls2)
-	
 }
 
 pushclsh2_(hw_2="")       {
@@ -1516,33 +1512,33 @@ clht2_max_I         += 1
 } 
 
 last_classes_handles:
-	for index, element in classhwlast
+for index, element in classhwlast
 	concat := concat . "`n" . element
-	tooltip,% "e " concat " "  clst_max_I " "  clht_max_I
-	concat :=""
-	return,
+tooltip,% "e " concat " "  clst_max_I " "  clht_max_I
+concat :=""
+return,
 	
 last_classes_names:
-	for index, element in classeslast
+for index, element in classeslast
 	concat := concat . "`n" . element
-	tooltip,% "e " concat " "  clst_max_I " "  clht_max_I
-	concat :=""
-	return,
+tooltip,% "e " concat " "  clst_max_I " "  clht_max_I
+concat :=""
+return,
 	
 last_classes_handles2:
-	for index, element in classhwlast2
+for index, element in classhwlast2
 	concat := concat . "`n" . element
-	tooltip,% "e " concat " "  clst2_max_I " "  clht2_max_I
-	concat :=""
-	return,
+tooltip,% "e " concat " "  clst2_max_I " "  clht2_max_I
+concat :=""
+return,
 	
 last_classes_names2:
-	for index, element in classeslast2
+for index, element in classeslast2
 	concat := concat . "`n" . element
-	tooltip,% "e " concat " "  clst2_max_I " "  clht2_max_I
-	concat :=""
-	return,
-	
+tooltip,% "e " concat " "  clst2_max_I " "  clht2_max_I
+concat :=""
+return,
+
 reload_orload_admhk:
 if !aasa:=check_ADMHOTKEY()
 	run,% AdHkRun
@@ -1561,32 +1557,31 @@ Dix := True
 MouseGetPos, OutputVarX, OutputVarY, OutputVarWin, OutputVarControl
 TargetHandle := ("ahk_id " . OutputVarWin)
 wingetClass, new_cl,%              TargetHandle 
-;winget       pname__, Processname,% TargetHandle
 wingetTitle, TargetTitle,%          TargetHandle
 if !TargetTitle 
 	return,
-new_tt:=TargetTitle
+new_tt := TargetTitle
 winget, new_PN,     ProcessName,%   TargetHandle
 winget, new_style,    Style,% 		TargetHandle
 winget, new_exstyle,  ExStyle,% 	TargetHandle
 
 menu_Style_main:
 if new_PN {
-	menu,         F,   Add,%     new_PN, donothing
-	menu,         F,   Disable,% new_PN
+	menu,     F,   Add,%     new_PN, donothing
+	menu,     F,   Disable,% new_PN
 }
-menu,         F,   Add,%     Grants_Son["Sys_Menu"],  toggle_sysmenu
+menu,         F,   Add,%     Style_Men_arr_["Sys_Menu"],  toggle_sysmenu
 if (new_style    &    0x00080000)
-	  menu,   F,   check,%   Grants_Son["Sys_Menu"]
-else, menu,   F,   uncheck,% Grants_Son["Sys_Menu"]
-      menu,   F,   add,%     Grants_Son["Clickthru"], toggle_Clickthru
+	  menu,   F,   check,%   Style_Men_arr_["Sys_Menu"]
+else, menu,   F,   uncheck,% Style_Men_arr_["Sys_Menu"]
+      menu,   F,   add,%     Style_Men_arr_["Clickthru"], toggle_Clickthru
 if(new_exstyle   &    0x00000001)
-	  menu,   F,   check,%   Grants_Son["Clickthru"]
-else, menu,   F,   uncheck,% Grants_Son["Clickthru"]
-      Menu,   F,   add,%     Grants_Son["AppWindow"], toggle_AppWindow
+	  menu,   F,   check,%   Style_Men_arr_["Clickthru"]
+else, menu,   F,   uncheck,% Style_Men_arr_["Clickthru"]
+      Menu,   F,   add,%     Style_Men_arr_["AppWindow"], toggle_AppWindow
 if(new_exstyle   &    0x00040000)
-	  menu,   F,   check,%   Grants_Son["AppWindow"]
-else, menu,   F,   uncheck,% Grants_Son["AppWindow"]
+	  menu,   F,   check,%   Style_Men_arr_["AppWindow"]
+else, menu,   F,   uncheck,% Style_Men_arr_["AppWindow"]
 goto, menus_subitem
 
 Submenus:
@@ -1612,14 +1607,14 @@ else, menu,      S1, uncheck,%  "Modal Frame"
 if(new_exstyle  &   0x00020000)   
 	  menu,      S1, check,%    "Static edge"
 else, menu,      S1, uncheck,%  "Static edge"
-      menu,      S1, Add,%      Grants_Son["Maxbox"],     toggle_Maxbox
+      menu,      S1, Add,%      Style_Men_arr_["Maxbox"],     toggle_Maxbox
 if (Style2   &    0x00010000)                     
-	  menu,      S1, check,%    Grants_Son["Maxbox"]        
-else, menu,      S1, uncheck,%  Grants_Son["Maxbox"]       
-      menu,      S1, Add,%      Grants_Son["MinBox"],     toggle_MinBox
+	  menu,      S1, check,%    Style_Men_arr_["Maxbox"]        
+else, menu,      S1, uncheck,%  Style_Men_arr_["Maxbox"]       
+      menu,      S1, Add,%      Style_Men_arr_["MinBox"],     toggle_MinBox
 if (Style2   &   0x00020000)                   
-	  menu,      S1, check,%    Grants_Son["MinBox"]          
-else, menu,      S1, uncheck,%  Grants_Son["MinBox"]          
+	  menu,      S1, check,%    Style_Men_arr_["MinBox"]          
+else, menu,      S1, uncheck,%  Style_Men_arr_["MinBox"]          
       menu,      S2, Add,%      "HScroll",                toggle_hscroll
 if (Style2   &   0x00100000)                  
 	  menu,      S2, check,% 	"HScroll"  
@@ -1628,18 +1623,18 @@ else, menu,      S2, uncheck,%  "HScroll"
 if(Style2    &   0x00200000)                    
 	  menu,      S2, check,% 	"VScroll"      
 else, menu,      S2, uncheck,%   "VScroll"   
-      menu,      S2, Add,%      Grants_Son["LeftScroll"], toggle_LeftScroll
+      menu,      S2, Add,%      Style_Men_arr_["LeftScroll"], toggle_LeftScroll
 if(new_exstyle  &   0x00004000)                   
-	  menu,      S2, check,%    Grants_Son["LeftScroll"]     
-else, menu,      S2, uncheck,%  Grants_Son["LeftScroll"]   
-      menu,      S3, Add,%      Grants_Son["RightAlign"], toggle_RightAlign
+	  menu,      S2, check,%    Style_Men_arr_["LeftScroll"]     
+else, menu,      S2, uncheck,%  Style_Men_arr_["LeftScroll"]   
+      menu,      S3, Add,%      Style_Men_arr_["RightAlign"], toggle_RightAlign
 if (new_exstyle &   0x00001000)                   
-	  menu,      S3, check,%    Grants_Son["RightAlign"]
-else, menu,      S3, uncheck,%  Grants_Son["RightAlign"]
-      menu,      S3, Add,%      Grants_Son["RightoLeft"], toggle_RightoLeft
+	  menu,      S3, check,%    Style_Men_arr_["RightAlign"]
+else, menu,      S3, uncheck,%  Style_Men_arr_["RightAlign"]
+      menu,      S3, Add,%      Style_Men_arr_["RightoLeft"], toggle_RightoLeft
 if (new_exstyle &   0x00002000)                   
-	  menu,      S3, check,%    Grants_Son["RightoLeft"]    
-else, menu,      S3, uncheck,%  Grants_Son["RightoLeft"]
+	  menu,      S3, check,%    Style_Men_arr_["RightoLeft"]    
+else, menu,      S3, uncheck,%  Style_Men_arr_["RightoLeft"]
 goto, Submenus
 
 menus_other: ; below submenus
@@ -1677,6 +1672,7 @@ NewTrayMenuParam( LabelPointer = "", Title = "", Icon = "" ) {
 	else, return, 0
 	return, 3
 }
+
 ; ~`~`~~`~;`~`~`~`~		~`~`~`~		~`~`~`~		~`~`~`  ~`~`~` ~`~`~	`~` ~`~ `~  ~`~`	~`~	`~`~`~	`~	`~`
 MenuP:
 loop, parse, mmenuListLbl, /,
@@ -1686,6 +1682,7 @@ loop, parse, mmenuListTtl, /,
 for index, element in MenuLablTitlAr
 	menu, tray, Add,% element,% index
 return,
+
 ; ~`~`~~`~;`~`~`~`~		~`~`~`~		~`~`~`~		~`~`~`  ~`~`~` ~`~`~	`~` ~`~ `~  ~`~`	~`~	`~`~`~	`~	`~`
 test_icons:
 mti := (NewTrayMenuParam("", "Launch PowerConfig", ((icn := "C:\Icon\") . "20\alien.ico") )), mti := (NewTrayMenuParam("", "Launch MattDWM", (icn . "24\dwm24.ico") )), mti := (NewTrayMenuParam("", "Launch YouTube_DL", (icn . "24\YouTube.ico") )), mti := (NewTrayMenuParam("", "DWM_Axnt_fix", (icn . "24\pNG\refresh.png") )), mti := (NewTrayMenuParam("", "LoadAeroRegKeyz", (icn . "24\PNG\refresh.png") )), mti := (NewTrayMenuParam("", "Launch M2Drag", (ScpW . "\Mouse242.ico") )), mti := (NewTrayMenuParam("", "Launch screen clean!", (icn . "24\AF_Icon.ico") )), mti := (NewTrayMenuParam("", "setsyscols", (icn . "24\colwh_24.ico") ))
@@ -1713,12 +1710,12 @@ menu, 	SubMenu1, icon, restart wacom,   C:\Icon\24\DNA.ico
 
 menu,   tray,     add,  Services,        :SubMenu1
 menu,   tray,     icon, Services,        C:\Icon\24\DNA.ico
-
 return,
+
 SvcRestartWacom:
 result := service_restart("WTabletServicePro")   
 settimer, testresult, -4500
-return
+return,
 
 testresult:  ;0 = OK
 if result ! = 0	
@@ -1734,12 +1731,13 @@ if result ! = 0
 	
 } else 
 	ttp(("Success..`nThe" Target_Service " Restarted succesfully" A_now))
-return
-;         Style and extended style setter menu Init
+return,
+
+;               Style and extended style setter menu Init
 Menu_Style_Init:           
-;        -DeLimiters
+;                    -DeLimiters
 _x := ("|"), _y := "£" 
-;        -String
+; -String
 str_aL:=("Sys_Menu" . _y . """Title (+ & X Conrols) (SysMenu)""" . _x . "Maxbox" . _y . """Maximise Button (□)""" . _x . "MinBox" . _y . """Minimise Button (_)""" . _x . "LeftScroll" . _y . """Left Scroll Orientation""" . _x . "ClickThru" . _y . """Click-through""" . _x . "RightAlign" . _y . """Generic Right-alignment""" . _x . "RightoLeft" . _y . """Right-to-Left reading""" . _x . "AppWindow" . _y . """Taskbar Item (not 100%)""" . _x . "Save" . _y . """Save window style preferences""" . _x . "Reset" . _y . """Reset window style preferences""")
 ;        -Parse
 loop,     parse, str_aL,%      _x
@@ -1748,18 +1746,18 @@ loop,     parse, str_aL,%      _x
 			case "1":
 				eyeBall:=A_loopfield
 			case "2": ; msgbox %
-				Grants_Son[eyeBall] := A_loopfield
+				Style_Men_arr_[eyeBall] := A_loopfield
 		}
-		for index, element in grants_son
+		for index, element in Style_Men_arr_
 		;msgbox % index "`n" element
 		bum="sysmenu"
-		;msgbox % Grants_Son["sys_menu"]
+		;msgbox % Style_Men_arr_["sys_menu"]
 return  ;END
 ;	^-=___=-^				^-=___=-^				^--___=-^   ^   ~   ~   _   ¬   ¬   ¬   ¬   ¬   ¬   ¬   ¬   _
 Varz:   ; 01010101010 ' ` ' `' `':C\Root\`'`'''`'      `''`0101'`'`'```''`'`'     ``'010101`''`'0xFFEEDD`'`'`'`'``'`'     			`''`''KILL!'`'`' '`''`'``'' `'`''`''` ''`'` '`''` `''` `''` `'` 
 global AHKdir, AF, AF2, AutoFireScript, Scr_, dbgtt, AutoFireScript2, TargetScriptTitle, TargetScriptTitle2, AF_Delay, SysShadowStyle_New, SysShadowExStyle_New, toolx, offsett, XCent, YCent, starttime, text, X_X, Last_Title, autofire, RhWnd_old, MouseTextID, DMT, roblox, toggleshift, Norm_menuStyle, Norm_menuexStyle, Title_last, dcStyle, classname, tool, tooly, EventLogBuffer_Old, Roblox_hwnd, Time_Elapsed, KillCount, SBAR_2berestored_True, Sidebar, TT, TT4g, TTFoc, TTcr, TTds, TTmb, dbg, TClass, TTitle, TProcName, delim, delim2, TitleCount, ClassCount, ProcCount, style2, new_exstyle, ArrayProc, ArrayClass, ArrayTitle, Array_LProc, Array_LTitle, Array_LClass, Style_ClassnameList2, Style_procnameList2, Style_wintitleList2, Youtube_Popoutwin, Script_Title, np, m2dstatus, crashmb, 8skin_crash, OutputVarWin, F, s1, s2, s3, FileListStr, oldlist, FileCount, ADELIM, hTarget, hTargetprev, hgui, xPrev, yPrev, hPrev, logvar, ADM_wTtL, triggeredGFS, Matrix, Maxbox, MinBox, LeftScroll, ClickThru, RightAlign, RightoLeft, AppWindow, Save, Reset, MiDiRun, test_move, 
 
-global mattdwmrun, Quoting, mmenuListTtl, MenuLablAr, MenuLablTitlAr, mmenuListLbl, Desk_Wi, Desk_Hi, FileListStr_Ar, hTargetPrev, wPrev, hPrev, xPrev, yPrev, hidegui, q_dlim, quotes, DEBUGTEST_HWND, hook4g, HookMb, HookCr, HookOD, HookFc, DEBUGTEST_FOC, hook4g, Proc4g_, AhkPath, HookMb, ProcMb_, ProcCr_, ProcDstroyd, procFc_, nnd, 1998, 1999, SkpO, old_focus1, old_focus2, old_focus3, old4gnd1, old4gnd2, old4gnd3, qstr, mattdwmrun2, test_move, SidebarPath, Path_PH, AHK_Rare, CleanME_PLZz, Schd_T, HKCUCurVer, stylekey, AdHkRun, PConfig, YT_DL, M2dRun, Mag_, DWMFixS, WMPRun, MiDiRun, MiDi_, adh, ScpW, MiDir, winevents, winevents_i, Split_Tail, Split_Head, RiPpLe, ripoldm, t_x, t_Y, lo0, Grants_Son, mouse24, wintitlekey, procnamekey, classnamekey, OBJ4g, OBJFc, OBJCR, OBJDS, MNPPS, WIN_TARGET_DESC, MSG_WIN_TARGET, WINEVENT_SkpOROCESS, WINEVENT_OUTOFCONTEXT, OoC, Desktop_Margin, hooked_events, newhook, firefoxhandles, classeslast, clst_max_I, classeslast, Clss_, Pnamee_, AHkold, SysMetrix, Contextmenu 
+global mattdwmrun, Quoting, mmenuListTtl, MenuLablAr, MenuLablTitlAr, mmenuListLbl, Desk_Wi, Desk_Hi, FileListStr_Ar, hTargetPrev, wPrev, hPrev, xPrev, yPrev, hidegui, q_dlim, quotes, DEBUGTEST_HWND, hook4g, HookMb, HookCr, HookOD, HookFc, DEBUGTEST_FOC, hook4g, Proc4g_, AhkPath, HookMb, ProcMb_, ProcCr_, ProcDstroyd, procFc_, nnd, 1998, 1999, SkpO, old_focus1, old_focus2, old_focus3, old4gnd1, old4gnd2, old4gnd3, qstr, mattdwmrun2, test_move, SidebarPath, Path_PH, AHK_Rare, CleanME_PLZz, Schd_T, HKCUCurVer, stylekey, AdHkRun, PConfig, YT_DL, M2dRun, Mag_, DWMFixS, WMPRun, MiDiRun, MiDi_, adh, ScpW, MiDir, winevents, winevents_i, Split_Tail, Split_Head, RiPpLe, ripoldm, t_x, t_Y, lo0, Style_Men_arr_, mouse24, wintitlekey, procnamekey, classnamekey, OBJ4g, OBJFc, OBJCR, OBJDS, MNPPS, WIN_TARGET_DESC, MSG_WIN_TARGET, WINEVENT_SkpOROCESS, WINEVENT_OUTOFCONTEXT, OoC, Desktop_Margin, hooked_events, newhook, firefoxhandles, classeslast, clst_max_I, classeslast, Clss_, Pnamee_, AHkold, SysMetrix, Contextmenu 
  
 global TargetHandle, old_classfocus2, old_classfocus1, old_classfocus3, old_classfocus4, hWnd4st, classhwlast, classeslast2, classhwlast2, clht_max_I, clht2_max_I, TBBUTTON, vCount, extension_set, alignment, Gui_W, GuiRolled, met_desc, copy, Gui_lastclass_W, Gui_lastclass_H, Gui_extended, Windle, hookreadonly, count23, list_death, icon_clhw_arr, icon_cl_arr, icon_PN_arr, icon_tt_arr, icon_style_arrnew_PN, new_style, new_exstyle, onlytt, onlypn, onlycl, syscols, action_, act, typeid, IProcName, IClass, ITitle, pn_, cl_, tt_
 
@@ -1779,8 +1777,9 @@ clht2_max_I := 0
 clst2_max_I := 0
 
  ;	^-=___=-^ 	 ;-=-=;'`'``''`'`'``''`'`'``''`'`'`
+ 
 tt := 800 			     ; default tooltip timeout
-loop, parse,% "ArrayProc,ArrayClass,ArrayTitle,Array_LProc,Array_LTitle,Array_LClass,MenuLablAr,MenuLablTitlAr,FileListStr_Ar,quotes,winevents_i,winevents,hooked_events,Grants_Son,firefoxhandles,classeslast,classhwlast,classeslast2,classhwlast2,icon_clhw_arr,icon_cl_arr,icon_PN_arr,icon_tt_arr,icon_style_arr", `,
+loop, parse,% "ArrayProc,ArrayClass,ArrayTitle,Array_LProc,Array_LTitle,Array_LClass,MenuLablAr,MenuLablTitlAr,FileListStr_Ar,quotes,winevents_i,winevents,hooked_events,Style_Men_arr_,firefoxhandles,classeslast,classhwlast,classeslast2,classhwlast2,icon_clhw_arr,icon_cl_arr,icon_PN_arr,icon_tt_arr,icon_style_arr", `,
 	%A_loopfield% := []  ; array_inits:
 
 mmenuListTtl := "4ground hook tip/focus hook tip/obj_create tip/obj_destroy tip/msgbox hook tip/Toggle debug/Toggle Sidebar off/DWM_Axnt_fix/LoadAeroRegKeyz/Launch PowerConfig/Launch MattDWM/Launch M2Drag/Launch WMP_MATT/Launch midi_in_out/Launch AdHkRun/Launch YouTube_DL/Launch test_move/Launch screen clean!/CLSIDS Folders/SetSysCols"
@@ -1840,26 +1839,26 @@ OBJ4g := 0x0003, OBJFc:=0x8005, OBJCR := 0x8000, OBJDS := 0x8001, MNPPS := 0x000
 DESKTOP_AREA= %AHk64% "C:\Script\AHK\Desktop_Set-Workarea.ahk"
 
 stylearr:=[]
-stylearr["toggle_sysmenu"]    := "^0x00080000"
-stylearr["toggle_DLGFRAME"]   := "^0x00400000"
-stylearr["toggle_thickframe"] := "^0x00040000"
-stylearr["toggle_border"]     := "^0x00040000"
-stylearr["toggle_MinBox"]     := "^0x00020000"
-stylearr["toggle_Maxbox"]     := "^0x00010000"
-stylearr["toggle_hscroll"]    := "^0x00100000"
-stylearr["toggle_vscroll"]    := "^0x00200000"
+stylearr["toggle_sysmenu"]     :=  "^0x00080000"
+stylearr["toggle_DLGFRAME"]    :=  "^0x00400000"
+stylearr["toggle_thickframe"]  :=  "^0x00040000"
+stylearr["toggle_border"]      :=  "^0x00040000"
+stylearr["toggle_MinBox"]      :=  "^0x00020000"
+stylearr["toggle_Maxbox"]      :=  "^0x00010000"
+stylearr["toggle_hscroll"]     :=  "^0x00100000"
+stylearr["toggle_vscroll"]     :=  "^0x00200000"
 
 stylexarr:=[]
-stylexarr["toggle_modalframe"] := "^0x00000001"
-stylexarr["toggle_raisededge"] := "^0x00000100"
-stylexarr["toggle_sunkenedge"] := "^0x00000100"
-stylexarr["toggle_staticedge"] := "^0x00020000"
-stylexarr["toggle_3dedge"]     := "^0x00020000"
-stylexarr["toggle_LeftScroll"] := "^0x00004000"
-stylexarr["toggle_Clickthru"]  := "^0x00000020"
-stylexarr["toggle_RightAlign"] := "^0x00001000"
-stylexarr["toggle_RightoLeft"] := "^0x00002000"
-stylexarr["toggle_AppWindow"]  := "^0x00040000"
+stylexarr["toggle_modalframe"] :=  "^0x00000001"
+stylexarr["toggle_raisededge"] :=  "^0x00000100"
+stylexarr["toggle_sunkenedge"] :=  "^0x00000100"
+stylexarr["toggle_staticedge"] :=  "^0x00020000"
+stylexarr["toggle_3dedge"]     :=  "^0x00020000"
+stylexarr["toggle_LeftScroll"] :=  "^0x00004000"
+stylexarr["toggle_Clickthru"]  :=  "^0x00000020"
+stylexarr["toggle_RightAlign"] :=  "^0x00001000"
+stylexarr["toggle_RightoLeft"] :=  "^0x00002000"
+stylexarr["toggle_AppWindow"]  :=  "^0x00040000"
 
 donothing:
 return,
@@ -2021,8 +2020,8 @@ IL_Add(hIL, "C:\Icon\48\chrome_48.ico", 0)
 IL_Add(hIL, "C:\Icon\48\paste_send_to48.ico", 0)
 IL_Add(hIL, "C:\Icon\48\Star (4).ico", 0) 
 
-GLOBAL GUISYS_LVW := 890
-GLOBAL Gui_sysL_H := 890
+GUISYS_LVW := 890
+Gui_sysL_H := 890
 gui, Gui_sys:Add, ListView, gTranny vCopy x0 y0 Checked ReadOnly w%GUISYS_LVW% h%Gui_sysL_H% +E0x4000 0x4 LV0x8200 Grid R38 +Multi NoSort NoSortHdr, Sys-Event|Description|Value
  LV_ModifyCol(1, "180 Text"), LV_ModifyCol(2, "Text 600"), LV_ModifyCol(3, "Text c0xFF2211 80")  
  GuiControl, +Report, tranny
@@ -2038,9 +2037,8 @@ gui, Gui_sys:Add, ListView, gTranny vCopy x0 y0 Checked ReadOnly w%GUISYS_LVW% h
 	if !detected
 		LV_Add("-Select",t_Ind, winevents_i[ index ],winevents[ index ])	
 	if !list_death
-		list_death:= max_index . ","
-	list_death:= list_death . max_index . ","
-	
+		list_death := max_index . ","
+	list_death := list_death . max_index . ","
 	detected :=
 }
 GLOBAL GUISYS_TB_Y := Gui_sysL_H + 10 
@@ -2079,9 +2077,6 @@ if hTB
 OnMessage(   0x111, "WM_COMMAND")
 OnMessage(   0x201, "WM_LBUTTONDOWN")
 return,
-cock:
-msgbox cock
-return
 
 WM_LBUTTONDOWN(wParam, lParam) 						{
 	global xxx := lParam & 0xFFFF
@@ -2129,7 +2124,7 @@ return,
 extension_toggle:
 extension_set:=!extension_set
 goto, GoGoGadget_Gui 
-return
+
 
 ~Escape::
 if !(winactive("ahk_id " Windle))
