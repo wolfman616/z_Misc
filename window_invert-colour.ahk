@@ -11,11 +11,11 @@ menu, tray, standard
 
 global Matrix
 
-Matrix := 	"-1|0|0|0|0|"
-. 				"0|-1|0|0|0|"
-. 				"0|0|-1|0|0|"
-. 				"0|0|0|1|0|"
-. 				"1|1|1|0|1"
+Matrix := 	"-1| 0| 0| 0| 0|"
+. 		" 0|-1| 0| 0| 0|"
+. 		" 0| 0|-1| 0| 0|"
+. 		" 0| 0| 0| 1| 0|"
+. 		" 1| 1| 1| 0| 1"
 
 gui, +HWNDhgui +AlwaysOnTop
 DllCall("GetWindowBand", "ptr", hgui, "uint*", band)
