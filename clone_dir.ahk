@@ -7,7 +7,7 @@ menu, tray, add, Open Script Folder, Open_ScriptDir
 menu, tray, standard
 clsidTHISpc:="::{20d04fe0-3aea-1069-a2d8-08002b30309d}"
 Thread, NoTimers
-FileSelectFolder, destpath, %clsidTHISpc% , 4, % " fuck off "
+FileSelectFolder, destpath, %clsidTHISpc% , 4, % " select path... "
 Thread, NoTimers, false
 if !destpath
 	exitapp
