@@ -42,7 +42,7 @@ T4ilH00k( wParam,lParam ) {
 				pname_list := StrReplace(pname_list, a:=(Format("{:#x}", lParam) , ""))
 					tt(("HSHELL_WINDOWDESTROYED " . pname . " - " . a), 1000)
 			}
-	  else,	if instr(Clas5_list, (Format("{:#x}", lParam))) {
+	         else,	if instr(Clas5_list, (Format("{:#x}", lParam))) {
 				Clas5_list := StrReplace(Clas5_list, a:=(Format("{:#x}", lParam) , ""))
 					tt(("HSHELL_WINDOWDESTROYED " . Clas5 . " - " . a), 1000)
 }	}		}
