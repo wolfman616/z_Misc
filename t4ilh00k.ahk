@@ -49,7 +49,7 @@ T4ilH00k( wParam,lParam ) {
 	
 Open_Containing_ii(target_uncpath, HighlightDisabledonFile="") {
 	SplitPath, target_uncpath, OutFileName, OutDir, OutExtension
-	if OutExtension && !HighlightDisabledonFile ; highlight target is a file? & if the option arg isnt declared to disable the prior
+	if OutExtension && !HighlightDisabledonFile ; highlight target is a file?
 		highlight_file := "/select,"
 	run,% (comspec " /C explorer.exe " . highlight_file . target_uncpath),, hide
 	;run,% "explore " target_uncpath
