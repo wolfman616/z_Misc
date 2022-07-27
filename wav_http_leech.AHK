@@ -16,14 +16,13 @@ Fileread, HTML_Data, %F1%
 if ErrorLevel
 	{
 	urlDownloadToFile,%url%,%f1%
-	if ErrorLevel
-		{			
-		TrayTip, %Domain%, ERROR %error%`n%url%
-		Filedelete %F1%
-		exit
-		}
+	if ErrorLevel {			
+		TrayTip,%  Domain,% "ERROR " error "`n" url
+		Filedelete, %F1%
+		exit,
+	}
 	FileRead, HTML_Data, %f1%
-	FileDelete %F1%
+	FileDelete, %F1%
 	p:= 1,	Matched_String:= ""
 	While p := RegExMatch(HTML_Data, NeedleWav, Matched_String, p + StrLen(Matched_String)) {
 	WAV_Index := WAV_Index + 1, p := p + StrLen(Matched_String), Link_Match := StrReplace(Matched_String, "\" , "")		

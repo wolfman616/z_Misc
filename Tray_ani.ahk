@@ -9,9 +9,9 @@ setWorkingDir,% 		a_scriptDir
 
 #INCLUDE C:\Script\AHK\- LiB\Trayicon.ahk ;#INCLUDE C:\Script\AHK\- LiB\TrayIcon_GetInfo.ahk
 
-global frames, fps_desired, fps_sleep, Playing, anus, HN, NID, max_index, fileinfo, fileinfo3, steam_iconhandle
+global frames, fps_desired, fps_sleep, Playing, trarray, HN, NID, max_index, fileinfo, fileinfo3, steam_iconhandle
 
-fps_desired := 12, fps_sleep := ( 1000 / fps_desired ), anus := []
+fps_desired := 12, fps_sleep := ( 1000 / fps_desired ), trarray := []
 
 ;hnd:=winexist("wmp_Matt.ahk")  
 
@@ -32,25 +32,25 @@ if (framecount()) {
 		FileSelectFile, filePath ,,% "D:\Documents\My Pictures\",% "select",% "iCO Files (*.ICO)"
 }	}
 
- anus := ( ad := TrayIcon_GetInfo() ) ; get all tray items !anus := TrayIcon_GetInfo("MSIAfterburner.exe")
+ trarray := ( ad := TrayIcon_GetInfo() ) ; get all tray items !trarray := TrayIcon_GetInfo("MSIAfterburner.exe")
 
- ;msgbox % "uid " anus[1].uid "`nhwnd " anus[1].hwnd "`nidcmd "  anus[1].idcmd "`npid " anus[1].pid "`nidx " anus[1].idx "`nhicon " anus[1].hicon "`nlocation " anus[1].tray "`npname " anus[1].process "`nclss "  anus[1].class  ; 
+ ;msgbox % "uid " trarray[1].uid "`nhwnd " trarray[1].hwnd "`nidcmd "  trarray[1].idcmd "`npid " trarray[1].pid "`nidx " trarray[1].idx "`nhicon " trarray[1].hicon "`nlocation " trarray[1].tray "`npname " trarray[1].process "`nclss "  trarray[1].class  ; 
  
 gosub, tray_count
 
 loop %max_index% { 
-	; tt:= tt . " " . ( ringpiece := anus[a_index].process)
-	ringpiece := anus[a_index].process
-	switch ringpiece {
+	; tt:= tt . " " . ( P_N := trarray[a_index].process)
+	P_N := trarray[a_index].process
+	switch P_N {
 		case "Wacom_TabletUser.exe":
-			loc:= anus[a_index].tray
+			loc:= trarray[a_index].tray
 			if !(loc = "Shell_TrayWnd") { 
 				tooltip % "Located in Tray: "   target_orig:=a_index " (Overflow)" ;	TrayIcon_Move(2,4)
-				;msgbox % (ringp := anus[a_index].idx  ) "`n"  (ring := anus[a_index].uid  ) 
+				;msgbox % (ringp := trarray[a_index].idx  ) "`n"  (ring := trarray[a_index].uid  ) 
 			}
-			hnd := anus[a_index].hwnd
+			hnd := trarray[a_index].hwnd
 		case "steam.exe":
-			hh := (anus[a_index].hwnd), uu := (anus[a_index].uid)
+			hh := (trarray[a_index].hwnd), uu := (trarray[a_index].uid)
 			TrayIcon_Set(hh,uu,steam_iconhandle,0, 0)
 }	}  
 ; tooltip,% tt
@@ -126,7 +126,7 @@ return,
 
 tray_count:
 loop 
-	if (ldoc:= anus[a_index].hicon)
+	if (ldoc:= trarray[a_index].hicon)
 		max_index := a_index 
 	else, break
 return,
@@ -151,7 +151,7 @@ TrayIcon_Move(hot, hot+1)
 tooltip % TrayIcon_GetInfo(hot+1)
 return
 ^up::
-tooltip, % "sfdf " . anuss:=TrayIcon_Button("AutoHotkey.exe", sButton := "R", bDouble := true, index := 1)
+tooltip, % "sfdf " . trarrays:=TrayIcon_Button("AutoHotkey.exe", sButton := "R", bDouble := true, index := 1)
 as:=NumGet(fileinfo, 0, "Ptr")
 ;        settimer, Icon_animation_loop_init, -200msgbox % TrayIcon_Set(hnd, 1028,hic, 0, 0), 0,0)
         settimer, Icon_animation_loop_init, -200

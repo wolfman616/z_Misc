@@ -1,3 +1,6 @@
+; spurious GFI Imagery layera to cover up w10 / aeroglass watermark along with a somewhat nonstandard uiband minhook dll injection (adopted from ahk forums / likely broken further).
+; ctrl + alt + escape to exit
+
 #NoEnv 
 #Notrayicon
 #persistent
@@ -8,24 +11,24 @@ coordMode,    ToolTip, Screen
 coordmode,    Mouse,   Screen
 #include      <GDI+_All.ahk>
 
-; create 1 pic
-ImgFilePath   :=  "C:\Script\AHK\Psych0s1s2bg.png" ; spurious layer designed to cover up watermark
+; 1st pic
+ImgFilePath   :=  "C:\Script\AHK\Psych0s1s2bg.png" 
 gui_zpos      :=  "aot" 
-gui_pos       :=  "x3541 y1010"  ; gets recalculated later
+gui_pos       :=  "x3541 y1010"  ; recalculated later
 gui_noactiv8  :=  "noactivate"
 
 1mgdr4w(ImgFilePath, 1, "br", "br", "neither always on top nor UI_BAND") 
 
-; create 2nd pic
-ImgFilePath   :=  "C:\Script\AHK\Psych335.png"     ; the desired image
+; 2nd pic
+ImgFilePath   :=  "C:\Script\AHK\Psych335.png"     ;  desired image
 gui_zpos      :=  "+UIBand" 
-gui_pos       :=  "x3541 y1010"  ; gets recalculated later
+gui_pos       :=  "x3541 y1010"  ; recalculated later
 gui_noactiv8  :=  "noactivate"
 
 1mgdr4w(ImgFilePath, 2, "br", "br", "UIBand") 
 return,
 
-~^!escape:: ctl alt escape
+~^!escape:: 
 GuiClose:
 GuiEscape:
 exitapp,
@@ -68,47 +71,46 @@ exitapp,
 	else {
 		if (zpos = "UIBand")
 			ourBand := 2   ; ZBID_UIACCESS
-			
+		
 		code =
 		(LTrim
 		   SetWorkingDir, %A_ScriptDir%
 		   #Include %A_ScriptDir%\Lib\MinHook.ahk
 		   address_SetWindowBand := DllCall("GetProcAddress", Ptr, DllCall("GetModuleHandle", Str, "user32", "Ptr"), AStr, "SetWindowBand", "Ptr")
 		   hook1 := New MinHook("", address_SetWindowBand, "SetWindowBand_Hook")
-		   hook1.Enable()
-		  ; send {LWin}
-		   return
+		   hook1.Enable() ; send {LWin}
+		   return,
 
 			SetWindowBand_Hook(hWnd, hwndInsertAfter, dwBand) {
 			  global hook1
 			  hg=hGui%id_num%
 			  global (%hg%)
-			  return DllCall(hook1.original, "ptr",%hg%, "ptr", 0, "uint", %ourBand%)
-			}
-		)
+			  return DllCall(hook1.original,"ptr",%hg%,"ptr",0,"uint",%ourBand%)
+		}	}
 		
 		Process, Exist, explorer.exe
 		pid := ErrorLevel
-		dllFile := FileExist("AutoHotkeyMini.dll") ? A_ScriptDir "C:\Script\AHK\- LiB\minhook\x32\AutoHotkeyMini.dll"
-				  : (A_PtrSize = 8)                ?             "C:\Script\AHK\- LiB\minhook\x64\AutoHotkeyMini.dll"
-				  :  A_ScriptDir "\ahkDll\x32\AutoHotkeyMini.dll"
+		dllFile:=FileExist("AutoHotkeyMini.dll") ? A_ScriptDir "C:\Script\AHK\- LiB\minhook\x32\AutoHotkeyMini.dll"
+			      : (A_PtrSize = 8)              ?             "C:\Script\AHK\- LiB\minhook\x64\AutoHotkeyMini.dll"
+				  :  A_ScriptDir . "\ahkDll\x32\AutoHotkeyMini.dll"
 		rThread := InjectAhkDll(pid, dllFile, "")
 		rThread.Exec(code)
 		AppVisibility := ComObjCreate(CLSID_AppVisibility := "{7E5FE3D9-985F-4908-91F9-EE19F9FD1514}", IID_IAppVisibility := "{2246EA2D-CAEA-4444-A3C4-6DE827E44313}")
-		settimer poon, -2000
+		settimer, uibinit, -2000
 		rThread := ""
-				return, hGui%id_num%
-		poon:
+		return, hGui%id_num%
+		
+		uibinit:
 		if (DllCall(NumGet(NumGet(AppVisibility+0)+4*A_PtrSize), "Ptr", AppVisibility, "Int*", fVisible) >= 0)   {
 			if (fVisible = 1) 
-				settimer, rapist , -1
-		return,  
-		;send {LWin}
-		rapist:
-		   if (DllCall("GetWindowBand", "ptr", (hGui%id_num%), "uint*", pdwBand) = 1) 
-			  if (pdwBand = ourBand)
-				return
-		   else, settimer, rapist, -2000
+				settimer, uibcheck , -1 ; send {LWin}
+			return,  
+		
+			uibcheck:
+			   if (DllCall("GetWindowBand", "ptr", (hGui%id_num%), "uint*", pdwBand) = 1) 
+				  if (pdwBand = ourBand)
+					return
+			   else, settimer, uibcheck, -2000
 		}
 		rThread := ""
 		return, hGui%id_num%
