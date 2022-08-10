@@ -4,7 +4,7 @@
 DetectHiddenWindows,%  "On"
 ;DetectHiddenText,%    "On"
 SetTitleMatchMode,%    "2"		
-;SetTitleMatchMode,%   "Slow" 
+SetTitleMatchMode,%   "Slow" 
 setWorkingDir,% 		a_scriptDir
 
 #INCLUDE C:\Script\AHK\- LiB\Trayicon.ahk ;#INCLUDE C:\Script\AHK\- LiB\TrayIcon_GetInfo.ahk
