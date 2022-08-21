@@ -10,6 +10,6 @@ DwmGetColorizationColor(byref Colour="", byref Opacity="") {
 	dllCall("Dwmapi.dll\DwmGetColorizationColor","Int",
 	. &pcrColorization,"Ptr",&pfOpaqueBlend,"Ptr")
 	Opacity := numget(pfOpaqueBlend, 0,2)
-	return, (Colour:=Format("{:#x}",numget(pcrColorization,0,a_ptrsize)))
+	return, (Colour := Format("{:#x}",numget(pcrColorization,0,a_ptrsize)))
 }
 ;;;;; msgbox % Send_Msg(0x320, winexist("ahk_exe explorer.exe"),"0x99ff0000", 1) ; WM_DWMCOLORIZATIONCOLORCHANGED

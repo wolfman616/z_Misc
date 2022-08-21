@@ -3,14 +3,11 @@
 
 ;SPI_GETGRADIENTCAPTIONS 0x1008
 toggle: ; test!
-thread_LocalInput := True 
-thread_LocalInput := false 
-go:=DllCall("SystemParametersInfo","UInt",0x0049,"UInt",0,"UInt",1,"UInt",1,"UInt")
+thread_LocalInput := True
+go:=DllCall("SystemParametersInfo","UInt",0x1008,"UInt",0,"UInt",&thread_LocalInput,"UInt",0,"UInt")
 msgbox,0,Result1,% "Current: " - go - (!thread_LocalInput ? "Off" : "On")  " - ( flappin )",2000
 
 exit
-go:=DllCall("SystemParametersInfo","UInt",0x1017,"UInt",0,"UInt",1,"UInt",1,"UInt")
-go:=DllCall("SystemParametersInfo","UInt",0x1019,"UInt",0,"UInt",0,"UInt",1,"UInt")
 actual:=SPI_THREADLOCALINPUT()
 go:=DllCall("SystemParametersInfo","UInt",0x104E,"UInt",0,"UInt",&thread_LocalInput,"UInt",0,"UInt")
 ;msgbox % actual result confirms
