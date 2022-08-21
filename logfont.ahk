@@ -10,6 +10,25 @@ SetKeyDelay, -1
 ;SetStoreCapsLockMode, OFF
 ;#KeyHistory,         	10
 ;  ListLines,           	off
+-------------------separator
+Open Containing Dir
+Open Containing Dir
+Invert selection
+&Copy file-path
+&Copy file-contents
+&nignogcattlelord
+&poo0p
+-------------------separator
+Cu&t
+&Copy
+-------------------separator
+Create &shortcut
+&Delete
+Rena&me
+-------------------separator
+Se&nd to
+7-Zip
+File-admin,
 #maxhotkeysPerInterval, 1440
 #maxThreadsPerhotkey,	1
 DetectHiddenText, 		On
@@ -17,20 +36,20 @@ DetectHiddenWindows, 	On
 settitlematchmode,		2 
 settitlematchmode,		slow
 #IfTimeout 120
-;setbatchlines,        	    -1
+;setbatchlines,        	-1
 SetWinDelay,         	-1
 global lf,offset,r,IM
-; global ICONMETRICS:="
+; ICONMETRICSW_STRUCT
+; global IM:="
 ; (
   ; UINT cbSize;
   ; INT iHorzSpacing;
   ; INT iVertSpacing;
   ; INT iTitleWrap;
-  ; HFONT lf;
+  ; HFONT LF;
 ; )"
-msgbox % LOGFONTSize := 46 * (A_IsUnicode ? 2 : 1 ) 
+msgbox % szLF := 46 * (A_IsUnicode ? 2 : 1 ) 
  
-; ICONMETRICSW_STRUCT
 VarSetCapacity(IM, 108) 
 NumPut(108, IM, 0, "uInt") 
 success := DllCall("SystemParametersInfoW", "UInt", 0x002D, "UInt", 108, "uint", &IM, "uint", 0, "Uint")      ; Enable
@@ -38,45 +57,28 @@ success := DllCall("SystemParametersInfoW", "UInt", 0x002D, "UInt", 108, "uint",
 offset:=42
 loop, parse,% "Continuum Light", 
 	numput(asc(a_loopfield), IM ,offset += 1, "char")
-	 
-	
-	
-	
 success := DllCall("SystemParametersInfoW", "UInt", 0x002E, "UInt", 108, "uint", &IM, "uint", 1, "Uint")      ; Enable
 VarSetCapacity(IM, 108)
 NumPut(108, IM, 0, "uInt") 
-	success := DllCall("SystemParametersInfoW", "UInt", 0x002D, "UInt", 108, "uint", &IM, "uint", 0, "Uint")      ; Enable
-	
-	
-	 
-	
+success := DllCall("SystemParametersInfoW", "UInt", 0x002D, "UInt", 108, "uint", &IM, "uint", 0, "Uint")      ; Enable
 offset:=42
+pull_:=""
+While (offset < 108)
+	(ad:=chr(NumGet(IM, offset += 1, "Char") ),	pull_.= ad, aa:=a_index) ;msgbox % offset "`n" ad
 
-anus:=""
- While (offset < 108){
-			ad:=chr(NumGet(IM, offset += 1, "Char") )
-			anus.= ad
-			;msgbox % offset "`n" ad
-  aa:=a_index
- 
-		}
-		msgbox % "resul! " anus "`n" aa
+msgbox % "resul! " pull_ "`n" aa
 sizeT:=96
 ;spiHFONT:= NumGet(&IM,  16, 92) 
- 
-VarSetCapacity(lf, LOGFONTSize)
-NumPut(spiHFONT,lfw, 0, "uInt")
-;VarSetCapacity(LF, LOGFONTSize, 0)
-
+VarSetCapacity(lf, szLF)
+;NumPut(spiHFONT,lfw, 0, "uInt")
+VarSetCapacity(&LF, szLF, 0)
 numput(-22, &LF, 0, "long") ;Height
 numput(0,   &LF, 4, "long") ;Width
 numput(0,   &LF, 8, "long") ;Escapement
 numput(0,   &LF, 12, "long") ;Orientation
 numput(400, &LF, 16, "long") ;Weight
-;a_ptrsize 
 offset := 16
 msgbox % NumGet(&LF, 16 , "long")
-
 ; Of Type BYTE
 numput(0, &LF, 7 + offset, "byte") ;Italic Verified
 numput(0, &LF, 8 + offset, "byte") ;Underline Verified
@@ -86,24 +88,38 @@ numput(1, &LF, 11 + offset, "byte") ;OutPrecision
 numput(0, &LF, 5 + offset, "byte") ;ClipPrecision
 numput(0, &LF, 6 + offset, "byte") ;Quality
 numput(144, &LF, 4 + offset, "byte") ;PitchAndFamily
-;msgbox % offset
-;r:="g"
-		offset:=27
+
+offset:=27
 
 loop, parse,% "Continuum Light", 
 	numput(asc(a_loopfield), &LF ,offset += 1, "char")
 	offset:=27
-anus:=""
- While (offset < LOGFONTSize){
+pull_:=""
+ While (offset < szLF){
 		ad:=chr(NumGet(&lf, offset += 1, "Char") )
-			anus .= ad 
+			pull_ .= ad 
 		}
-		msgbox % anus " fin" 
+		msgbox % pull_ " fin" 
 	
 return
 
-
- 
+^#c::
+winget rg,id,ahk_class RegEdit_RegEdit
+MouseGetPos, x, y, win
+WinGet, ActiveControlList, ControlListhwnd,  ahk_id %win%
+; msgbox % chr(NumGet(font0.hfont , 28 + a_index, "uChar"))
+Loop, Parse, ActiveControlList, `n
+{
+	SendMessage 0x0030, &lf, 1,, ahk_id %A_LoopField% ; SCI_STYLEGETFONT, STYLE_DEFAULT
+	sleep 2000
+	SendMessage 0x0030, 0, 1,, ahk_id %A_LoopField% ; SCI_STYLEGETFONT, STYLE_DEFAULT
+; 	font0 := New LOGFONT(A_LoopField)
+;	MsgBox, % "W`tH`n" pull_:= RegExReplace(font0.FaceName, "[^a-zA-Z ]") 	;0x0030
+;	MsgBox, % "Some LOGFONT Values`n`n" font0.Print()
+;	MsgBox, % "Test of UpdateFont`n`n" var "`n`n`n" "W`tH`n" font0.print()
+}
+exit
+	
 ; dik:= a_index 
 ; }
 ; loop %dik% {
@@ -117,48 +133,14 @@ return
 ; numput("Continuum Light", LF, 71 + offset, "str") ;FaceName
 ;4 * 0 + offset +72
 
-^#c::
-winget rg,id,ahk_class RegEdit_RegEdit
-MouseGetPos, x, y, win
-WinGet, ActiveControlList, ControlListhwnd,  ahk_id %win%
-; msgbox % chr(NumGet(font0.hfont , 28 + a_index, "uChar"))
-
-Loop, Parse, ActiveControlList, `n
-	{
-
-	    
-SendMessage 0x0030, &lf, 1,, ahk_id %A_LoopField% ; SCI_STYLEGETFONT, STYLE_DEFAULT
-sleep 2000
-SendMessage 0x0030, 0, 1,, ahk_id %A_LoopField% ; SCI_STYLEGETFONT, STYLE_DEFAULT
-; font0 := New LOGFONT(A_LoopField)
-
-;MsgBox, % "W`tH`n" anus:= RegExReplace(font0.FaceName, "[^a-zA-Z ]") 
-;0x0030
-;MsgBox, % "Some LOGFONT Values`n`n" font0.Print()
-;MsgBox, % "Test of UpdateFont`n`n" var "`n`n`n" "W`tH`n" font0.print()
-
-
-		}
-	
-		exit
-	
-
-
-
-
 WinGet, ActiveControlList, ControlListhwnd,  ahk_id %rg%
 Loop, Parse, ActiveControlList, `n
 {
-	
     SendMessage 0x0030, &font0.hfont, 1,, ahk_id %A_LoopField% ; SCI_STYLEGETFONT, STYLE_DEFAULT
-	
-	
 	msgbox % errorlevel
-	
-	}
-  ; SendMessage 0x31, 0, 0, , ahk_id %hWnd% ; WM_GETFONT
-
-		;thHFONT := DllCall("SendMessage", "Ptr", rg, "UInt", &font0, "Ptr", 1, "Ptr")
+}
+; 	SendMessage 0x31, 0, 0, , ahk_id %hWnd% ; WM_GETFONT
+;	thHFONT := DllCall("SendMessage", "Ptr", rg, "UInt", &font0, "Ptr", 1, "Ptr")
 exit
 Gui, Font, s15, Klingon
 GuiControl, Font, %Hwnd0%
@@ -261,8 +243,8 @@ Control_GetFont(hWnd, ByRef Name, ByRef Size, ByRef Style, IsGDIFontSize := 0) {
     }
 
     hFont := Errorlevel
-    VarSetCapacity(LOGFONT, LOGFONTSize := 60 * (A_IsUnicode ? 2 : 1 ))
-    DllCall("GetObject", "Ptr", hFont, "Int", LOGFONTSize, "Ptr", &LOGFONT)
+    VarSetCapacity(LOGFONT, szLF := 60 * (A_IsUnicode ? 2 : 1 ))
+    DllCall("GetObject", "Ptr", hFont, "Int", szLF, "Ptr", &LOGFONT)
 
     Name := DllCall("MulDiv", "Int", &LOGFONT + 28, "Int", 1, "Int", 1, "Str")
 
