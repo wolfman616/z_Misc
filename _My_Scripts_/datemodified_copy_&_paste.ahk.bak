@@ -8,7 +8,7 @@ Menu_ICO:="C:\Icon\20\dna 2.ico", Copy_Ico:="C:\Icon\20\copy.ico,0", Paste_ICO:=
 Menu, Tray, Icon, %Menu_ICO%
 While Match_Pos := RegExMatch(D8_2_Cpy, "[0-9]{14}", Match_Result, Match_Pos)
 	{
-	iF FileExist(D8_TARGET)	{
+	iF FileExist(D8_TARGET)	{	
 		FileRead, D8_2_Cpy, %D8_TARGET%
 
 		FileGetTime, Old_D8 , %1%, m
