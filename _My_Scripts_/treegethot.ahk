@@ -9,7 +9,7 @@ treegethot(action="") {
 	MyTV:= new RemoteTreeView(cwnd)
 	 cnt:= MyTV.GetCount()
 	root:= MyTV.GetRoot()
-	loop {
+	loop,{
 		cnt2++
 		TT(CNT2 "`n" cnt "`n" a_index)
 		sel:= MyTV.GetChild(root)
