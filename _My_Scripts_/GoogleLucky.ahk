@@ -1,15 +1,36 @@
-﻿Googlelucky(SearchTerm) {
-	regX:="(https:\/\/[^\(?:\&)" 
-	regX = %regx%"]*)
-	Dlim=";BeloWme!  ;        uRL      ; (to the Lucky End-point!)       '()
-	LuckyURL:=("http://www.google.com/search?q=" . SearchTerm . "&btnI") 
-	UrlDownloadToFile,%  LuckyURL,html ; temp.html-File- ; nc (method)! =`(
-	try,   Fileexist(    tUNC:=(A_ScriptDir . "\html"))    ; temp.universal-name-conventioned Path-Variable
-	try,   Fileread,     html,%    tUNC
-	try,   RegeXmatch(   html,regX,LuckyEndPoint)
-	try,   FileRecycle,% html
-	       Return,       LuckyEndPoint ; ( Definitely! ) 
-}     ;    ------========================> below was initial goal to implement but someone didnt remeber how to make reqs
+﻿; msgbox,% Googlelucky("https://www.google.com/url?q=https://learn.microsoft.com/en-us/training/")
+; return,
+
+Googlelucky(SearchTerm="",UA="",RedirectDtect="",openbrowser="") { ;DeFault TRUE
+	loop,parse,% "UA,RedirectDtect",`,
+		(%a_loopfield%):= (%RedirectDtect%=""? True : False)
+	(ua=1?	ua:="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36")
+	wb:= ComObjCreate("WinHttp.WinHttpRequest.5.1")
+	regX:="(https:\/\/(windows\/win32)+[^\(?:\&)]*[" chr(34) "]*)"
+	LuckySuRL:= ("http://www.google.com/search?q=" 
+	. (tern:= quote(SearchTerm)) . "&btnI")
+	if(!RedirectDtect) {
+		run,% LuckySuRL
+		return,
+	}
+	;msgbox % ua "`n " LuckySuRL
+	try,{
+		wb.open("GET",LuckySuRL) 
+		((ua!=1)	wb.SetRequestHeader("User-Agent",UA))
+		wb.Send()
+		wb.WaitForResponse()
+		clipboard:= pm:= wb.ResponseText
+		try,{
+			RegeXmatch(pm,regX,Lucky1stResult)
+			if(Lucky1stResult) {
+				run,% Lucky1stResult
+				;msgbox % Lucky1stResult
+				}
+			return,Lucky1stResult? Lucky1stResult : LuckySuRL
+		}
+	} catch,e
+		return,% e.message
+}	;    ------========================> below was initial goal to implement but some people didnt know how to make reqs
 /*  - STEP_NAME                          ; String := File.Read(_______SidegayZ__u______uttr_______) ; b3LL
       call: HTTP_REQUEST                 	; try{ ; only way to properly protect from an error here
       args:                              	; createFormData(rData,rHeader,data) ; formats & stores the data, rHeader header info,
