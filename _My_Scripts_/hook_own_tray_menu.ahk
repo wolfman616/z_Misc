@@ -26,7 +26,7 @@ main()
 return,
 
 main() {
-tooltip nigger
+tooltip test
 }
 
 menutray(){
